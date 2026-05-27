@@ -8,7 +8,7 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || ""
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || ""
 const BUCKET = process.env.CLOUDFLARE_R2_PUBLIC_BUCKET || "gaskuy-spot-images"
 const PREFIX = "dev"
-const PUBLIC_DOMAIN = process.env.R2_PUBLIC_DOMAIN || `${BUCKET}.r2.cloudflarestorage.com`
+const PUBLIC_DOMAIN = process.env.R2_PUBLIC_DOMAIN || `pub-1a37d792e7bc411380f4fed507dc7100.r2.dev`
 
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
   auth: { autoRefreshToken: false, persistSession: false },
@@ -27,11 +27,13 @@ async function main() {
   const { data: spots, error: spotErr } = await supabase.from("spots").select("id, slug, image_url")
   if (spotErr) { console.error("  ❌ Spots fetch error:", spotErr.message); return }
 
+  const OLD_DOMAIN = "gaskuy-spot-images.r2.cloudflarestorage.com"
+
   let spotUpdated = 0
   for (const spot of spots) {
-    if (!spot.image_url || spot.image_url.startsWith("http")) continue
-    const filename = spot.image_url.split("/").pop()
-    const newUrl = `${R2_BASE}/spots/${filename}`
+    if (!spot.image_url) continue
+    if (!spot.image_url.includes(OLD_DOMAIN)) continue
+    const newUrl = spot.image_url.replace(OLD_DOMAIN, PUBLIC_DOMAIN)
     const { error } = await supabase.from("spots").update({ image_url: newUrl }).eq("id", spot.id)
     if (!error) spotUpdated++
   }
@@ -44,9 +46,9 @@ async function main() {
 
   let prodUpdated = 0
   for (const product of products) {
-    if (!product.image_url || product.image_url.startsWith("http")) continue
-    const filename = product.image_url.split("/").pop()
-    const newUrl = `${R2_BASE}/products/${filename}`
+    if (!product.image_url) continue
+    if (!product.image_url.includes(OLD_DOMAIN)) continue
+    const newUrl = product.image_url.replace(OLD_DOMAIN, PUBLIC_DOMAIN)
     const { error } = await supabase.from("products").update({ image_url: newUrl }).eq("id", product.id)
     if (!error) prodUpdated++
   }

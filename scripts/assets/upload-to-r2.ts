@@ -9,7 +9,7 @@ const accountId = process.env.CLOUDFLARE_ACCOUNT_ID!
 const accessKeyId = process.env.CLOUDFLARE_R2_ACCESS_KEY_ID!
 const secretAccessKey = process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY!
 const bucketName = process.env.CLOUDFLARE_R2_PUBLIC_BUCKET!
-const publicDomain = process.env.R2_PUBLIC_DOMAIN || `${bucketName}.r2.cloudflarestorage.com`
+const publicDomain = process.env.R2_PUBLIC_DOMAIN || `pub-1a37d792e7bc411380f4fed507dc7100.r2.dev`
 
 const PREFIX = "dev" // change to "staging" or "prod" as needed
 

@@ -9,7 +9,7 @@ const env = process.env.VERCEL_ENV || "development"
 const envPrefix = env === "production" ? "prod" : env === "preview" ? "staging" : "dev"
 
 // Public domain — updates when custom domain is ready
-const PUBLIC_DOMAIN = process.env.R2_PUBLIC_DOMAIN || `${bucketName}.r2.cloudflarestorage.com`
+const PUBLIC_DOMAIN = process.env.R2_PUBLIC_DOMAIN || `pub-1a37d792e7bc411380f4fed507dc7100.r2.dev`
 
 export const r2Client = new S3Client({
   region: "auto",
