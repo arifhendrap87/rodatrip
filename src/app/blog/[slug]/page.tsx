@@ -2,42 +2,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import { SITE_NAME } from "@/lib/constants"
-
-interface BlogPost {
-  slug: string
-  title: string
-  excerpt: string
-  content: string
-  image_url: string
-  category: string
-  author: string
-  published_at: string
-  read_time: string
-  tags: string[]
-}
-
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-
-async function getPost(slug: string): Promise<BlogPost | null> {
-  try {
-    const res = await fetch(`${BASE_URL}/api/blog/${slug}`, { next: { revalidate: 3600 } })
-    if (!res.ok) return null
-    const json = await res.json()
-    return json.data
-  } catch {
-    return null
-  }
-}
-
-async function getPosts(): Promise<BlogPost[]> {
-  try {
-    const res = await fetch(`${BASE_URL}/api/blog`, { next: { revalidate: 3600 } })
-    const json = await res.json()
-    return json.data || []
-  } catch {
-    return []
-  }
-}
+import { getPosts, getPostBySlug } from "@/lib/services/blog"
 
 export async function generateStaticParams() {
   const posts = await getPosts()
@@ -46,7 +11,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
-  const post = await getPost(slug)
+  const post = await getPostBySlug(slug)
   if (!post) return {}
   return {
     title: `${post.title} — Blog — ${SITE_NAME}`,
@@ -57,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const post = await getPost(slug)
+  const post = await getPostBySlug(slug)
   if (!post) notFound()
 
   const allPosts = await getPosts()
@@ -78,8 +43,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-heading leading-tight">{post.title}</h1>
         <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
-          <span>Oleh {post.author}</span>
-          <span>•</span>
+          <span>Oleh {post.author}</span><span>•</span>
           <span>{new Date(post.published_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}</span>
         </div>
 
@@ -102,7 +66,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         </div>
 
         <div className="mt-10 flex flex-wrap gap-2">
-          {post.tags.map((tag: string) => (
+          {post.tags?.map((tag: string) => (
             <span key={tag} className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">#{tag}</span>
           ))}
         </div>

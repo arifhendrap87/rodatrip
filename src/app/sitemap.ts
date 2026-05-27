@@ -1,22 +1,18 @@
 import type { MetadataRoute } from "next"
-import { SITE_NAME } from "@/lib/constants"
+import { getSpots } from "@/lib/services/spots"
+import { getRoutes } from "@/lib/services/routes"
+import { getPosts } from "@/lib/services/blog"
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://gaskuy.id"
 
-async function fetchAPI(path: string) {
-  try {
-    const res = await fetch(`${BASE_URL}/api${path}`, { next: { revalidate: 3600 } })
-    const json = await res.json()
-    return json.data || []
-  } catch { return [] }
-}
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [spots, routes, blog] = await Promise.all([
-    fetchAPI("/spots?limit=100"),
-    fetchAPI("/routes"),
-    fetchAPI("/blog"),
+  const [spotsRes, routes, blog] = await Promise.all([
+    getSpots({ limit: 100 }),
+    getRoutes(),
+    getPosts(),
   ])
+
+  const { data: spots } = spotsRes
 
   const staticPages = [
     { url: BASE_URL, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 1.0 },
@@ -28,21 +24,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/faq`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.4 },
   ]
 
-  const routePages = (routes as any[]).map((route) => ({
+  const routePages = routes.map((route) => ({
     url: `${BASE_URL}/rute/${route.slug}`,
     lastModified: new Date(),
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }))
 
-  const spotPages = (spots as any[]).map((spot) => ({
+  const spotPages = spots.map((spot) => ({
     url: `${BASE_URL}/spot-istimewa/${spot.slug}`,
-    lastModified: new Date(),
+    lastModified: new Date(spot.updated_at),
     changeFrequency: "monthly" as const,
     priority: 0.8,
   }))
 
-  const blogPages = (blog as any[]).map((post) => ({
+  const blogPages = blog.map((post) => ({
     url: `${BASE_URL}/blog/${post.slug}`,
     lastModified: new Date(post.published_at),
     changeFrequency: "monthly" as const,

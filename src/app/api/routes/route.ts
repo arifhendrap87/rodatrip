@@ -1,13 +1,8 @@
-import { createClient } from "@supabase/supabase-js"
-import { success, badRequest, internalError, unauthorized } from "@/lib/api/response"
-import { createRouteSchema, updateRouteSchema } from "@/lib/validators/route"
+import { success, badRequest, unauthorized } from "@/lib/api/response"
+import { createRouteSchema } from "@/lib/validators/route"
 import { getServerAdmin } from "@/lib/api/auth"
-
-const adminClient = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { autoRefreshToken: false, persistSession: false } }
-)
+import { getRoutes } from "@/lib/services/routes"
+import { db } from "@/lib/services/db"
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
@@ -15,14 +10,16 @@ export async function GET(request: Request) {
   const destination = searchParams.get("destination")
   const search = searchParams.get("search")
 
-  let query = adminClient.from("routes").select("*").order("name")
-  if (origin) query = query.ilike("origin", `%${origin}%`)
-  if (destination) query = query.ilike("destination", `%${destination}%`)
-  if (search) query = query.ilike("name", `%${search}%`)
-
-  const { data, error } = await query
-  if (error) return internalError(error.message)
-  return success(data || [])
+  try {
+    const routes = await getRoutes()
+    let filtered = routes
+    if (origin) filtered = filtered.filter((r) => r.origin.toLowerCase().includes(origin.toLowerCase()))
+    if (destination) filtered = filtered.filter((r) => r.destination.toLowerCase().includes(destination.toLowerCase()))
+    if (search) filtered = filtered.filter((r) => r.name.toLowerCase().includes(search.toLowerCase()))
+    return success(filtered)
+  } catch {
+    return success([])
+  }
 }
 
 export async function POST(request: Request) {
@@ -34,12 +31,12 @@ export async function POST(request: Request) {
   if (!parsed.success) return badRequest(parsed.error.issues.map(e => e.message).join(", "))
 
   const slug = parsed.data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
-  const { data, error } = await adminClient
+  const { data, error } = await db
     .from("routes")
     .insert([{ ...parsed.data, slug }])
     .select("id, slug, name, created_at")
     .single()
 
-  if (error) return internalError(error.message)
+  if (error) return new Response(JSON.stringify({ error: { message: error.message } }), { status: 500 })
   return success(data, 201)
 }

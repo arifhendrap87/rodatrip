@@ -1,11 +1,5 @@
-import { createClient } from "@supabase/supabase-js"
-import { success, notFound, internalError } from "@/lib/api/response"
-
-const adminClient = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { autoRefreshToken: false, persistSession: false } }
-)
+import { success, notFound } from "@/lib/api/response"
+import { getRouteBySlug } from "@/lib/services/routes"
 
 const FUEL_PRICE = 10000
 const VEHICLES: Record<string, number> = {
@@ -14,28 +8,23 @@ const VEHICLES: Record<string, number> = {
 
 export async function GET(_request: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-
   const url = new URL(_request.url)
   const vehicle = url.searchParams.get("vehicle") || "mobil"
 
-  const { data: route, error } = await adminClient
-    .from("routes")
-    .select("*")
-    .eq("slug", slug)
-    .single()
-
-  if (error || !route) return notFound("Route")
+  const route = await getRouteBySlug(slug)
+  if (!route) return notFound("Route")
 
   const consumption = VEHICLES[vehicle] || VEHICLES.mobil
   const distance = Number(route.distance_km) || 0
-  const fuelLiters = distance / consumption
-  const fuelCost = Math.round(fuelLiters * FUEL_PRICE)
+  const fuelCost = Math.round((distance / consumption) * FUEL_PRICE)
 
   return success({
-    distanceKm: distance,
-    fuelCost,
-    fuelLiters: Math.round(fuelLiters * 10) / 10,
-    totalCost: fuelCost,
-    vehicle,
+    ...route,
+    estimate: {
+      distanceKm: distance,
+      fuelCost,
+      fuelPrice: FUEL_PRICE,
+      vehicleConsumption: consumption,
+    },
   })
 }

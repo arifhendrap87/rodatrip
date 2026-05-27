@@ -1,37 +1,8 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { SITE_NAME } from "@/lib/constants"
+import { getRoutes, getRouteBySlug } from "@/lib/services/routes"
 import { RouteDetailClient } from "./client"
-
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-
-interface APIRoute {
-  id: string
-  name: string
-  slug: string
-  origin: string
-  destination: string
-  distance_km: number
-  duration_hours: number
-  polyline: [number, number][]
-}
-
-async function getRoute(slug: string): Promise<APIRoute | null> {
-  try {
-    const res = await fetch(`${BASE_URL}/api/routes/${slug}`, { next: { revalidate: 3600 } })
-    if (!res.ok) return null
-    const json = await res.json()
-    return json.data
-  } catch { return null }
-}
-
-async function getRoutes(): Promise<APIRoute[]> {
-  try {
-    const res = await fetch(`${BASE_URL}/api/routes`, { next: { revalidate: 3600 } })
-    const json = await res.json()
-    return json.data || []
-  } catch { return [] }
-}
 
 export async function generateStaticParams() {
   const routes = await getRoutes()
@@ -40,18 +11,18 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
-  const route = await getRoute(slug)
+  const route = await getRouteBySlug(slug)
   if (!route) return { title: "Rute Tidak Ditemukan" }
   return {
     title: `${route.origin} → ${route.destination} — Rute Roadtrip ${SITE_NAME}`,
     description: `Rute ${route.origin} ke ${route.destination} lengkap dengan POI, info jalan, dan estimasi biaya. ${route.distance_km} km perjalanan.`,
-    openGraph: { title: `${route.origin} → ${route.destination} - Rute`, description: `Rute ${route.origin} ke ${route.destination}: ${route.distance_km} km dengan POI menarik di sepanjang jalan.`, locale: "id_ID", type: "article" },
+    openGraph: { title: `${route.origin} → ${route.destination} - Rute`, description: `Rute ${route.origin} ke ${route.destination}: ${route.distance_km} km.`, locale: "id_ID", type: "article" },
   }
 }
 
 export default async function RouteDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const route = await getRoute(slug)
+  const route = await getRouteBySlug(slug)
   if (!route) notFound()
 
   const fuelCost = Math.round(route.distance_km * 12500 / 11)
@@ -65,12 +36,11 @@ export default async function RouteDetailPage({ params }: { params: Promise<{ sl
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <h1 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight">{route.origin} → {route.destination}</h1>
-            <p className="mt-2 text-lg text-muted-foreground">Rute sejauh {route.distance_km} km dengan POI menarik di sepanjang jalan.</p>
+            <p className="mt-2 text-lg text-muted-foreground">Rute sejauh {route.distance_km} km.</p>
             <div className="mt-6 hidden lg:flex gap-8 py-4 border-y border-border/50">
               <div><p className="text-2xl font-bold font-heading text-primary">{route.distance_km}</p><p className="text-xs text-muted-foreground">Kilometer</p></div>
               <div><p className="text-2xl font-bold font-heading text-secondary">{Math.round(route.distance_km / 60)}</p><p className="text-xs text-muted-foreground">Jam perjalanan</p></div>
-              <div><p className="text-2xl font-bold font-heading text-accent">-</p><p className="text-xs text-muted-foreground">POI</p></div>
-              <div><p className="text-2xl font-bold font-heading">Rp {(totalCost / 1000).toFixed(0)}k</p><p className="text-xs text-muted-foreground">Estimasi biaya</p></div>
+              <div><p className="text-2xl font-bold font-heading text-accent">Rp {(totalCost / 1000).toFixed(0)}k</p><p className="text-xs text-muted-foreground">Estimasi biaya</p></div>
             </div>
           </div>
           <div className="flex flex-col justify-center gap-3">

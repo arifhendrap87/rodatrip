@@ -6,57 +6,17 @@ import { SPOT_CATEGORIES } from "@/data/spots"
 import { getPopularRoutes } from "@/data/popular-routes"
 import { SITE_NAME } from "@/lib/constants"
 import { SpotCard } from "@/components/spot/SpotCard"
-
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-
-interface APISpot {
-  slug: string
-  name: string
-  category: string
-  province: string
-  region: string
-  description: string
-  rating: number
-  image_url: string
-  image_credit: string
-  tags: string[]
-  tips: string
-  best_time: string
-  opening_hours: string
-  estimated_time: string
-  ticket_price: string
-  road_access: string
-  facilities: string[]
-  distance_from_city: string
-  why_special: string
-  location: string
-}
-
-async function getSpot(slug: string): Promise<APISpot | null> {
-  try {
-    const res = await fetch(`${BASE_URL}/api/spots/${slug}`, { next: { revalidate: 3600 } })
-    if (!res.ok) return null
-    const json = await res.json()
-    return json.data
-  } catch { return null }
-}
-
-async function getSpots(): Promise<APISpot[]> {
-  try {
-    const res = await fetch(`${BASE_URL}/api/spots?limit=100`, { next: { revalidate: 3600 } })
-    const json = await res.json()
-    return json.data || []
-  } catch { return [] }
-}
+import { getSpots, getSpotBySlug } from "@/lib/services/spots"
+import type { SpotData } from "@/lib/services/spots"
 
 export async function generateStaticParams() {
-  const spots = await getSpots()
+  const { data: spots } = await getSpots({ limit: 100 })
   return spots.map((spot) => ({ slug: spot.slug }))
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
-  const spot = await getSpot(slug)
+  const spot = await getSpotBySlug(slug)
   if (!spot) return {}
   return {
     title: `${spot.name} — Spot Istimewa — ${SITE_NAME}`,
@@ -67,7 +27,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function SpotDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const spot = await getSpot(slug)
+  const spot = await getSpotBySlug(slug)
   if (!spot) notFound()
 
   const cat = SPOT_CATEGORIES[spot.category as keyof typeof SPOT_CATEGORIES] || { icon: "📍", label: spot.category }
@@ -80,7 +40,7 @@ export default async function SpotDetailPage({ params }: { params: Promise<{ slu
     { icon: "📏", label: "Jarak dari Kota", value: spot.distance_from_city },
   ].filter((i) => i.value)
 
-  const allSpots = await getSpots()
+  const { data: allSpots } = await getSpots({ limit: 100 })
 
   return (
     <>
