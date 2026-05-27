@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr"
+import { createClient } from "@supabase/supabase-js"
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
@@ -41,7 +42,14 @@ export async function middleware(request: NextRequest) {
     }
 
     // Check if user has profile with super_admin role
-    const { data: profile } = await supabase
+    // Use service_role client to bypass RLS and ensure consistent access
+    const adminClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { autoRefreshToken: false, persistSession: false } }
+    )
+
+    const { data: profile } = await adminClient
       .from("profiles")
       .select("role")
       .eq("id", session.user.id)
