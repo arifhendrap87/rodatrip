@@ -1,0 +1,54 @@
+import type { NavLink } from "@/types"
+
+export const SITE_NAME = "Gaskuy"
+export const SITE_TAGLINE = "Gas — Plan · Prepare · Go"
+export const SITE_DESCRIPTION = "Platform POI, info jalan, dan perlengkapan roadtrip untuk roadtripper Indonesia."
+
+export const NAV_LINKS: NavLink[] = [
+  { href: "/", label: "Beranda" },
+  { href: "/spot-istimewa", label: "Spot Istimewa" },
+  { href: "/map", label: "Peta" },
+  { href: "/products", label: "Produk" },
+]
+
+export const SOCIAL_LINKS = {
+  instagram: "https://instagram.com/gaskuy.id",
+  tiktok: "https://tiktok.com/@gaskuy.id",
+  twitter: "https://twitter.com/gaskuy_id",
+}
+
+export const POI_CATEGORIES = [
+  { value: "spbu", label: "SPBU", icon: "⛽", color: "text-blue-400" },
+  { value: "kuliner", label: "Kuliner", icon: "🍜", color: "text-orange-400" },
+  { value: "bengkel", label: "Bengkel", icon: "🔧", color: "text-gray-400" },
+  { value: "spot_foto", label: "Spot Foto", icon: "📸", color: "text-purple-400" },
+  { value: "info_jalan", label: "Info Jalan", icon: "⚠️", color: "text-red-400" },
+] as const
+
+export const PRODUCT_CATEGORIES = [
+  "Safety & Darurat",
+  "Comfort",
+  "Gadget & Mount",
+  "Organizer",
+  "Lifestyle & Merch",
+  "Bundle Hemat",
+] as const
+
+export const VEHICLES = [
+  { id: "mobil", label: "🚗 Mobil (10-12 km/L)", consumption: 11 },
+  { id: "motor", label: "🏍️ Motor (40-50 km/L)", consumption: 45 },
+  { id: "avanza", label: "🚙 Avanza/Xenia (13 km/L)", consumption: 13 },
+  { id: "innova", label: "🚐 Innova (10 km/L)", consumption: 10 },
+  { id: "pajero", label: "🚙 SUV/Pajero (9 km/L)", consumption: 9 },
+  { id: "brio", label: "🚗 Brio/Ayla (15 km/L)", consumption: 15 },
+] as const
+
+export const FUEL_PRICE = 12500
+
+export const POPULAR_ROUTES = [
+  { label: "Jakarta → Yogyakarta", origin: "Jakarta", destination: "Yogyakarta" },
+  { label: "Jakarta → Bandung", origin: "Jakarta", destination: "Bandung" },
+  { label: "Bandung → Yogyakarta", origin: "Bandung", destination: "Yogyakarta" },
+  { label: "Surabaya → Malang", origin: "Surabaya", destination: "Malang" },
+  { label: "Jakarta → Surabaya", origin: "Jakarta", destination: "Surabaya" },
+]

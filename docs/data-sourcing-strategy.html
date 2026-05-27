@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Spot Istimewa — Strategi Data Sourcing</title>
+<style>
+  @page {
+    size: A4;
+    margin: 2cm;
+  }
+  body {
+    font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.6;
+    color: #1a1a1a;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0;
+  }
+  .cover {
+    page-break-after: always;
+    text-align: center;
+    padding-top: 120px;
+  }
+  .cover h1 {
+    font-size: 28pt;
+    font-weight: 800;
+    color: #FF6B35;
+    margin-bottom: 8px;
+  }
+  .cover .tagline {
+    font-size: 14pt;
+    color: #666;
+    margin-bottom: 40px;
+  }
+  .cover .info {
+    font-size: 10pt;
+    color: #999;
+    margin-top: 60px;
+  }
+  .cover .logo {
+    font-size: 48pt;
+    margin-bottom: 20px;
+  }
+  .toc {
+    page-break-after: always;
+  }
+  .toc h2 {
+    font-size: 18pt;
+    border-bottom: 2px solid #FF6B35;
+    padding-bottom: 6px;
+  }
+  .toc ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+  }
+  .toc li {
+    padding: 4px 0;
+    font-size: 11pt;
+    border-bottom: 1px dotted #ddd;
+  }
+  .toc li span { color: #999; margin-right: 8px; }
+  h1 { font-size: 20pt; color: #FF6B35; page-break-before: always; }
+  h1:first-of-type { page-break-before: auto; }
+  h2 { font-size: 14pt; color: #222; margin-top: 24px; padding-bottom: 4px; border-bottom: 1px solid #eee; }
+  h3 { font-size: 12pt; color: #444; margin-top: 18px; }
+  h4 { font-size: 11pt; color: #555; margin-top: 14px; }
+  p { margin: 6px 0; }
+  ul, ol { margin: 4px 0; padding-left: 20px; }
+  li { margin: 2px 0; }
+  code {
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    font-size: 9pt;
+    background: #f5f5f5;
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+  pre {
+    background: #1a1a1a;
+    color: #f8f8f8;
+    padding: 12px 14px;
+    border-radius: 6px;
+    font-size: 8.5pt;
+    line-height: 1.4;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  pre code { background: none; color: inherit; padding: 0; }
+  .info-box {
+    background: #fef3e7;
+    border-left: 4px solid #FF6B35;
+    padding: 10px 14px;
+    margin: 12px 0;
+    border-radius: 4px;
+  }
+  .info-box.success { background: #e8f5e9; border-left-color: #4CAF50; }
+  .info-box.warning { background: #fff8e1; border-left-color: #FFB300; }
+  .info-box.danger { background: #fbe9e7; border-left-color: #E53935; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 10pt;
+  }
+  th, td {
+    border: 1px solid #ddd;
+    padding: 6px 10px;
+    text-align: left;
+  }
+  th { background: #FF6B35; color: white; font-weight: 600; }
+  tr:nth-child(even) { background: #f9f9f9; }
+  .page-break { page-break-before: always; }
+  .section-desc { color: #666; font-size: 10pt; margin-bottom: 12px; }
+  .footer-text { font-size: 8pt; color: #999; text-align: center; margin-top: 40px; border-top: 1px solid #eee; padding-top: 8px; }
+</style>
+</head>
+<body>
+
+<!-- ===== COVER ===== -->
+<div class="cover">
+  <div class="logo">📋</div>
+  <h1>Strategi Data Sourcing</h1>
+  <p class="tagline">Spot Istimewa — Gaskuy</p>
+  <p class="tagline" style="font-size:11pt;color:#888;">Panduan lengkap mengumpulkan &amp; mengelola data destinasi roadtrip Indonesia<br>dengan metode 100% gratis.</p>
+  <p class="info">
+    <strong>Versi:</strong> 1.0 &bull; <strong>Tanggal:</strong> Mei 2026<br>
+    <strong>Proyek:</strong> Gaskuy — Platform Roadtrip Indonesia<br>
+    <strong>Status:</strong> MVP (25 spots manual)
+  </p>
+</div>
+
+<!-- ===== TOC ===== -->
+<div class="toc">
+  <h2>Daftar Isi</h2>
+  <ul>
+    <li><span>1</span> Ringkasan Eksekutif</li>
+    <li><span>2</span> Arsitektur Data</li>
+    <li><span>3</span> Metode Manual (Current)</li>
+    <li><span>4</span> Google Form Submission</li>
+    <li><span>5</span> OpenStreetMap Overpass API</li>
+    <li><span>6</span> Wikipedia API</li>
+    <li><span>7</span> Web Scraping (Opsional)</li>
+    <li><span>8</span> Pipeline Automation</li>
+    <li><span>9</span> Implementation Roadmap</li>
+    <li><span>10</span> Maintenance Guide</li>
+    <li><span>A</span> Appendix — Data Schema</li>
+    <li><span>B</span> Appendix — Province-to-City Mapping</li>
+    <li><span>C</span> Appendix — API Quotas &amp; Limits</li>
+  </ul>
+</div>
+
+<!-- ===== 1. EXECUTIVE SUMMARY ===== -->
+<h1>1. Ringkasan Eksekutif</h1>
+
+<p>Halaman <strong>/spot-istimewa</strong> adalah fitur kurasi destinasi roadtrip Indonesia. Saat ini berisi <strong>25 spots</strong> yang diinput secara manual. Untuk scale ke ratusan hingga ribuan spots, diperlukan pipeline data yang sistematis.</p>
+
+<p>Dokumen ini merangkum 4 metode pengumpulan data gratis yang bisa digunakan:</p>
+
+<table>
+  <tr><th>Metode</th><th>Effort</th><th>Data Quality</th><th>Scalability</th><th>Best Untuk</th></tr>
+  <tr><td>Manual Curation</td><td>30 menit/spot</td><td>⭐⭐⭐⭐⭐</td><td>❌</td><td>MVP, featured spots</td></tr>
+  <tr><td>Google Form</td><td>30 menit setup</td><td>⭐⭐⭐</td><td>✅</td><td>Community submissions</td></tr>
+  <tr><td>OpenStreetMap API</td><td>2-3 hari setup</td><td>⭐⭐⭐</td><td>✅✅</td><td>Bulk POI (koordinat, jam)</td></tr>
+  <tr><td>Wikipedia API</td><td>1 hari setup</td><td>⭐⭐⭐⭐</td><td>✅</td><td>Deskripsi, sejarah, fakta unik</td></tr>
+</table>
+
+<div class="info-box success">
+<strong>Strategi:</strong> Manual curation untuk 50 spots featured + Google Form untuk community submissions. Enrich data dengan OSM &amp; Wikipedia API untuk auto-populate field.
+</div>
+
+<!-- ===== 2. ARSITEKTUR DATA ===== -->
+<h1>2. Arsitektur Data</h1>
+
+<h2>2.1 Data Flow</h2>
+<pre>
+                    ┌──────────────────┐
+                    │   Google Form    │
+                    │ (User Submission)│
+                    └────────┬─────────┘
+                             │ CSV Export
+                             ▼
+                    ┌──────────────────┐
+                    │   Google Sheets  │
+                    │  (Data Pool)     │
+                    └────────┬─────────┘
+                             │
+              ┌──────────────┼──────────────┐
+              ▼              ▼              ▼
+     ┌──────────────┐ ┌──────────┐ ┌──────────────┐
+     │ OSM Overpass │ │Wikipedia │ │ Manual Review │
+     │ (Koordinat,  │ │(Deskripsi│ │ (Tips, Harga, │
+     │  Jam Buka)   │ │, Sejarah)│ │  Rating)      │
+     └──────┬───────┘ └────┬─────┘ └──────┬───────┘
+              └────────────┼──────────────┘
+                           ▼
+                    ┌──────────────────┐
+                    │   spots.ts       │
+                    │ (Data Final)     │
+                    └────────┬─────────┘
+                             │ npm run build
+                             ▼
+                    ┌──────────────────┐
+                    │  Static Pages    │
+                    │  (27 halaman)    │
+                    └──────────────────┘
+</pre>
+
+<h2>2.2 Data Schema</h2>
+<pre>
+Spot {
+  slug: string              // URL slug (auto-generate dari nama)
+  name: string              // Nama tempat
+  category: SpotCategory    // Alam | Kuliner | Budaya | Foto | Petualangan | Sejarah
+  province: string          // Provinsi
+  region: string            // Region: Jawa, Sumatera, dll
+  location: {               // Koordinat (OSM API)
+    lat: number
+    lng: number
+  }
+  description: string       // Deskripsi (Wikipedia + Manual)
+  whySpecial: string        // Keunikan (Manual)
+  rating: number            // Rating (OSM + Manual)
+  imageUrl: string          // Foto (Download + Local)
+  tags: string[]            // Tags (Auto dari kategori + manual)
+  tips: string              // Tips (Manual)
+  bestTime: string          // Waktu terbaik (Manual)
+  openingHours: string      // Jam buka (OSM API)
+  estimatedTime: string     // Estimasi waktu explore (Manual)
+  ticketPrice: string       // Harga tiket (Manual)
+  roadAccess: string        // Akses jalan (Manual)
+  facilities: string[]      // Fasilitas (OSM API)
+  distanceFromCity: string  // Jarak dari kota (Manual)
+}
+</pre>
+
+<div class="info-box">
+<strong>Catatan:</strong> Field yang bisa dipopulate otomatis = location, openingHours, facilities, tags. Sisanya butuh review manual.
+</div>
+
+<!-- ===== 3. METODE MANUAL ===== -->
+<h1>3. Metode Manual (Current)</h1>
+
+<p>Metode yang dipakai untuk 25 spots saat ini. Ideal untuk featured spots berkualitas tinggi.</p>
+
+<h2>3.1 Workflow per Spot</h2>
+<ol>
+  <li><strong>Riset:</strong> Google Maps + blog travel Indonesia (jalantikus, pergi.com, traveloka blog)</li>
+  <li><strong>Verifikasi:</strong> Cek jam buka, harga, koordinat di Google Maps</li>
+  <li><strong>Konten:</strong> Tulis deskripsi, tips, whySpecial (3-5 kalimat)</li>
+  <li><strong>Foto:</strong> Download dari Unsplash (resolusi 800px, simpan di <code>/public/images/spots/</code>)</li>
+  <li><strong>Input:</strong> Tambah data ke <code>src/data/spots.ts</code></li>
+  <li><strong>Build:</strong> <code>npm run build</code> untuk generate halaman statis</li>
+</ol>
+
+<h2>3.2 Template Deskripsi</h2>
+<pre>
+deskripsi: "Kalimat 1: Lokasi + daya tarik utama.
+            Kalimat 2: Detail tambahan (suasana, aktivitas, keunikan)."
+
+whySpecial: "Kenapa ini wajib dikunjungi?
+             Fakta unik atau record yang membedakan dari tempat lain."
+</pre>
+
+<h2>3.3 Sumber Riset Gratis</h2>
+<table>
+  <tr><th>Sumber</th><th>Data</th><th>Akses</th></tr>
+  <tr><td>Google Maps</td><td>Jam buka, harga, rating, foto, review</td><td>gratis (manual)</td></tr>
+  <tr><td>Wikipedia</td><td>Deskripsi, sejarah, koordinat</td><td>gratis (API)</td></tr>
+  <tr><td>Blog Travel</td><td>Tips, pengalaman, harga terkini</td><td>gratis (manual)</td></tr>
+  <tr><td>Instagram</td><td>Tags, hashtag, foto terkini</td><td>gratis (manual)</td></tr>
+  <tr><td>Google Trends</td><td>Popularitas destinasi</td><td>gratis</td></tr>
+</table>
+
+<!-- ===== 4. GOOGLE FORM ===== -->
+<h1>4. Google Form Submission</h1>
+
+<h2>4.1 Setup</h2>
+<ol>
+  <li>Buka <a href="https://forms.google.com">forms.google.com</a></li>
+  <li>Buat form baru: <strong>"Submit Spot Istimewa"</strong></li>
+  <li>Tambah fields berikut:</li>
+</ol>
+
+<h2>4.2 Fields Google Form</h2>
+<table>
+  <tr><th>Field</th><th>Tipe</th><th>Required</th><th>Validasi</th></tr>
+  <tr><td>Nama Tempat</td><td>Short text</td><td>✅</td><td>-</td></tr>
+  <tr><td>Provinsi</td><td>Dropdown</td><td>✅</td><td>34 provinsi Indonesia</td></tr>
+  <tr><td>Kategori</td><td>Dropdown</td><td>✅</td><td>Alam, Kuliner, Budaya, Foto, Petualangan, Sejarah</td></tr>
+  <tr><td>Link Google Maps</td><td>URL</td><td>✅</td><td>Valid URL format</td></tr>
+  <tr><td>Deskripsi Singkat</td><td>Paragraph</td><td>✅</td><td>Min 50 karakter</td></tr>
+  <tr><td>Kenapa Istimewa?</td><td>Paragraph</td><td>-</td><td>Min 30 karakter</td></tr>
+  <tr><td>Tips</td><td>Paragraph</td><td>-</td><td>-</td></tr>
+  <tr><td>Harga Tiket</td><td>Short text</td><td>-</td><td>-</td></tr>
+  <tr><td>Jam Buka</td><td>Short text</td><td>-</td><td>-</td></tr>
+  <tr><td>Link Foto</td><td>URL</td><td>-</td><td>Optional, bisa upload sendiri</td></tr>
+  <tr><td>Nama Kamu</td><td>Short text</td><td>✅</td><td>Untuk kredit</td></tr>
+  <tr><td>Email</td><td>Email</td><td>✅</td><td>Valid email</td></tr>
+</table>
+
+<h2>4.3 Workflow Moderation</h2>
+<pre>
+1. User submit → Google Sheets
+2. Kamu review (weekly)
+3. Cek validitas data (Google Maps)
+4. Enrich dengan OSM API
+5. Tulis deskripsi final
+6. Download foto
+7. Merge ke spots.ts
+8. Build &amp; deploy
+</pre>
+
+<div class="info-box warning">
+<strong>Estimasi waktu review:</strong> 5-10 menit per submission (termasuk verifikasi + enrichment).
+</div>
+
+<!-- ===== 5. OPENSTREETMAP ===== -->
+<h1>5. OpenStreetMap Overpass API</h1>
+
+<h2>5.1 Overview</h2>
+<p>OpenStreetMap (OSM) adalah database geografis gratis dan open-source. Overpass API memungkinkan query data POI secara terstruktur. Cocok untuk mengambil data koordinat, jam buka, fasilitas, dan rating.</p>
+
+<h2>5.2 Query Examples</h2>
+
+<h3>Query: Cari SPBU di Bandung</h3>
+<pre>// Overpass QL
+[out:json];
+node
+  ["amenity"="fuel"]
+  ["name"~"pertamina",i]
+  (area:searchArea);
+out body 10;</pre>
+
+<h3>Query: Cari Restoran di Yogyakarta</h3>
+<pre>[out:json];
+node
+  ["amenity"="restaurant"]
+  (area:searchArea);
+out body 20;</pre>
+
+<h3>Query: Cari Tempat Wisata Alam di Jawa Barat</h3>
+<pre>[out:json];
+(
+  node["tourism"="attraction"](area:searchArea);
+  node["leisure"="nature_reserve"](area:searchArea);
+  node["waterway"="waterfall"](area:searchArea);
+);
+out body 15;</pre>
+
+<h2>5.3 Python Script: Enrichment Pipeline</h2>
+<pre>import requests, json
+
+OVERPASS_URL = "https://overpass-api.de/api/interpreter"
+
+def enrich_spot(name: str, lat: float, lng: float) -> dict:
+    """Enrich spot data from OSM."""
+    query = f"""
+    [out:json];
+    (
+      node(around:100,{lat},{lng});
+      way(around:100,{lat},{lng});
+    );
+    out body 5;
+    """
+    resp = requests.get(OVERPASS_URL, params={"data": query},
+                        timeout=15)
+
+    # Parse response
+    elements = resp.json().get("elements", [])
+    if not elements:
+        return {}
+
+    tags = elements[0].get("tags", {})
+    return {
+        "opening_hours": tags.get("opening_hours", ""),
+        "phone": tags.get("phone", ""),
+        "website": tags.get("website", ""),
+        "wheelchair": tags.get("wheelchair", ""),
+        "toilets": tags.get("toilets", ""),
+    }
+
+# Example usage
+result = enrich_spot("Kawah Putih", -7.1660, 107.4042)
+print(result)</pre>
+
+<h2>5.4 Python Script: Bulk Search by Category</h2>
+<pre>import requests, time
+
+def search_poi_by_category(category: str, lat: float, lng: float,
+                           radius: int = 50000):
+    """Search POI by category around a location."""
+    osm_tags = {
+        "kuliner": '["amenity"="restaurant"]',
+        "alam": '["tourism"="attraction"]["natural"]',
+        "budaya": '["tourism"="museum"]',
+        "spbu": '["amenity"="fuel"]',
+        "bengkel": '["amenity"="car_repair"]',
+    }
+    tag_query = osm_tags.get(category, '["tourism"="attraction"]')
+
+    query = f"""
+    [out:json];
+    node{tag_query}(around:{radius},{lat},{lng});
+    out body 20;
+    """
+    resp = requests.get("https://overpass-api.de/api/interpreter",
+                        params={"data": query})
+    time.sleep(2)  # Rate limiting
+    return resp.json().get("elements", [])
+
+# Example: cari kuliner di sekitar Borobudur
+spots = search_poi_by_category("kuliner", -7.6079, 110.2038)
+for s in spots[:5]:
+    print(f"{s.get('tags',{}).get('name','-')}")</pre>
+
+<div class="info-box warning">
+<strong>Rate Limit:</strong> Overpass API gratis, maksimal 10 request per menit. Gunakan caching untuk production.
+</div>
+
+<!-- ===== 6. WIKIPEDIA API ===== -->
+<h1>6. Wikipedia API</h1>
+
+<h2>6.1 Overview</h2>
+<p>Wikipedia API gratis, tanpa rate limit ketat. Cocok untuk mengambil deskripsi, sejarah, dan fakta unik dari spot.</p>
+
+<h2>6.2 Python Script: Fetch Description</h2>
+<pre>import requests, urllib.parse
+
+WIKI_API = "https://id.wikipedia.org/w/api.php"
+# Gunakan bahasa Indonesia untuk spot Indonesia
+
+def fetch_wikipedia_description(spot_name: str) -> dict:
+    """Fetch description from Wikipedia Indonesia."""
+    params = {
+        "action": "query",
+        "format": "json",
+        "titles": spot_name,
+        "prop": "extracts|coordinates|pageimages",
+        "exintro": True,
+        "explaintext": True,
+        "exsentences": 5,
+        "pithumbsize": 500,
+    }
+    resp = requests.get(WIKI_API, params=params, timeout=10)
+    data = resp.json()
+    pages = data.get("query", {}).get("pages", {})
+    for page_id, page in pages.items():
+        if page_id == "-1":
+            continue  # Page not found
+        return {
+            "description": page.get("extract", ""),
+            "coordinates": page.get("coordinates", [{}])[0]
+                           if page.get("coordinates") else None,
+            "thumbnail": page.get("thumbnail", {}).get("source", ""),
+        }
+    return {}
+
+# Example: ambil deskripsi Borobudur
+result = fetch_wikipedia_description("Candi Borobudur")
+print(result["description"][:200])</pre>
+
+<h2>6.3 Extract "Why Special" dari Wikipedia</h2>
+<pre>def extract_why_special(description: str) -> str:
+    """Extract key facts from Wikipedia description."""
+    import re
+    # Cari kalimat dengan kata kunci
+    keywords = ["terbesar", "tertinggi", "tertua", "satu-satunya",
+                "terbaik", "terkenal", "ikon", "warisan dunia",
+                "terindah", "legendaris"]
+    sentences = re.split(r'(?&lt;=[.!?])\s+', description)
+    special = []
+    for s in sentences:
+        for kw in keywords:
+            if kw in s.lower() and len(s) &gt; 20:
+                special.append(s.strip())
+                break
+    return " ".join(special[:3]) if special else description[:200]</pre>
+
+<!-- ===== 7. WEB SCRAPING ===== -->
+<h1>7. Web Scraping (Opsional)</h1>
+
+<div class="info-box danger">
+<strong>⚠️ Legal Disclaimer:</strong> Scraping website bisa melanggar Terms of Service. Lakukan dengan bijak dan hormati robots.txt. Gunakan hanya untuk data publik dan rate limit yang wajar.
+</div>
+
+<h2>7.1 Target Websites</h2>
+<table>
+  <tr><th>Website</th><th>Data</th><th>Risiko</th><th>Notes</th></tr>
+  <tr><td>Traveloka Blog</td><td>Destinasi, tips</td><td>Rendah</td><td>Content blog publik</td></tr>
+  <tr><td>Pergi.com</td><td>Destinasi, harga</td><td>Rendah</td><td>Public info</td></tr>
+  <tr><td>Wikipedia</td><td>Deskripsi</td><td>Tidak ada</td><td>API resmi tersedia ✅</td></tr>
+  <tr><td>Google Maps</td><td>Rating, jam buka</td><td>Tinggi</td><td>Gunakan Places API</td></tr>
+  <tr><td>Instagram</td><td>Foto, tags</td><td>Tinggi</td><td>ToS violation risk</td></tr>
+</table>
+
+<h2>7.2 Scraping dengan Python</h2>
+<pre>import requests
+from bs4 import BeautifulSoup
+
+def scrape_blog_articles(url: str) -> list:
+    """Scrape travel blog articles."""
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'}
+    resp = requests.get(url, headers=headers, timeout=10)
+    soup = BeautifulSoup(resp.text, 'html.parser')
+
+    articles = []
+    for article in soup.select('article')[:5]:
+        title = article.select_one('h2, h3')
+        desc = article.select_one('p')
+        if title:
+            articles.append({
+                'title': title.get_text(strip=True),
+                'snippet': desc.get_text(strip=True) if desc else '',
+            })
+    return articles</pre>
+
+<h2>7.3 Best Practices</h2>
+<ul>
+  <li><strong>Rate limit:</strong> Max 1 request per 3 detik</li>
+  <li><strong>User-Agent:</strong> Gunakan identitas yang jelas</li>
+  <li><strong>Robots.txt:</strong> Cek <code>/robots.txt</code> sebelum scraping</li>
+  <li><strong>Cache:</strong> Simpan hasil scraping, jangan scrape ulang</li>
+  <li><strong>Attribution:</strong> Kredit sumber jika diperlukan</li>
+</ul>
+
+<!-- ===== 8. PIPELINE AUTOMATION ===== -->
+<h1>8. Pipeline Automation</h1>
+
+<h2>8.1 Full Enrichment Script</h2>
+<pre>import requests, json, time, re
+
+# --- CONFIG ---
+OVERPASS_URL = "https://overpass-api.de/api/interpreter"
+WIKI_API = "https://id.wikipedia.org/w/api.php"
+
+def enrich_spot(name: str, lat: float, lng: float) -> dict:
+    """Full enrichment pipeline."""
+    result = {"name": name, "lat": lat, "lng": lng}
+
+    # 1. OSM Enrichment
+    query = f"[out:json];node(around:50,{lat},{lng});out body 5;"
+    try:
+        resp = requests.get(OVERPASS_URL, params={"data": query},
+                            timeout=10)
+        elements = resp.json().get("elements", [])
+        if elements:
+            tags = elements[0].get("tags", {})
+            result["opening_hours"] = tags.get("opening_hours", "")
+            result["phone"] = tags.get("phone", "")
+            result["website"] = tags.get("website", "")
+    except Exception as e:
+        print(f"  OSM error: {e}")
+
+    time.sleep(2)  # Rate limit
+
+    # 2. Wikipedia Enrichment
+    params = {
+        "action": "query", "format": "json",
+        "titles": name, "prop": "extracts|coordinates",
+        "exintro": True, "explaintext": True, "exsentences": 5,
+    }
+    try:
+        resp = requests.get(WIKI_API, params=params, timeout=10)
+        pages = resp.json().get("query", {}).get("pages", {})
+        for pid, page in pages.items():
+            if pid != "-1":
+                result["wikipedia_desc"] = page.get("extract", "")
+                coords = page.get("coordinates", [{}])[0]
+                if coords:
+                    result["wiki_lat"] = coords.get("lat")
+                    result["wiki_lng"] = coords.get("lon")
+    except Exception as e:
+        print(f"  Wiki error: {e}")
+
+    return result
+
+# --- BATCH PROCESS ---
+SPOTS = [
+    {"name": "Kawah Putih", "lat": -7.1660, "lng": 107.4042},
+    {"name": "Candi Borobudur", "lat": -7.6079, "lng": 110.2038},
+    {"name": "Gunung Bromo", "lat": -7.9425, "lng": 112.9530},
+]
+
+for spot in SPOTS:
+    print(f"Enriching: {spot['name']}...")
+    data = enrich_spot(spot["name"], spot["lat"], spot["lng"])
+    print(json.dumps(data, indent=2))
+    print("---")</pre>
+
+<h2>8.2 Automation Workflow</h2>
+<pre>
+┌─────────────────────────────────────────┐
+│           Weekly Batch Script           │
+├─────────────────────────────────────────┤
+│  1. Export Google Form → CSV            │
+│  2. Run Python enrichment script        │
+│  3. Manual review &amp; edit                  │
+│  4. Generate draft spots.ts             │
+│  5. npm run build &amp; verify              │
+│  6. Manual git commit                   │
+└─────────────────────────────────────────┘
+</pre>
+
+<div class="info-box success">
+<strong>Weekly schedule:</strong> Setiap Senin pagi, batch process submission minggu sebelumnya. Estimasi: 30-60 menit total.
+</div>
+
+<!-- ===== 9. IMPLEMENTATION ROADMAP ===== -->
+<h1>9. Implementation Roadmap</h1>
+
+<h2>Phase 1: Launch (Sekarang) ✅</h2>
+<table>
+  <tr><th>Task</th><th>Status</th><th>Effort</th></tr>
+  <tr><td>25 spots manual curation</td><td>✅ Done</td><td>1 minggu</td></tr>
+  <tr><td>Halaman listing + detail</td><td>✅ Done</td><td>2 hari</td></tr>
+  <tr><td>Region filter</td><td>✅ Done</td><td>-</td></tr>
+  <tr><td>Rute Populer integration</td><td>✅ Done</td><td>-</td></tr>
+</table>
+
+<h2>Phase 2: Post-Launch (Minggu 2-4)</h2>
+<table>
+  <tr><th>Task</th><th>Effort</th><th>Priority</th></tr>
+  <tr><td>Google Form submission</td><td>30 menit</td><td>🔥 High</td></tr>
+  <tr><td>Add "Submit Spot" link di website</td><td>30 menit</td><td>🔥 High</td></tr>
+  <tr><td>Python enrichment script</td><td>2 hari</td><td>⚡ Medium</td></tr>
+  <tr><td>Tambah 25 spots baru</td><td>1 hari</td><td>⚡ Medium</td></tr>
+  <tr><td>Foto spesifik per spot (bukan generic)</td><td>2 hari</td><td>📸 Medium</td></tr>
+</table>
+
+<h2>Phase 3: Scale (Bulan 2+)</h2>
+<table>
+  <tr><th>Task</th><th>Effort</th><th>Priority</th></tr>
+  <tr><td>Setup Supabase + backend database</td><td>1 minggu</td><td>📊 High</td></tr>
+  <tr><td>Build submission form di app (no Google Form)</td><td>3 hari</td><td>🔄 Medium</td></tr>
+  <tr><td>Admin moderation panel</td><td>1 minggu</td><td>🛠️ Medium</td></tr>
+  <tr><td>Auto-approve for trusted users</td><td>2 hari</td><td>🚀 Low</td></tr>
+  <tr><td>100+ spots in database</td><td>2 minggu</td><td>🎯 High</td></tr>
+</table>
+
+<!-- ===== 10. MAINTENANCE GUIDE ===== -->
+<h1>10. Maintenance Guide</h1>
+
+<h2>10.1 Weekly Workflow Checklist</h2>
+<pre>
+[ ] Export Google Form submissions from Sheets
+[ ] Validate: cek koordinat, jam buka, harga via Google Maps
+[ ] Run Python enrichment script (OSM + Wikipedia)
+[ ] Tulis deskripsi final (1-2 paragraf)
+[ ] Download foto dari Unsplash (800px, landscape)
+[ ] Update src/data/spots.ts
+[ ] npm run build
+[ ] Verify: buka localhost, cek 3-5 halaman random
+[ ] Git commit &amp; push
+[ ] Deploy
+</pre>
+
+<h2>10.2 Quality Control Checklist</h2>
+<ul>
+  <li>✅ Nama tempat sesuai ejaan yang benar</li>
+  <li>✅ Koordinat akurat (cek di Google Maps)</li>
+  <li>✅ Deskripsi minimal 50 karakter, informatif</li>
+  <li>✅ Tips praktis, bukan generic</li>
+  <li>✅ Harga tiket update (cek bulan ini)</li>
+  <li>✅ Jam buka valid (cek Google Maps)</li>
+  <li>✅ Foto tidak pecah/blur</li>
+  <li>✅ Slug unik, tanpa duplikasi</li>
+  <li>✅ Build success (36+ pages)</li>
+</ul>
+
+<h2>10.3 Troubleshooting</h2>
+<table>
+  <tr><th>Masalah</th><th>Cause</th><th>Solution</th></tr>
+  <tr><td>Image not found (404)</td><td>File tidak ada di /public/images/spots/</td><td>Cek path, download ulang dari Unsplash</td></tr>
+  <tr><td>Build error: duplicate key</td><td>Slug tidak unique</td><td>Gunakan slug generator: nama + lokasi</td></tr>
+  <tr><td>OSM API timeout</td><td>Rate limit exceeded</td><td>Tambahkan sleep(3) antar request</td></tr>
+  <tr><td>Wikipedia page not found</td><td>Judul berbeda di Wikipedia</td><td>Coba alternatif: "Kawah Putih" → "Kawah Putih Ciwidey"</td></tr>
+  <tr><td>Foto terlalu besar</td><td>Resolusi &gt; 800px</td><td>Resize: convert -resize 800x input.jpg output.jpg</td></tr>
+</table>
+
+<!-- ===== APPENDIX A ===== -->
+<h1>Lampiran A: Data Schema Lengkap</h1>
+<pre>
+interface Spot {
+  slug: string
+  name: string
+  category: "alam" | "kuliner" | "budaya" | "foto" | "petualangan" | "sejarah"
+  province: string
+  region: string
+  location: { lat: number; lng: number }
+  description: string
+  whySpecial: string
+  rating: number
+  imageUrl: string
+  imageCredit: string
+  tags: string[]
+  addedAt: Date
+  tips: string
+  bestTime: string
+  openingHours: string
+  estimatedTime: string
+  ticketPrice: string
+  roadAccess: string
+  facilities: string[]
+  distanceFromCity: string
+  popularRoutes?: { from: string; duration: string }[]
+  relatedProductIds?: string[]
+}
+
+type SpotCategory = "alam" | "kuliner" | "budaya" | "foto" | "petualangan" | "sejarah"
+
+// Category config
+{
+  alam:   { label: "Alam",   icon: "🏞️", color: "emerald" }
+  kuliner:{ label: "Kuliner",icon: "🍜", color: "orange" }
+  budaya: { label: "Budaya", icon: "🏛️", color: "purple" }
+  foto:   { label: "Spot Foto", icon: "📸", color: "pink" }
+  petualangan: { label: "Petualangan", icon: "🧗", color: "blue" }
+  sejarah:{ label: "Sejarah", icon: "📜", color: "amber" }
+}
+</pre>
+
+<!-- ===== APPENDIX B ===== -->
+<h1>Lampiran B: Province-to-City Mapping</h1>
+<pre>
+const PROVINCE_ROUTES = {
+  "Jakarta":        ["Jakarta", "Bandung"],
+  "Jawa Barat":     ["Jakarta", "Bandung", "Bogor"],
+  "Jawa Tengah":    ["Yogyakarta", "Semarang", "Solo"],
+  "DIY":            ["Yogyakarta", "Semarang", "Solo"],
+  "Jawa Timur":     ["Surabaya", "Malang"],
+  "Bali":           ["Denpasar", "Canggu", "Kuta"],
+  "NTB":            ["Mataram", "Lombok Airport"],
+  "NTT":            ["Labuan Bajo"],
+  "Sumatera Utara": ["Medan"],
+  "Sumatera Barat": ["Padang", "Medan"],
+  "Sulawesi Utara": ["Manado"],
+  "Sulawesi Selatan": ["Makassar"],
+  "Kalimantan Timur": ["Balikpapan", "Tanjung Redeb"],
+}
+</pre>
+
+<!-- ===== APPENDIX C ===== -->
+<h1>Lampiran C: API Quotas &amp; Limits</h1>
+<table>
+  <tr><th>API</th><th>Free Quota</th><th>Rate Limit</th><th>Notes</th></tr>
+  <tr><td>Overpass API</td><td>Unlimited</td><td>~10 req/min</td><td>Turun drastis kalo overload</td></tr>
+  <tr><td>Wikipedia API</td><td>Unlimited</td><td>~200 req/min</td><td>Fair use, jangan abuse</td></tr>
+  <tr><td>Google Places API</td><td>$200 credit/bln</td><td>~180 req/min</td><td>Pilih yang gratis dulu</td></tr>
+  <tr><td>Unsplash API</td><td>50 req/jam</td><td>50 req/jam</td><td>Hanya untuk search, download unlimited</td></tr>
+  <tr><td>OpenStreetMap Nominatim</td><td>Unlimited</td><td>1 req/dtk</td><td>Gunakan User-Agent yang jelas</td></tr>
+</table>
+
+<div class="footer-text">
+Dokumen ini dibuat untuk proyek Gaskuy &bull; Spot Istimewa &bull; 2026
+</div>
+
+</body>
+</html>

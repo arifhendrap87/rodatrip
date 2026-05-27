@@ -1,0 +1,411 @@
+[
+  {
+    "name": "Gunung Tangkuban Perahu",
+    "input_lat": -6.7694,
+    "input_lng": 107.605,
+    "osm": {
+      "opening_hours": "",
+      "phone": "",
+      "website": "",
+      "wheelchair": "",
+      "toilets": ""
+    },
+    "wikipedia": {
+      "description": "",
+      "wikipedia_coordinates": null,
+      "thumbnail": ""
+    },
+    "slug": "gunung-tangkuban-perahu",
+    "region": "Bandung",
+    "category": "alam"
+  },
+  {
+    "name": "Curug Cimahi",
+    "input_lat": -6.8444,
+    "input_lng": 107.5692,
+    "osm": {
+      "opening_hours": "",
+      "phone": "",
+      "website": "",
+      "wheelchair": "",
+      "toilets": ""
+    },
+    "wikipedia": {
+      "description": "Curug Cimahi ( juga dikenal sebagai Curug Pelangi) adalah air terjun yang terletak di Jalan Kolonel Masturi, Desa Kertawangi, Kecamatan Cisarua, Kabupaten Bandung Barat, Jawa Barat. Dengan ketinggian sekitar 87 meter, menjadikan air terjun ini sebagai salah satu curug tertinggi di wilayah Bandung dan sekitarnya. Nama Cimahi berasal dari nama sungai yang mengalir di atasnya yaitu Sungai Cimahi yang berhulu di Situ (danau) Lembang dan mengalir ke Kota Cimahi. Destinasi wisata ini berjarak kurang lebih 10 kilometer dari Kota Cimahi ke arah Lembang atau 20 kilometer dari Kota Bandung.",
+      "wikipedia_coordinates": null,
+      "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/e/e5/COLLECTIE_TROPENMUSEUM_Waterval_in_de_omgeving_van_Tjisaroea_en_Tjimahi_TMnr_60050403.jpg"
+    },
+    "why_special": "Dengan ketinggian sekitar 87 meter, menjadikan air terjun ini sebagai salah satu curug tertinggi di wilayah Bandung dan sekitarnya.",
+    "slug": "curug-cimahi",
+    "region": "Bandung",
+    "category": "alam"
+  },
+  {
+    "name": "Tebing Keraton",
+    "input_lat": -6.8,
+    "input_lng": 107.65,
+    "osm": {
+      "opening_hours": "",
+      "phone": "",
+      "website": "",
+      "wheelchair": "",
+      "toilets": ""
+    },
+    "wikipedia": {
+      "description": "Tebing Keraton atau Tebing Karaton merupakan sebuah tebing yang berada di dalam kawasan Taman Hutan Raya Ir. H. Djuanda. Tebing ini terletak di Kampung Ciharegem Puncak, Desa Ciburial, Bandung, Jawa Barat, Indonesia. Dari Tebing Keraton dapat menikmati pemandangan spektakuler. Bukan lampu kota, melainkan hutan!",
+      "wikipedia_coordinates": null,
+      "thumbnail": "https://upload.wikimedia.org/wikipedia/id/9/9d/20140730_tebing_keraton.jpg"
+    },
+    "why_special": "Tebing Keraton atau Tebing Karaton merupakan sebuah tebing yang berada di dalam kawasan Taman Hutan Raya Ir. H. Djuanda. Tebing ini terletak di Kampung Ciharegem Puncak, Desa Ciburial, Bandung, Jawa B",
+    "slug": "tebing-keraton",
+    "region": "Bandung",
+    "category": "foto"
+  },
+  {
+    "name": "Gedung Sate Bandung",
+    "input_lat": -6.9011,
+    "input_lng": 107.6186,
+    "osm": {
+      "opening_hours": "",
+      "phone": "",
+      "website": "",
+      "wheelchair": "",
+      "toilets": ""
+    },
+    "wikipedia": {},
+    "slug": "gedung-sate-bandung",
+    "region": "Bandung",
+    "category": "sejarah"
+  },
+  {
+    "name": "Museum Geologi Bandung",
+    "input_lat": -6.9046,
+    "input_lng": 107.6183,
+    "osm": {
+      "opening_hours": "",
+      "phone": "",
+      "website": "",
+      "wheelchair": "",
+      "toilets": ""
+    },
+    "wikipedia": {
+      "description": "Museum Geologi (bahasa Sunda: Musieum Géologi Bandung) didirikan pada tanggal 16 Mei 1929. Museum ini direnovasi dengan mendapat dana bantuan dari JICA  (Japan International Cooperation Agency). Setelah renovasi selesai, Museum Geologi dibuka kembali dan diresmikan oleh Wakil Presiden RI, Megawati Setiawati Soekarnoputri pada 23 Agustus 2000.\nSebagai monumen bersejarah, museum ini berada di bawah perlindungan pemerintah dan merupakan peninggalan sejarah nasional. Di museum ini, tersimpan dan mengelola berbagai materi geologi, seperti fosil, batuan, dan mineral.",
+      "wikipedia_coordinates": null,
+      "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Bandung%2C_Museum_Geologi.jpg/500px-Bandung%2C_Museum_Geologi.jpg"
+    },
+    "why_special": "Museum Geologi (bahasa Sunda: Musieum Géologi Bandung) didirikan pada tanggal 16 Mei 1929. Museum ini direnovasi dengan mendapat dana bantuan dari JICA  (Japan International Cooperation Agency). Setel",
+    "slug": "museum-geologi-bandung",
+    "region": "Bandung",
+    "category": "sejarah"
+  },
+  {
+    "name": "Alun-Alun Bandung",
+    "input_lat": -6.9217,
+    "input_lng": 107.6069,
+    "osm": {
+      "opening_hours": "",
+      "phone": "",
+      "website": "",
+      "wheelchair": "",
+      "toilets": ""
+    },
+    "wikipedia": {},
+    "slug": "alun-alun-bandung",
+    "region": "Bandung",
+    "category": "foto"
+  },
+  {
+    "name": "Orchid Forest Cikole",
+    "input_lat": -6.78,
+    "input_lng": 107.61,
+    "osm": {},
+    "wikipedia": {},
+    "slug": "orchid-forest-cikole",
+    "region": "Bandung",
+    "category": "alam"
+  },
+  {
+    "name": "Situ Patenggang",
+    "input_lat": -7.1667,
+    "input_lng": 107.3667,
+    "osm": {},
+    "wikipedia": {
+      "description": "Situ Patenggang atau Patengan adalah sebuah danau pegunungan yang terletak di kawasan taman wisata alam di Rancabali, Jawa Barat, Indonesia. Situ Patengan memiliki luas perairan sekitar 46,6 hektar (0,466 km²) dan berada di ketinggian kurang lebih 1.600 meter di atas permukaan laut.\nDanau ini menawarkan panorama alam pegunungan yang dikelilingi oleh perkebunan teh dan hutan tropis, menjadikannya salah satu destinasi ekowisata favorit di kawasan Bandung Selatan.",
+      "wikipedia_coordinates": null,
+      "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Junghuhn_See_Telaga_Patengan_auf_Java.jpg/500px-Junghuhn_See_Telaga_Patengan_auf_Java.jpg"
+    },
+    "why_special": "Situ Patenggang atau Patengan adalah sebuah danau pegunungan yang terletak di kawasan taman wisata alam di Rancabali, Jawa Barat, Indonesia. Situ Patengan memiliki luas perairan sekitar 46,6 hektar (0",
+    "slug": "situ-patenggang",
+    "region": "Bandung",
+    "category": "alam"
+  },
+  {
+    "name": "Farmhouse Lembang",
+    "input_lat": -6.8167,
+    "input_lng": 107.6167,
+    "osm": {
+      "opening_hours": "",
+      "phone": "",
+      "website": "",
+      "wheelchair": "",
+      "toilets": ""
+    },
+    "wikipedia": {},
+    "slug": "farmhouse-lembang",
+    "region": "Bandung",
+    "category": "foto"
+  },
+  {
+    "name": "Kawah Rengganis",
+    "input_lat": -7.1833,
+    "input_lng": 107.4333,
+    "osm": {},
+    "wikipedia": {},
+    "slug": "kawah-rengganis",
+    "region": "Bandung",
+    "category": "alam"
+  },
+  {
+    "name": "Taman Safari Bogor",
+    "input_lat": -6.7,
+    "input_lng": 106.95,
+    "osm": {
+      "opening_hours": "",
+      "phone": "",
+      "website": "",
+      "wheelchair": "",
+      "toilets": ""
+    },
+    "wikipedia": {},
+    "slug": "taman-safari-bogor",
+    "region": "Bogor",
+    "category": "alam"
+  },
+  {
+    "name": "Kebun Raya Bogor",
+    "input_lat": -6.5972,
+    "input_lng": 106.799,
+    "osm": {
+      "opening_hours": "",
+      "phone": "",
+      "website": "",
+      "wheelchair": "",
+      "toilets": ""
+    },
+    "wikipedia": {
+      "description": "Kebun Raya Bogor atau Kebun Botani Bogor (bahasa Sunda: ᮊᮨᮘᮧᮔ᮪ ᮛᮚ ᮘᮧᮌᮧᮁcode: su is deprecated , translit. Kebon Raya Bogor) adalah sebuah kebun botani besar yang terletak di Kota Bogor, Indonesia. Kebun ini dioperasikan oleh Badan Riset dan Inovasi Nasional (BRIN). Kebun ini terletak di pusat kota Bogor dan bersebelahan dengan kompleks istana kepresidenan Istana Bogor. Luasnya mencapai 87 hektar dan memiliki 15.000 jenis koleksi pohon dan tumbuhan.",
+      "wikipedia_coordinates": null,
+      "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Kebun_Raya_Bogor_19.jpg/500px-Kebun_Raya_Bogor_19.jpg"
+    },
+    "why_special": "Kebun Raya Bogor atau Kebun Botani Bogor (bahasa Sunda: ᮊᮨᮘᮧᮔ᮪ ᮛᮚ ᮘᮧᮌᮧᮁcode: su is deprecated , translit. Kebon Raya Bogor) adalah sebuah kebun botani besar yang terletak di Kota Bogor, Indonesia. Keb",
+    "slug": "kebun-raya-bogor",
+    "region": "Bogor",
+    "category": "alam"
+  },
+  {
+    "name": "Curug Cigamea",
+    "input_lat": -6.75,
+    "input_lng": 106.9333,
+    "osm": {
+      "opening_hours": "",
+      "phone": "",
+      "website": "",
+      "wheelchair": "",
+      "toilets": ""
+    },
+    "wikipedia": {},
+    "slug": "curug-cigamea",
+    "region": "Bogor",
+    "category": "alam"
+  },
+  {
+    "name": "Gunung Pancar",
+    "input_lat": -6.55,
+    "input_lng": 106.8667,
+    "osm": {
+      "opening_hours": "",
+      "phone": "",
+      "website": "",
+      "wheelchair": "",
+      "toilets": ""
+    },
+    "wikipedia": {
+      "description": "Gunung Pancar adalah sebuah gunung yang terletak di Kecamatan Babakan Madang, Kabupaten Bogor, Jawa Barat, Indonesia. Gunung ini terletak pada rangkaian Pegunungan Jonggol yang terbentang dari Hambalang hingga Cipanas, yang berketinggian antara 300–800 m dpl dengan topografinya landai hingga bergelombang terjal dengan kemiringan sekitar 15-40%. Bagian tertinggi yaitu pada puncak Gunung Pancar 800 m dpl dan Pasir Astana 700 m dpl.",
+      "wikipedia_coordinates": null,
+      "thumbnail": ""
+    },
+    "why_special": "Bagian tertinggi yaitu pada puncak Gunung Pancar 800 m dpl dan Pasir Astana 700 m dpl.",
+    "slug": "gunung-pancar",
+    "region": "Bogor",
+    "category": "petualangan"
+  },
+  {
+    "name": "Telaga Warna Puncak",
+    "input_lat": -6.7167,
+    "input_lng": 107.0167,
+    "osm": {},
+    "wikipedia": {},
+    "slug": "telaga-warna-puncak",
+    "region": "Bogor",
+    "category": "alam"
+  },
+  {
+    "name": "Sate Maranggi Cianjur",
+    "input_lat": -6.8128,
+    "input_lng": 107.1394,
+    "osm": {
+      "opening_hours": "",
+      "phone": "",
+      "website": "",
+      "wheelchair": "",
+      "toilets": ""
+    },
+    "wikipedia": {},
+    "slug": "sate-maranggi-cianjur",
+    "region": "Cianjur",
+    "category": "kuliner"
+  },
+  {
+    "name": "Cipanas Hot Spring",
+    "input_lat": -6.7333,
+    "input_lng": 107.0333,
+    "osm": {
+      "opening_hours": "",
+      "phone": "",
+      "website": "",
+      "wheelchair": "",
+      "toilets": ""
+    },
+    "wikipedia": {},
+    "slug": "cipanas-hot-spring",
+    "region": "Cianjur",
+    "category": "alam"
+  },
+  {
+    "name": "Gunung Gede Pangrango",
+    "input_lat": -6.7833,
+    "input_lng": 106.9667,
+    "osm": {
+      "opening_hours": "",
+      "phone": "",
+      "website": "",
+      "wheelchair": "",
+      "toilets": ""
+    },
+    "wikipedia": {
+      "description": "",
+      "wikipedia_coordinates": null,
+      "thumbnail": ""
+    },
+    "slug": "gunung-gede-pangrango",
+    "region": "Cianjur",
+    "category": "petualangan"
+  },
+  {
+    "name": "Pantai Santolo",
+    "input_lat": -7.6167,
+    "input_lng": 107.9,
+    "osm": {},
+    "wikipedia": {
+      "description": "Pantai Santolo adalah sebuah pantai yang terletak di Kecamatan Cikelet, Kabupaten Garut, Jawa Barat, Indonesia.\nGarut tidak hanya terkenal dengan Jeruk Garut tetapi salah satu pantai yang populer terdapat di Kabupaten Garut yaitu Pantai Santolo. Terletak di kec. Cikelet, sebelah selatan pusat kota Garut atau biasa disebut Garut Selatan, Garsel atau Garsela, jarak tempuh dalam waktu 3,5 jam perjalanan atau sekitar 88 km dari Garut Kota.\nPantai ini cukup dikenal di kota Bandung dan merupakan daerah tujuan wisata .",
+      "wikipedia_coordinates": null,
+      "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Pamengpeuk_Beach%2C_Garut.jpg/500px-Pamengpeuk_Beach%2C_Garut.jpg"
+    },
+    "why_special": "Garut tidak hanya terkenal dengan Jeruk Garut tetapi salah satu pantai yang populer terdapat di Kabupaten Garut yaitu Pantai Santolo.",
+    "slug": "pantai-santolo",
+    "region": "Garut",
+    "category": "alam"
+  },
+  {
+    "name": "Cipanas Garut",
+    "input_lat": -7.2167,
+    "input_lng": 107.8833,
+    "osm": {
+      "opening_hours": "",
+      "phone": "",
+      "website": "",
+      "wheelchair": "",
+      "toilets": ""
+    },
+    "wikipedia": {},
+    "slug": "cipanas-garut",
+    "region": "Garut",
+    "category": "alam"
+  },
+  {
+    "name": "Gunung Papandayan",
+    "input_lat": -7.3167,
+    "input_lng": 107.7333,
+    "osm": {},
+    "wikipedia": {
+      "description": "Gunung Papandayan adalah gunung api stratovolcano yang terletak di Kabupaten Garut, Jawa Barat, tepatnya di Kecamatan Cisurupan. Gunung dengan ketinggian 2.665 m di atas permukaan laut ini terletak sekitar 70 km sebelah tenggara Kota Bandung. Gunung Papandayan memiliki beberapa kawah yang terkenal, di antaranya Kawah Mas, Kawah Baru, Kawah Nangklak, dan Kawah Manuk.\nTopografi Gunung Papandayan berada di dalam kawasan curam, berbukit dan bergunung, serta terdapat tebing yang terjal.",
+      "wikipedia_coordinates": null,
+      "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Indonesia_-_papandayan_4.jpg/500px-Indonesia_-_papandayan_4.jpg"
+    },
+    "why_special": "Gunung Papandayan memiliki beberapa kawah yang terkenal, di antaranya Kawah Mas, Kawah Baru, Kawah Nangklak, dan Kawah Manuk.",
+    "slug": "gunung-papandayan",
+    "region": "Garut",
+    "category": "petualangan"
+  },
+  {
+    "name": "Green Canyon Cijulang",
+    "input_lat": -7.7333,
+    "input_lng": 108.5333,
+    "osm": {},
+    "wikipedia": {},
+    "slug": "green-canyon-cijulang",
+    "region": "Pangandaran",
+    "category": "petualangan"
+  },
+  {
+    "name": "Pantai Batu Karas",
+    "input_lat": -7.6833,
+    "input_lng": 108.5,
+    "osm": {
+      "opening_hours": "",
+      "phone": "",
+      "website": "",
+      "wheelchair": "",
+      "toilets": ""
+    },
+    "wikipedia": {
+      "description": "Pantai Batu Karas adalah salah satu objek wisata pantai yang ada di Kabupaten Pangandaran, tepatnya di Desa Batu Karas, Kecamatan Cijulang, Kabupaten Pangandaran, Provinsi Jawa Barat. Perjalanan menuju Pantai Batu Karas ini dapat ditempuh sekitar 30 menit dengan jarak 34 km dari Pantai Pangandaran. Sementara itu, apabila perjalanan dilakukan dari Jakarta akan menempuh sekitar 392 km ke arah tenggara, sedangkan apabila dari Bandung ke Batu Karas sekitar 197 km ke arah tenggara. Pantai Batu Karas ini juga letaknya berdekatan dengan Bandara Nusawiru Pangandaran. Atraksi wisata yang biasanya dapat dilakukan di Pantai Batu Karas ini yaitu berenang dan berselancar (surfing), dan biasanya wisatawan yang berkunjung tidak hanya wisatawan domestik, tetapi juga mancanegara.",
+      "wikipedia_coordinates": null,
+      "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Sunrise_Batu_karas_Pangandaran.jpg/500px-Sunrise_Batu_karas_Pangandaran.jpg"
+    },
+    "why_special": "Pantai Batu Karas adalah salah satu objek wisata pantai yang ada di Kabupaten Pangandaran, tepatnya di Desa Batu Karas, Kecamatan Cijulang, Kabupaten Pangandaran, Provinsi Jawa Barat. Perjalanan menuj",
+    "slug": "pantai-batu-karas",
+    "region": "Pangandaran",
+    "category": "alam"
+  },
+  {
+    "name": "Pantai Ujung Genteng",
+    "input_lat": -7.3833,
+    "input_lng": 106.4167,
+    "osm": {},
+    "wikipedia": {},
+    "slug": "pantai-ujung-genteng",
+    "region": "Sukabumi",
+    "category": "alam"
+  },
+  {
+    "name": "Geopark Ciletuh",
+    "input_lat": -7.2167,
+    "input_lng": 106.4333,
+    "osm": {
+      "opening_hours": "",
+      "phone": "",
+      "website": "",
+      "wheelchair": "",
+      "toilets": ""
+    },
+    "wikipedia": {
+      "description": "",
+      "wikipedia_coordinates": null,
+      "thumbnail": ""
+    },
+    "slug": "geopark-ciletuh",
+    "region": "Sukabumi",
+    "category": "petualangan"
+  }
+]
