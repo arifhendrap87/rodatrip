@@ -1,0 +1,247 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { supabase } from "@/lib/supabase"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { ArrowLeft, Save, Loader2, Trash2 } from "lucide-react"
+import Link from "next/link"
+import { useParams } from "next/navigation"
+import TiptapEditor from "@/components/ui/tiptap/tiptap-editor"
+
+const CATEGORIES = [
+  { value: "alam", label: "Alam" },
+  { value: "kuliner", label: "Kuliner" },
+  { value: "budaya", label: "Budaya" },
+  { value: "foto", label: "Spot Foto" },
+  { value: "petualangan", label: "Petualangan" },
+  { value: "sejarah", label: "Sejarah" },
+]
+
+const PROVINCES = [
+  "Jawa Barat", "Jawa Tengah", "DIY", "Jawa Timur",
+  "Bali", "Sumatera Utara", "Sumatera Barat",
+  "Sulawesi Utara", "Sulawesi Selatan",
+  "Kalimantan Timur", "Nusa Tenggara Barat",
+  "Nusa Tenggara Timur",
+]
+
+export default function EditSpotPage() {
+  const params = useParams()
+  const router = useRouter()
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState<any>({})
+
+  useEffect(() => {
+    const slug = params.id as string
+    supabase
+      .from("spots")
+      .select("*")
+      .eq("slug", slug)
+      .single()
+      .then(({ data }) => {
+        if (data) {
+          setForm({
+            ...data,
+            lat: data.location?.coordinates?.[0] || "",
+            lng: data.location?.coordinates?.[1] || "",
+            facilities: (data.facilities || []).join(", "),
+            tags: (data.tags || []).join(", "),
+          })
+        }
+        setLoading(false)
+      })
+  }, [params.id])
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setSaving(true)
+
+    const updates = {
+      name: form.name,
+      category: form.category,
+      province: form.province,
+      region: form.region,
+      description: form.description,
+      why_special: form.why_special,
+      tips: form.tips,
+      rating: parseFloat(form.rating),
+      best_time: form.best_time,
+      opening_hours: form.opening_hours,
+      estimated_time: form.estimated_time,
+      ticket_price: form.ticket_price,
+      road_access: form.road_access,
+      facilities: form.facilities.split(",").map((f: string) => f.trim()).filter(Boolean),
+      distance_from_city: form.distance_from_city,
+      tags: form.tags.split(",").map((t: string) => t.trim()).filter(Boolean),
+      is_featured: form.is_featured,
+    }
+
+    const { error } = await supabase
+      .from("spots")
+      .update(updates)
+      .eq("slug", params.id)
+
+    if (error) {
+      alert("Error: " + error.message)
+    } else {
+      router.push("/admin/spots")
+    }
+    setSaving(false)
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <div className="mb-6 flex items-center gap-4">
+        <Link href="/admin/spots">
+          <Button variant="ghost" size="icon">
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+        </Link>
+        <div>
+          <h1 className="text-2xl font-bold font-heading">Edit Spot</h1>
+          <p className="text-muted-foreground">{form.name}</p>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Basic Information</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Name</Label>
+                <Input value={form.name} onChange={(e) => setForm((f: any) => ({ ...f, name: e.target.value }))} />
+              </div>
+              <div className="space-y-2">
+                <Label>Category</Label>
+                <Select value={form.category} onValueChange={(v) => v && setForm((f: any) => ({ ...f, category: v }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CATEGORIES.map((c) => (
+                      <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Province</Label>
+                <Select value={form.province} onValueChange={(v) => v && setForm((f: any) => ({ ...f, province: v }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PROVINCES.map((p) => (
+                      <SelectItem key={p} value={p}>{p}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Rating</Label>
+                <Input type="number" step="0.1" min="0" max="5" value={form.rating}
+                  onChange={(e) => setForm((f: any) => ({ ...f, rating: e.target.value }))} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Content</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Description</Label>
+              <TiptapEditor content={form.description || ""}
+                onChange={(html) => setForm((f: any) => ({ ...f, description: html }))} />
+            </div>
+            <div className="space-y-2">
+              <Label>Why Special</Label>
+              <TiptapEditor content={form.why_special || ""}
+                onChange={(html) => setForm((f: any) => ({ ...f, why_special: html }))} />
+            </div>
+            <div className="space-y-2">
+              <Label>Tips</Label>
+              <TiptapEditor content={form.tips || ""}
+                onChange={(html) => setForm((f: any) => ({ ...f, tips: html }))} />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Details</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Best Time</Label>
+                <Input value={form.best_time || ""}
+                  onChange={(e) => setForm((f: any) => ({ ...f, best_time: e.target.value }))} />
+              </div>
+              <div className="space-y-2">
+                <Label>Opening Hours</Label>
+                <Input value={form.opening_hours || ""}
+                  onChange={(e) => setForm((f: any) => ({ ...f, opening_hours: e.target.value }))} />
+              </div>
+              <div className="space-y-2">
+                <Label>Ticket Price</Label>
+                <Input value={form.ticket_price || ""}
+                  onChange={(e) => setForm((f: any) => ({ ...f, ticket_price: e.target.value }))} />
+              </div>
+              <div className="space-y-2">
+                <Label>Distance</Label>
+                <Input value={form.distance_from_city || ""}
+                  onChange={(e) => setForm((f: any) => ({ ...f, distance_from_city: e.target.value }))} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Button type="submit" disabled={saving}>
+              {saving ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</> : <><Save className="mr-2 h-4 w-4" /> Save Changes</>}
+            </Button>
+            <Link href="/admin/spots">
+              <Button variant="outline" type="button">Cancel</Button>
+            </Link>
+          </div>
+          <Button variant="destructive" type="button"
+            onClick={async () => {
+              if (confirm("Delete this spot?")) {
+                await supabase.from("spots").delete().eq("slug", params.id)
+                router.push("/admin/spots")
+              }
+            }}>
+            <Trash2 className="mr-2 h-4 w-4" /> Delete
+          </Button>
+        </div>
+      </form>
+    </div>
+  )
+}
