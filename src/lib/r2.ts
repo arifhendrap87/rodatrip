@@ -5,6 +5,9 @@ const accessKeyId = process.env.CLOUDFLARE_R2_ACCESS_KEY_ID!
 const secretAccessKey = process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY!
 const bucketName = process.env.CLOUDFLARE_R2_PUBLIC_BUCKET!
 
+const env = process.env.VERCEL_ENV || "development"
+const envPrefix = env === "production" ? "prod" : env === "preview" ? "staging" : "dev"
+
 export const r2Client = new S3Client({
   region: "auto",
   endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
@@ -16,7 +19,7 @@ export async function uploadImage(
   fileName: string,
   folder: string = "spots"
 ): Promise<string> {
-  const key = `${folder}/${Date.now()}-${fileName}`
+  const key = `${envPrefix}/${folder}/${Date.now()}-${fileName}`
 
   await r2Client.send(
     new PutObjectCommand({
