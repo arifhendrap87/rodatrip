@@ -28,8 +28,9 @@ export interface Route {
   origin: string
   destination: string
   distance_km: number
+  duration_hours?: number
   polyline: [number, number][]
-  poi_ids: string[]
+  poi_ids?: string[]
 }
 
 export interface TripEstimate {

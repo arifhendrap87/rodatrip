@@ -135,6 +135,16 @@ export const api = {
       request<{ data: { date: string; views: number }[] }>(`/analytics/views/daily?days=${days}`),
   },
 
+  blog: {
+    list: (params?: Record<string, string>) => {
+      const qs = params ? `?${new URLSearchParams(params)}` : ""
+      return request<{ data: Record<string, unknown>[] }>(`/blog${qs}`)
+    },
+
+    get: (slug: string) =>
+      request<{ data: Record<string, unknown> }>(`/blog/${slug}`),
+  },
+
   admin: {
     stats: () =>
       request<{ data: { spots: number; products: number; waitlist: number; views: number } }>("/admin/stats"),

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { mockProducts } from "@/lib/mock/products"
+import { api } from "@/lib/api/client"
 import { PRODUCT_CATEGORIES } from "@/lib/constants"
 import { ProductCard } from "@/components/product/ProductCard"
 import { CartSheet } from "@/components/product/CartSheet"
@@ -11,11 +11,20 @@ export default function ProductsPage() {
   const [activeCategory, setActiveCategory] = useState<string>("Semua")
   const [cart, setCart] = useState<Product[]>([])
   const [cartOpen, setCartOpen] = useState(false)
+  const [products, setProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useState(() => {
+    api.products.list()
+      .then((res: any) => setProducts(res?.data || []))
+      .catch(() => setProducts([]))
+      .finally(() => setLoading(false))
+  })
 
   const filteredProducts =
     activeCategory === "Semua"
-      ? mockProducts
-      : mockProducts.filter((p) => p.category === activeCategory)
+      ? products
+      : products.filter((p) => p.category === activeCategory)
 
   const addToCart = (product: Product) => {
     setCart((prev) => [...prev, product])
@@ -38,12 +47,9 @@ export default function ProductsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold font-heading">Produk Roadtrip</h1>
-            <p className="mt-1 text-muted-foreground">
-              Perlengkapan roadtrip yang pas buat perjalanan kamu.
-            </p>
+            <p className="mt-1 text-muted-foreground">Perlengkapan roadtrip yang pas buat perjalanan kamu.</p>
           </div>
-          <button
-            onClick={() => setCartOpen(true)}
+          <button onClick={() => setCartOpen(true)}
             className="relative rounded-xl border border-border/50 bg-white px-4 py-2.5 shadow-sm transition-all hover:shadow-md"
           >
             <div className="flex items-center gap-2">
@@ -51,50 +57,31 @@ export default function ProductsPage() {
               <span className="text-sm font-medium">Keranjang</span>
             </div>
             {cart.length > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-                {cart.length}
-              </span>
+              <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">{cart.length}</span>
             )}
           </button>
         </div>
 
         <div className="mt-8 flex flex-wrap gap-2">
-          <button
-            onClick={() => setActiveCategory("Semua")}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
-              activeCategory === "Semua"
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted/50 text-muted-foreground hover:bg-muted"
-            }`}
-          >
-            Semua
-          </button>
+          <button onClick={() => setActiveCategory("Semua")}
+            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${activeCategory === "Semua" ? "bg-primary text-primary-foreground" : "bg-muted/50 text-muted-foreground hover:bg-muted"}`}>Semua</button>
           {PRODUCT_CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
-                activeCategory === cat
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted/50 text-muted-foreground hover:bg-muted"
-              }`}
-            >
-              {cat}
-            </button>
+            <button key={cat} onClick={() => setActiveCategory(cat)}
+              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${activeCategory === cat ? "bg-primary text-primary-foreground" : "bg-muted/50 text-muted-foreground hover:bg-muted"}`}>{cat}</button>
           ))}
         </div>
 
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filteredProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onAddToCart={() => addToCart(product)}
-            />
-          ))}
-        </div>
+        {loading ? (
+          <div className="mt-12 text-center text-muted-foreground py-16">Memuat produk...</div>
+        ) : (
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filteredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} onAddToCart={() => addToCart(product)} />
+            ))}
+          </div>
+        )}
 
-        {filteredProducts.length === 0 && (
+        {!loading && filteredProducts.length === 0 && (
           <div className="flex flex-col items-center justify-center text-center py-16">
             <span className="text-4xl opacity-30 mb-4">📦</span>
             <p className="text-sm font-medium text-muted-foreground">Tidak ada produk di kategori ini</p>
@@ -103,13 +90,7 @@ export default function ProductsPage() {
         )}
       </div>
 
-      <CartSheet
-        open={cartOpen}
-        onClose={() => setCartOpen(false)}
-        items={cart}
-        total={cartTotal}
-        onRemove={removeFromCart}
-      />
+      <CartSheet open={cartOpen} onClose={() => setCartOpen(false)} items={cart} total={cartTotal} onRemove={removeFromCart} />
     </div>
   )
 }
