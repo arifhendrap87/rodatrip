@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { supabase } from "@/lib/supabase"
+import { api } from "@/lib/api/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -31,18 +31,21 @@ export default function NewProductPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSaving(true)
-    const { error } = await supabase.from("products").insert([{
-      slug: form.slug || generateSlug(form.name),
-      name: form.name,
-      category: form.category,
-      price: parseInt(form.price),
-      description: form.description,
-      rating: parseFloat(form.rating),
-      image_url: form.image_url,
-      stock_quantity: parseInt(form.stock_quantity),
-    }])
-    if (error) alert("Error: " + error.message)
-    else router.push("/admin/products")
+    try {
+      await api.products.create({
+        slug: form.slug || generateSlug(form.name),
+        name: form.name,
+        category: form.category,
+        price: parseInt(form.price),
+        description: form.description,
+        rating: parseFloat(form.rating),
+        image_url: form.image_url,
+        stock_quantity: parseInt(form.stock_quantity),
+      })
+      router.push("/admin/products")
+    } catch (err) {
+      alert("Error: " + (err as Error).message)
+    }
     setSaving(false)
   }
 

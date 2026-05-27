@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { supabase } from "@/lib/supabase"
+import { api } from "@/lib/api/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -111,12 +111,11 @@ export default function NewSpotPage() {
       image_credit: "Unsplash",
     }
 
-    const { error } = await supabase.from("spots").insert([spotData])
-
-    if (error) {
-      alert("Error: " + error.message)
-    } else {
+    try {
+      await api.spots.create(spotData as unknown as Record<string, unknown>)
       router.push("/admin/spots")
+    } catch (err) {
+      alert("Error: " + (err as Error).message)
     }
     setSaving(false)
   }

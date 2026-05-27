@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { supabase } from "@/lib/supabase"
+import { api } from "@/lib/api/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -38,23 +38,13 @@ export default function SpotsPage() {
 
   async function fetchSpots() {
     setLoading(true)
-    let query = supabase
-      .from("spots")
-      .select("*")
-      .order("created_at", { ascending: false })
+    const params: Record<string, string> = {}
+    if (search) params.search = search
+    if (categoryFilter !== "all") params.category = categoryFilter
+    if (provinceFilter !== "all") params.province = provinceFilter
 
-    if (search) {
-      query = query.ilike("name", `%${search}%`)
-    }
-    if (categoryFilter !== "all") {
-      query = query.eq("category", categoryFilter)
-    }
-    if (provinceFilter !== "all") {
-      query = query.eq("province", provinceFilter)
-    }
-
-    const { data } = await query
-    setSpots(data || [])
+    const res = await api.spots.list(params)
+    setSpots(res.data as any[])
     setLoading(false)
   }
 
@@ -64,7 +54,7 @@ export default function SpotsPage() {
 
   async function handleDelete(slug: string, name: string) {
     if (!confirm(`Hapus "${name}"?`)) return
-    await supabase.from("spots").delete().eq("slug", slug)
+    await api.spots.delete(slug)
     fetchSpots()
   }
 

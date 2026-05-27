@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { supabase } from "@/lib/supabase"
+import { api } from "@/lib/api/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -45,23 +45,21 @@ export default function EditSpotPage() {
 
   useEffect(() => {
     const slug = params.id as string
-    supabase
-      .from("spots")
-      .select("*")
-      .eq("slug", slug)
-      .single()
-      .then(({ data }) => {
+    api.spots.get(slug)
+      .then((res) => {
+        const data = res.data
         if (data) {
           setForm({
             ...data,
-            lat: data.location?.coordinates?.[0] || "",
-            lng: data.location?.coordinates?.[1] || "",
-            facilities: (data.facilities || []).join(", "),
-            tags: (data.tags || []).join(", "),
+            lat: (data.location as { coordinates?: number[] })?.coordinates?.[0] || "",
+            lng: (data.location as { coordinates?: number[] })?.coordinates?.[1] || "",
+            facilities: ((data.facilities as string[]) || []).join(", "),
+            tags: ((data.tags as string[]) || []).join(", "),
           })
         }
         setLoading(false)
       })
+      .catch(() => setLoading(false))
   }, [params.id])
 
   async function handleSubmit(e: React.FormEvent) {
@@ -88,15 +86,11 @@ export default function EditSpotPage() {
       is_featured: form.is_featured,
     }
 
-    const { error } = await supabase
-      .from("spots")
-      .update(updates)
-      .eq("slug", params.id)
-
-    if (error) {
-      alert("Error: " + error.message)
-    } else {
+    try {
+      await api.spots.update(params.id as string, updates)
       router.push("/admin/spots")
+    } catch (err) {
+      alert("Error: " + (err as Error).message)
     }
     setSaving(false)
   }
@@ -234,7 +228,7 @@ export default function EditSpotPage() {
           <Button variant="destructive" type="button"
             onClick={async () => {
               if (confirm("Delete this spot?")) {
-                await supabase.from("spots").delete().eq("slug", params.id)
+                await api.spots.delete(params.id as string)
                 router.push("/admin/spots")
               }
             }}>

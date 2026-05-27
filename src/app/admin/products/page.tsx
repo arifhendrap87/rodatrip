@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { supabase } from "@/lib/supabase"
+import { api } from "@/lib/api/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Plus, Edit, Trash2, ExternalLink } from "lucide-react"
@@ -12,19 +12,17 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase
-      .from("products")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .then(({ data }) => {
-        setProducts(data || [])
+    api.products.list()
+      .then((res) => {
+        setProducts(res.data as any[])
         setLoading(false)
       })
+      .catch(() => setLoading(false))
   }, [])
 
   async function handleDelete(id: string, name: string) {
     if (!confirm(`Hapus "${name}"?`)) return
-    await supabase.from("products").delete().eq("id", id)
+    await api.products.delete(id)
     setProducts((prev) => prev.filter((p) => p.id !== id))
   }
 

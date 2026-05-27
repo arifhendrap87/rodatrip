@@ -1,29 +1,19 @@
-import { createServerClient } from "@supabase/ssr"
-import { cookies } from "next/headers"
+import { createClient } from "@supabase/supabase-js"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { MapPin, ShoppingBag, Mail, Eye } from "lucide-react"
 
 async function getStats() {
-  const cookieStore = await cookies()
-  const supabase = createServerClient(
+  const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll() {},
-      },
-    }
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } }
   )
 
   const [spotsCount, productsCount, waitlistCount, viewsCount] = await Promise.all([
     supabase.from("spots").select("id", { count: "exact", head: true }),
     supabase.from("products").select("id", { count: "exact", head: true }),
     supabase.from("waitlist").select("id", { count: "exact", head: true }),
-    supabase.from("analytics").select("id", { count: "exact", head: true })
-      .eq("event_type", "page_view"),
+    supabase.from("analytics").select("id", { count: "exact", head: true }),
   ])
 
   return {

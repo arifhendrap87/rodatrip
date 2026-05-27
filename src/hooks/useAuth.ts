@@ -1,31 +1,18 @@
-import { createClient } from "@supabase/supabase-js"
-import { useEffect, useState } from "react"
+"use client"
+
+import { useEffect, useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { supabase } from "@/lib/supabase"
+import { api } from "@/lib/api/client"
 
 export function useAuth() {
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<{ id: string; email: string; role: string; full_name?: string } | null>(null)
   const [loading, setLoading] = useState(true)
-  const router = useRouter()
 
   useEffect(() => {
-    const getSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      setUser(session?.user ?? null)
-      setLoading(false)
-    }
-
-    getSession()
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-    })
-
-    return () => subscription.unsubscribe()
+    api.auth.session()
+      .then((res) => setUser(res.data.user as typeof user))
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false))
   }, [])
 
   return { user, loading }
@@ -44,35 +31,32 @@ export function useRequireAuth() {
   return { user, loading }
 }
 
-export async function signIn(email: string, password: string) {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  })
-  return { data, error }
+export async function signIn(email: string, password: string): Promise<{ data?: unknown; error?: Error }> {
+  try {
+    const res = await api.auth.signin(email, password)
+    return { data: res.data }
+  } catch (err) {
+    return { error: err as Error }
+  }
 }
 
 export async function signInWithGoogle() {
-  const { data, error } = await supabase.auth.signInWithOAuth({
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const { createBrowserClient } = await import("@supabase/ssr")
+  const supabase = createBrowserClient(
+    supabaseUrl || "",
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
+  )
+
+  return supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
       redirectTo: `${window.location.origin}/admin/auth/callback`,
     },
   })
-  return { data, error }
-}
-
-export async function signUp(email: string, password: string) {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo: `${window.location.origin}/admin/auth/callback`,
-    },
-  })
-  return { data, error }
 }
 
 export async function signOut() {
-  await supabase.auth.signOut()
+  await api.auth.signout()
+  window.location.href = "/admin/login"
 }
