@@ -8,12 +8,13 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || ""
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || ""
 const BUCKET = process.env.CLOUDFLARE_R2_PUBLIC_BUCKET || "gaskuy-spot-images"
 const PREFIX = "dev"
+const PUBLIC_DOMAIN = process.env.R2_PUBLIC_DOMAIN || `${BUCKET}.r2.cloudflarestorage.com`
 
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
   auth: { autoRefreshToken: false, persistSession: false },
 })
 
-const R2_BASE = `https://${BUCKET}.r2.cloudflarestorage.com/${PREFIX}`
+const R2_BASE = `https://${PUBLIC_DOMAIN}/${PREFIX}`
 
 async function main() {
   console.log("")

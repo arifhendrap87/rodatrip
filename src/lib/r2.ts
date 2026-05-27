@@ -8,6 +8,9 @@ const bucketName = process.env.CLOUDFLARE_R2_PUBLIC_BUCKET!
 const env = process.env.VERCEL_ENV || "development"
 const envPrefix = env === "production" ? "prod" : env === "preview" ? "staging" : "dev"
 
+// Public domain — updates when custom domain is ready
+const PUBLIC_DOMAIN = process.env.R2_PUBLIC_DOMAIN || `${bucketName}.r2.cloudflarestorage.com`
+
 export const r2Client = new S3Client({
   region: "auto",
   endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
@@ -30,7 +33,7 @@ export async function uploadImage(
     })
   )
 
-  return `https://${bucketName}.r2.cloudflarestorage.com/${key}`
+  return `https://${PUBLIC_DOMAIN}/${key}`
 }
 
 export async function deleteImage(key: string): Promise<void> {

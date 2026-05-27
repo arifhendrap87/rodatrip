@@ -5,6 +5,11 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "images.gaskuy.id",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
         hostname: "gaskuy-spot-images.r2.cloudflarestorage.com",
         pathname: "/**",
       },
