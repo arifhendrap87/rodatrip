@@ -1,12 +1,12 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { supabase } from "@/lib/supabase"
+import { api } from "@/lib/api/client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, LineChart, Line, AreaChart, Area,
+  PieChart, Pie, Cell, AreaChart, Area,
 } from "recharts"
 
 const COLORS = ["#f97316", "#06b6d4", "#a855f7", "#10b981", "#f43f5e", "#eab308"]
@@ -23,43 +23,30 @@ export default function AnalyticsPage() {
 
   async function fetchAnalytics() {
     const days = timeRange === "7d" ? 7 : timeRange === "30d" ? 30 : 90
-    const since = new Date()
-    since.setDate(since.getDate() - days)
 
-    const { data: spots } = await supabase
-      .from("spots")
-      .select("name, view_count, category")
-      .order("view_count", { ascending: false })
-      .limit(10)
+    const [spotsRes, categoriesRes, viewsRes] = await Promise.all([
+      api.analytics.spots().catch(() => null),
+      api.analytics.categories().catch(() => null),
+      api.analytics.dailyViews(days).catch(() => null),
+    ])
 
-    if (spots) setSpotViews(spots)
-
-    const { data: allSpots } = await supabase
-      .from("spots")
-      .select("category, id")
-
-    if (allSpots) {
-      const counts: Record<string, number> = {}
-      allSpots.forEach((s) => {
-        counts[s.category] = (counts[s.category] || 0) + 1
-      })
-      setCategoryData(Object.entries(counts).map(([name, value]) => ({ name, value })))
+    if (spotsRes?.data) {
+      setSpotViews(spotsRes.data.map((s: any) => ({
+        name: s.name,
+        view_count: s.view_count,
+        category: s.category,
+      })))
     }
 
-    const { data: events } = await supabase
-      .from("analytics")
-      .select("*")
-      .eq("event_type", "page_view")
-      .gte("created_at", since.toISOString())
-      .order("created_at", { ascending: true })
+    if (categoriesRes?.data) {
+      setCategoryData(categoriesRes.data.map((c: any) => ({
+        name: c.category,
+        value: c.count,
+      })))
+    }
 
-    if (events) {
-      const daily: Record<string, number> = {}
-      events.forEach((e) => {
-        const day = new Date(e.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short" })
-        daily[day] = (daily[day] || 0) + 1
-      })
-      setDailyViews(Object.entries(daily).map(([date, views]) => ({ date, views })))
+    if (viewsRes?.data) {
+      setDailyViews(viewsRes.data)
     }
   }
 

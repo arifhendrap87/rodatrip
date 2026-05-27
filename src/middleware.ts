@@ -3,12 +3,40 @@ import { createClient } from "@supabase/supabase-js"
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
+const ALLOWED_ORIGINS = [
+  "https://gaskuy-roadtrip.vercel.app",
+  "https://gaskuy-roadtrip-kkobh3vnv-arifhendrap87s-projects.vercel.app",
+  "http://localhost:3000",
+  "http://localhost",
+]
+
+const CSP_HEADERS = {
+  "x-frame-options": "DENY",
+  "x-content-type-options": "nosniff",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "x-dns-prefetch-control": "on",
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const response = NextResponse.next()
 
   // Set pathname header for root layout to use
   response.headers.set("x-pathname", pathname)
+
+  // Security headers
+  for (const [key, value] of Object.entries(CSP_HEADERS)) {
+    response.headers.set(key, value)
+  }
+
+  // CORS protection for API routes
+  if (pathname.startsWith("/api")) {
+    const origin = request.headers.get("origin")
+    if (origin && !ALLOWED_ORIGINS.includes(origin)) {
+      // Not allowed, but still process (we just don't add ACAO header)
+      // This prevents cross-origin reads
+    }
+  }
 
   // Only run auth checks for /admin routes
   if (pathname.startsWith("/admin")) {

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { supabase } from "@/lib/supabase"
+import { api } from "@/lib/api/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Mail, Download } from "lucide-react"
@@ -11,19 +11,15 @@ export default function WaitlistPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase
-      .from("waitlist")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .then(({ data }) => {
-        setEmails(data || [])
-        setLoading(false)
-      })
+    api.waitlist.list()
+      .then((res) => setEmails(res.data || []))
+      .catch(() => setEmails([]))
+      .finally(() => setLoading(false))
   }, [])
 
   function exportCSV() {
     const csv = "Email,Source,Date\n" +
-      emails.map((e) => `${e.email},${e.source},${new Date(e.created_at).toLocaleDateString("id-ID")}`).join("\n")
+      emails.map((e: any) => `${e.email},${e.source},${new Date(e.created_at).toLocaleDateString("id-ID")}`).join("\n")
     const blob = new Blob([csv], { type: "text/csv" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
@@ -58,7 +54,7 @@ export default function WaitlistPage() {
         <Card>
           <CardContent className="p-0">
             <div className="divide-y">
-              {emails.map((entry) => (
+              {emails.map((entry: any) => (
                 <div key={entry.id} className="flex items-center justify-between p-4">
                   <div>
                     <p className="font-medium">{entry.email}</p>

@@ -38,6 +38,9 @@ export const api = {
 
     session: () =>
       request<{ data: { user: { id: string; email: string; role: string; fullName?: string; avatarUrl?: string }; session: { access_token: string; expires_at: number } } }>("/auth/session"),
+
+    google: () =>
+      request<{ data: { url: string } }>("/auth/google"),
   },
 
   spots: {
@@ -127,5 +130,13 @@ export const api = {
         method: "POST",
         body: { eventType, entityType, entityId, metadata },
       }),
+
+    dailyViews: (days = 30) =>
+      request<{ data: { date: string; views: number }[] }>(`/analytics/views/daily?days=${days}`),
+  },
+
+  admin: {
+    stats: () =>
+      request<{ data: { spots: number; products: number; waitlist: number; views: number } }>("/admin/stats"),
   },
 }

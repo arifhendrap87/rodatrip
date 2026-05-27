@@ -1,5 +1,16 @@
-import { serverSupabase } from "./supabase"
+import { createClient } from "@supabase/supabase-js"
 import type { Spot } from "@/types"
+
+const serverSupabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  }
+)
 
 export async function getAllSpots() {
   const { data, error } = await serverSupabase

@@ -1,26 +1,13 @@
-import { createClient } from "@supabase/supabase-js"
+import { api } from "@/lib/api/client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { MapPin, ShoppingBag, Mail, Eye } from "lucide-react"
 
 async function getStats() {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  )
-
-  const [spotsCount, productsCount, waitlistCount, viewsCount] = await Promise.all([
-    supabase.from("spots").select("id", { count: "exact", head: true }),
-    supabase.from("products").select("id", { count: "exact", head: true }),
-    supabase.from("waitlist").select("id", { count: "exact", head: true }),
-    supabase.from("analytics").select("id", { count: "exact", head: true }),
-  ])
-
-  return {
-    spots: spotsCount.count || 0,
-    products: productsCount.count || 0,
-    waitlist: waitlistCount.count || 0,
-    views: viewsCount.count || 0,
+  try {
+    const res = await api.admin.stats()
+    return res.data
+  } catch {
+    return { spots: 0, products: 0, waitlist: 0, views: 0 }
   }
 }
 

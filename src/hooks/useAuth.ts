@@ -40,20 +40,16 @@ export async function signIn(email: string, password: string): Promise<{ data?: 
   }
 }
 
-export async function signInWithGoogle() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const { createBrowserClient } = await import("@supabase/ssr")
-  const supabase = createBrowserClient(
-    supabaseUrl || "",
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
-  )
-
-  return supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: `${window.location.origin}/admin/auth/callback`,
-    },
-  })
+export async function signInWithGoogle(): Promise<{ data?: { url: string }; error?: Error }> {
+  try {
+    const res = await api.auth.google()
+    if (res.data?.url) {
+      window.location.href = res.data.url
+    }
+    return { data: res.data }
+  } catch (err) {
+    return { error: err as Error }
+  }
 }
 
 export async function signOut() {
