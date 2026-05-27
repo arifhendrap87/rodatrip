@@ -104,7 +104,7 @@ export function MapSidebar({
               />
               <datalist id="origin-list">
                 {POPULAR_ROUTES.map((r) => (
-                  <option key={r.origin} value={r.origin} />
+                  <option key={r.label} value={r.origin} />
                 ))}
               </datalist>
               <Input
@@ -116,7 +116,7 @@ export function MapSidebar({
               />
               <datalist id="dest-list">
                 {POPULAR_ROUTES.map((r) => (
-                  <option key={r.destination} value={r.destination} />
+                  <option key={r.label} value={r.destination} />
                 ))}
               </datalist>
               <select

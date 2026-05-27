@@ -32,7 +32,7 @@ export function Hero() {
         className="object-cover"
         priority
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/80 to-white/60" />
+      <div className="absolute inset-0 bg-gradient-to-r from-white/60 via-white/40 to-white/20" />
       <div className="absolute inset-0 bg-gradient-to-t from-primary/[0.08] via-transparent to-transparent" />
       <BlobBackground position="top-right" className="opacity-70" />
       <BlobBackground position="bottom-left" className="opacity-50" />
