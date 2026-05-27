@@ -104,13 +104,10 @@ export default function AdminLayout({
 
       {/* Mobile sidebar */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetTrigger onClick={() => setMobileOpen(true)} className="fixed left-3 top-3 z-50 md:hidden">
-          <Button
-            variant="ghost"
-            size="icon"
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
+        <SheetTrigger
+          className="fixed left-3 top-3 z-50 inline-flex items-center justify-center rounded-lg border border-input bg-background p-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground md:hidden"
+        >
+          <Menu className="h-5 w-5" />
         </SheetTrigger>
         <SheetContent side="left" className="w-56 p-0">
           <SidebarContent />

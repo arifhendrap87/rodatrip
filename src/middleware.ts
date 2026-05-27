@@ -4,33 +4,36 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
 export async function middleware(request: NextRequest) {
-  const response = NextResponse.next()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            request.cookies.set(name, value)
-            response.cookies.set(name, value, options)
-          })
-        },
-      },
-    }
-  )
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
   const { pathname } = request.nextUrl
+  const response = NextResponse.next()
 
-  // Protect /admin routes
+  // Set pathname header for root layout to use
+  response.headers.set("x-pathname", pathname)
+
+  // Only run auth checks for /admin routes
   if (pathname.startsWith("/admin")) {
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              request.cookies.set(name, value)
+              response.cookies.set(name, value, options)
+            })
+          },
+        },
+      }
+    )
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+
     if (pathname === "/admin/login" || pathname.startsWith("/admin/auth")) {
       return response
     }
@@ -41,8 +44,6 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl)
     }
 
-    // Check if user has profile with super_admin role
-    // Use service_role client to bypass RLS and ensure consistent access
     const adminClient = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -66,5 +67,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
 }

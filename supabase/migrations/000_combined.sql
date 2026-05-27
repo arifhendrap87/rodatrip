@@ -224,3 +224,7 @@ CREATE POLICY "Admin can view analytics" ON analytics
 
 CREATE POLICY "Admin can insert analytics" ON analytics
   FOR INSERT TO authenticated, anon WITH CHECK (true);
+
+-- Service role grants (needed for middleware admin profile check)
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO service_role;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO service_role;

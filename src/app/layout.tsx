@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { headers } from "next/headers"
 import "./globals.css"
 import { Navbar } from "@/components/landing/Navbar"
 import { Footer } from "@/components/landing/Footer"
@@ -23,11 +24,25 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const headersList = await headers()
+  const pathname = headersList.get("x-pathname") || ""
+  const isAdmin = pathname.startsWith("/admin")
+
+  if (isAdmin) {
+    return (
+      <html lang="id" className="h-full antialiased">
+        <body className="min-h-full bg-background text-foreground">
+          {children}
+        </body>
+      </html>
+    )
+  }
+
   return (
     <html lang="id" className="h-full antialiased">
       <body className="min-h-full flex flex-col bg-background text-foreground">
