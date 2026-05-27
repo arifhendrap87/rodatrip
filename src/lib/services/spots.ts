@@ -38,35 +38,40 @@ export async function getSpots(options?: {
   limit?: number
   offset?: number
 }): Promise<{ data: SpotData[]; total: number }> {
-  let query = db.from("spots").select("*", { count: "exact" })
+  try {
+    let query = db.from("spots").select("*", { count: "exact" })
 
-  if (options?.category) query = query.eq("category", options.category)
-  if (options?.region) query = query.eq("region", options.region)
-  if (options?.province) query = query.eq("province", options.province)
-  if (options?.search) query = query.ilike("name", `%${options.search}%`)
-  if (options?.featured) query = query.eq("is_featured", true)
+    if (options?.category) query = query.eq("category", options.category)
+    if (options?.region) query = query.eq("region", options.region)
+    if (options?.province) query = query.eq("province", options.province)
+    if (options?.search) query = query.ilike("name", `%${options.search}%`)
+    if (options?.featured) query = query.eq("is_featured", true)
 
-  const limit = options?.limit || 20
-  const offset = options?.offset || 0
+    const limit = options?.limit || 20
+    const offset = options?.offset || 0
 
-  const { data, count, error } = await query
-    .order("created_at", { ascending: false })
-    .range(offset, offset + limit - 1)
+    const { data, count, error } = await query
+      .order("created_at", { ascending: false })
+      .range(offset, offset + limit - 1)
 
-  if (error) throw error
-  return { data: (data || []) as SpotData[], total: count || 0 }
+    if (error) return { data: [], total: 0 }
+    return { data: (data || []) as SpotData[], total: count || 0 }
+  } catch {
+    return { data: [], total: 0 }
+  }
 }
 
 export async function getSpotBySlug(slug: string): Promise<SpotData | null> {
-  const { data, error } = await db
-    .from("spots")
-    .select("*")
-    .eq("slug", slug)
-    .single()
+  try {
+    const { data, error } = await db
+      .from("spots")
+      .select("*")
+      .eq("slug", slug)
+      .single()
 
-  if (error) {
-    if (error.code === "PGRST116") return null
-    throw error
+    if (error) return null
+    return data as SpotData
+  } catch {
+    return null
   }
-  return data as SpotData
 }

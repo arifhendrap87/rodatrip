@@ -21,31 +21,36 @@ export async function getPosts(options?: {
   category?: string
   limit?: number
 }): Promise<BlogPostData[]> {
-  let query = db
-    .from("blog_posts")
-    .select("*")
-    .eq("is_published", true)
-    .order("published_at", { ascending: false })
+  try {
+    let query = db
+      .from("blog_posts")
+      .select("*")
+      .eq("is_published", true)
+      .order("published_at", { ascending: false })
 
-  if (options?.category) query = query.eq("category", options.category)
-  if (options?.limit) query = query.limit(options.limit)
+    if (options?.category) query = query.eq("category", options.category)
+    if (options?.limit) query = query.limit(options.limit)
 
-  const { data, error } = await query
-  if (error) throw error
-  return (data || []) as BlogPostData[]
+    const { data, error } = await query
+    if (error) return []
+    return (data || []) as BlogPostData[]
+  } catch {
+    return []
+  }
 }
 
 export async function getPostBySlug(slug: string): Promise<BlogPostData | null> {
-  const { data, error } = await db
-    .from("blog_posts")
-    .select("*")
-    .eq("slug", slug)
-    .eq("is_published", true)
-    .single()
+  try {
+    const { data, error } = await db
+      .from("blog_posts")
+      .select("*")
+      .eq("slug", slug)
+      .eq("is_published", true)
+      .single()
 
-  if (error) {
-    if (error.code === "PGRST116") return null
-    throw error
+    if (error) return null
+    return data as BlogPostData
+  } catch {
+    return null
   }
-  return data as BlogPostData
 }
