@@ -17,7 +17,7 @@ const CSP_HEADERS = {
   "x-dns-prefetch-control": "on",
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
   const response = NextResponse.next()
 
