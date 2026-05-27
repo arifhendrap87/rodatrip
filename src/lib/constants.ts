@@ -9,6 +9,22 @@ export const NAV_LINKS: NavLink[] = [
   { href: "/spot-istimewa", label: "Spot Istimewa" },
   { href: "/map", label: "Peta" },
   { href: "/products", label: "Produk" },
+  { href: "/blog", label: "Blog" },
+]
+
+export const FOOTER_LINKS_UTILITY: NavLink[] = [
+  { href: "/about", label: "Tentang Kami" },
+  { href: "/contact", label: "Kontak" },
+  { href: "/faq", label: "FAQ" },
+  { href: "/privacy", label: "Kebijakan Privasi" },
+  { href: "/terms", label: "Syarat & Ketentuan" },
+]
+
+export const FOOTER_LINKS_SPOTS: NavLink[] = [
+  { href: "/spot-istimewa", label: "Semua Spot" },
+  { href: "/map", label: "Peta Interaktif" },
+  { href: "/products", label: "Toko Roadtrip" },
+  { href: "/blog", label: "Blog" },
 ]
 
 export const SOCIAL_LINKS = {
