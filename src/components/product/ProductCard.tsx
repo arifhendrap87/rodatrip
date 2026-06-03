@@ -41,7 +41,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
           className="relative aspect-[4/3] w-full overflow-hidden rounded-t-2xl bg-gradient-to-br from-primary/10 to-secondary/10"
         >
           <Image
-            src={getProductImage(product.id)}
+            src={product.image_url || getProductImage(product.id)}
             alt={product.name}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -95,7 +95,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
 
           <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10">
             <Image
-              src={getProductImage(product.id)}
+              src={product.image_url || getProductImage(product.id)}
               alt={product.name}
               fill
               className="object-cover"

@@ -30,12 +30,28 @@ async function main() {
   }
   console.log(`  🏞️  Spots: ${spotUpdated}/${Object.keys(cache.spots).length} updated`)
 
-  // Update products by id
+  // Update products by name (mock ID "prod-1" doesn't match DB UUID)
+  const productNameMap: Record<string, string> = {
+    "prod-1": "Tire Inflator Portable 12V",
+    "prod-2": "Segitiga Pengaman Lipat",
+    "prod-3": "P3K Kit Mobil 40 pcs",
+    "prod-4": "Car Pillow Travel Memory Foam",
+    "prod-5": "Cooler Bag 20L Insulated",
+    "prod-6": "Phone Mount Dashboard Magnet",
+    "prod-7": "Dashcam 1080p Wide Angle",
+    "prod-8": "Trunk Organizer Lipat",
+    "prod-9": "Seat Gap Filler",
+    "prod-10": "Roadtrip Sticker Pack",
+    "prod-11": "Tumbler Stainless 500ml",
+    "prod-12": "Roadtrip Starter Pack Bundle",
+  }
   let prodUpdated = 0
   for (const [id, url] of Object.entries(cache.products) as [string, string][]) {
-    const { error } = await supabase.from("products").update({ image_url: url }).eq("id", id)
+    const name = productNameMap[id]
+    if (!name) continue
+    const { error } = await supabase.from("products").update({ image_url: url }).eq("name", name)
     if (!error) prodUpdated++
-    else console.log(`  ⚠️ Product "${id}": ${error.message}`)
+    else console.log(`  ⚠️ Product "${name}": ${error.message}`)
   }
   console.log(`  🛒 Products: ${prodUpdated}/${Object.keys(cache.products).length} updated`)
 
