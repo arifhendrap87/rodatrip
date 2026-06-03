@@ -38,7 +38,7 @@ Pantau prakiraan cuaca di rute yang akan dilewati untuk antisipasi kondisi jalan
 
 ## 7. Istirahat Cukup
 Jangan memaksakan diri. Istirahat setiap 3-4 jam perjalanan untuk menjaga konsentrasi.`,
-    image: "/placeholder.svg",
+    image: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/blog/persiapan-roadtrip-jauh.jpg",
     category: "Tips & Trik",
     author: "Tim Gaskuy",
     date: "2026-05-25",
@@ -65,7 +65,7 @@ Air terjun tersembunyi di kawasan Bandung Selatan. Trekking ringan dengan pemand
 
 ## 5. Situ Patenggang
 Danau dengan pulau kecil di tengahnya, konon tempat berseminya cinta. Romantis banget buat couple.`,
-    image: "/placeholder.svg",
+    image: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/blog/destinasi-wisata-jawa-barat.jpg",
     category: "Destinasi",
     author: "Tim Gaskuy",
     date: "2026-05-20",
@@ -100,7 +100,7 @@ Jalur selatan menawarkan pemandangan yang lebih bervariasi dibanding jalur pantu
 - Berangkat pagi hari (05.00-06.00) untuk hindari macet
 - Siapkan playlist lagu favorit
 - Bawa camilan dan air mineral yang cukup`,
-    image: "/placeholder.svg",
+    image: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/blog/rute-jakarta-yogyakarta.jpg",
     category: "Rute",
     author: "Tim Gaskuy",
     date: "2026-05-15",
@@ -142,7 +142,7 @@ Jendela terbuka di kecepatan tinggi meningkatkan drag dan konsumsi BBM.
 
 ## 10. Cari SPBU dengan Harga Lebih Murah
 Gunakan aplikasi untuk membandingkan harga BBM di SPBU sepanjang rute.`,
-    image: "/placeholder.svg",
+    image: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/blog/hemat-bbm-saat-roadtrip.jpg",
     category: "Tips & Trik",
     author: "Tim Gaskuy",
     date: "2026-05-10",
@@ -184,7 +184,7 @@ Tidak semua SPBU atau pedagang di pinggir jalan menerima pembayaran digital.
 
 ## 10. Camilan
 Biar perut tetap terisi dan perjalanan tetap menyenangkan.`,
-    image: "/placeholder.svg",
+    image: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/blog/perlengkapan-wajib-mobil.jpg",
     category: "Perlengkapan",
     author: "Tim Gaskuy",
     date: "2026-05-05",
@@ -226,7 +226,7 @@ Bakso ukuran jumbo dengan kuah kaldu sapi yang gurih. Cocok banget buat ngisi pe
 
 **Lokasi:** Bakso Pak Gendut, Solo
 **Harga:** Rp 25.000 - Rp 40.000 per porsi`,
-    image: "/placeholder.svg",
+    image: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/blog/kuliner-wajib-coba-saat-roadtrip.jpg",
     category: "Kuliner",
     author: "Tim Gaskuy",
     date: "2026-04-28",

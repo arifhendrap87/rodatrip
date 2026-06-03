@@ -11,6 +11,7 @@ export const mockPOI: POI[] = [
     rating: 4.2,
     address: "Jl. Raya Jakarta-Cianjur Km 45, Cianjur",
     description: "SPBU Pertamina dengan fasilitas toilet dan mushola",
+    image_url: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/poi/spbu-1.jpg",
   },
   {
     id: "spbu-2",
@@ -21,6 +22,7 @@ export const mockPOI: POI[] = [
     rating: 4.5,
     address: "Jl. Raya Cikampek, Karawang",
     description: "SPBU Shell dengan SPBU digital dan minimarket",
+    image_url: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/poi/spbu-2.jpg",
   },
   {
     id: "spbu-3",
@@ -31,6 +33,7 @@ export const mockPOI: POI[] = [
     rating: 4.0,
     address: "Jl. Raya Nagreg, Garut",
     description: "SPBU strategis di jalur selatan Jawa",
+    image_url: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/poi/spbu-3.jpg",
   },
   {
     id: "spbu-4",
@@ -40,6 +43,7 @@ export const mockPOI: POI[] = [
     longitude: 109.2237,
     rating: 4.3,
     address: "Jl. Raya Baturraden, Purwokerto",
+    image_url: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/poi/spbu-4.jpg",
   },
   {
     id: "spbu-5",
@@ -49,6 +53,7 @@ export const mockPOI: POI[] = [
     longitude: 110.3809,
     rating: 4.1,
     address: "Jl. Magelang Km 5, Sleman, Yogyakarta",
+    image_url: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/poi/spbu-5.jpg",
   },
 
   // Kuliner
@@ -61,6 +66,7 @@ export const mockPOI: POI[] = [
     rating: 4.5,
     address: "Jl. Raya Bandung-Cianjur, Cianjur",
     description: "Sate maranggi legendaris, buka sejak 1985",
+    image_url: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/poi/kuliner-1.jpg",
   },
   {
     id: "kuliner-2",
@@ -71,6 +77,7 @@ export const mockPOI: POI[] = [
     rating: 4.4,
     address: "Jl. Raya Cirebon-Kuningan, Cirebon",
     description: "Nasi jamblang khas Cirebon dengan lauk komplit",
+    image_url: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/poi/kuliner-2.jpg",
   },
   {
     id: "kuliner-3",
@@ -80,6 +87,7 @@ export const mockPOI: POI[] = [
     longitude: 110.8233,
     rating: 4.3,
     address: "Jl. Slamet Riyadi, Solo",
+    image_url: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/poi/kuliner-3.jpg",
   },
   {
     id: "kuliner-4",
@@ -90,6 +98,7 @@ export const mockPOI: POI[] = [
     rating: 4.6,
     address: "Jl. Kaliurang Km 5, Yogyakarta",
     description: "Gudeg legendaris Jogja, buka 24 jam",
+    image_url: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/poi/kuliner-4.jpg",
   },
   {
     id: "kuliner-5",
@@ -99,6 +108,7 @@ export const mockPOI: POI[] = [
     longitude: 110.8284,
     rating: 4.2,
     address: "Jl. Brigjen Katamso, Solo",
+    image_url: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/poi/kuliner-5.jpg",
   },
 
   // Bengkel
@@ -111,6 +121,7 @@ export const mockPOI: POI[] = [
     rating: 4.0,
     address: "Jl. Raya Karawang Km 67",
     description: "Spesialis ganti aki dan ban 24 jam",
+    image_url: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/poi/bengkel-1.jpg",
   },
   {
     id: "bengkel-2",
@@ -120,6 +131,7 @@ export const mockPOI: POI[] = [
     longitude: 108.5579,
     rating: 4.4,
     address: "Jl. Raya Cirebon Km 2",
+    image_url: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/poi/bengkel-2.jpg",
   },
   {
     id: "bengkel-3",
@@ -129,6 +141,7 @@ export const mockPOI: POI[] = [
     longitude: 109.2348,
     rating: 3.8,
     address: "Jl. Raya Banyumas, Purwokerto",
+    image_url: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/poi/bengkel-3.jpg",
   },
 
   // Spot Foto
@@ -141,6 +154,7 @@ export const mockPOI: POI[] = [
     rating: 4.7,
     address: "Kawasan Puncak, Cianjur",
     description: "Danau vulkanik dengan pemandangan sunrise",
+    image_url: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/poi/spot-1.jpg",
   },
   {
     id: "spot-2",
@@ -150,6 +164,7 @@ export const mockPOI: POI[] = [
     longitude: 107.3704,
     rating: 4.5,
     address: "Kec. Cikalong Wetan, Bandung Barat",
+    image_url: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/poi/spot-2.jpg",
   },
   {
     id: "spot-3",
@@ -159,6 +174,7 @@ export const mockPOI: POI[] = [
     longitude: 108.2449,
     rating: 4.3,
     address: "Kec. Sukaraja, Tasikmalaya",
+    image_url: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/poi/spot-3.jpg",
   },
   {
     id: "spot-4",
@@ -169,6 +185,7 @@ export const mockPOI: POI[] = [
     rating: 4.1,
     address: "Klaten, Jawa Tengah",
     description: "Ladang jagung Instagramable dengan background Gunung Merapi",
+    image_url: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/poi/spot-4.jpg",
   },
   {
     id: "spot-5",
@@ -178,6 +195,7 @@ export const mockPOI: POI[] = [
     longitude: 110.3669,
     rating: 4.8,
     address: "Jl. Malioboro, Yogyakarta",
+    image_url: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/poi/spot-5.jpg",
   },
 
   // Info Jalan
@@ -190,6 +208,7 @@ export const mockPOI: POI[] = [
     rating: 0,
     address: "Km 80 Jalur Puncak, Cianjur",
     description: "Perbaikan jalan sepanjang 2 km. Estimasi selesai: 2 minggu. Alternatif: jalur Jonggol.",
+    image_url: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/poi/info-1.jpg",
   },
   {
     id: "info-2",
@@ -200,6 +219,7 @@ export const mockPOI: POI[] = [
     rating: 0,
     address: "Km 128 Jalur Sumedang",
     description: "Longsor setelah hujan deras. Buka-tutup jalur. Alternatif: lewat Cisewu.",
+    image_url: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/poi/info-2.jpg",
   },
   {
     id: "info-3",
@@ -210,5 +230,6 @@ export const mockPOI: POI[] = [
     rating: 0,
     address: "Km 106 Jalur Pantura Brebes",
     description: "Genangan air 20-30 cm. Tidak bisa dilalui kendaraan kecil.",
+    image_url: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/poi/info-3.jpg",
   },
 ]
