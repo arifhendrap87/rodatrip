@@ -26,7 +26,7 @@ export async function seedPOI() {
       location: `POINT(${poi.longitude} ${poi.latitude})`,
       address: poi.address || null,
       rating: poi.rating || null,
-      image_url: (poi as Record<string, unknown>).image_url || null,
+      image_url: poi.image_url || null,
       verified: false,
     })
 
