@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Search, Edit, Trash2, Eye, ExternalLink } from "lucide-react"
+import { Plus, Search, Edit, Trash2, Eye, ExternalLink, Sparkles } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -67,12 +67,20 @@ export default function SpotsPage() {
             Manage destination guides ({spots.length} total)
           </p>
         </div>
-        <Link href="/admin/spots/new">
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Spot
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href="/admin/spots/scrape">
+            <Button variant="outline">
+              <Sparkles className="mr-2 h-4 w-4" />
+              Scrape from Wikipedia
+            </Button>
+          </Link>
+          <Link href="/admin/spots/new">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Spot
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <Card className="mb-6">

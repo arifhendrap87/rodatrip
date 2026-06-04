@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { useAuth, signOut } from "@/hooks/useAuth"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Toaster } from "@/components/ui/sonner"
 import {
   LayoutDashboard,
   MapPin,
@@ -120,6 +121,7 @@ export default function AdminLayout({
           {children}
         </div>
       </main>
+      <Toaster position="top-right" />
     </div>
   )
 }
