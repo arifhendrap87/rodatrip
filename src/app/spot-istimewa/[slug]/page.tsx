@@ -6,8 +6,10 @@ import { SPOT_CATEGORIES } from "@/data/spots"
 import { getPopularRoutes } from "@/data/popular-routes"
 import { SITE_NAME } from "@/lib/constants"
 import { SpotCard } from "@/components/spot/SpotCard"
-import { getSpots, getSpotBySlug } from "@/lib/services/spots"
+import { getSpots, getSpotBySlug, getSpotCoordinates } from "@/lib/services/spots"
+import { getItinerariesBySpotSlug } from "@/lib/services/itineraries"
 import type { SpotData } from "@/lib/services/spots"
+import { NearbyPlaces } from "@/components/roadtrip/NearbyPlaces"
 
 export async function generateStaticParams() {
   const { data: spots } = await getSpots({ limit: 100 })
@@ -41,6 +43,7 @@ export default async function SpotDetailPage({ params }: { params: Promise<{ slu
   ].filter((i) => i.value)
 
   const { data: allSpots } = await getSpots({ limit: 100 })
+  const relatedItineraries = await getItinerariesBySpotSlug(slug)
 
   return (
     <>
@@ -114,6 +117,45 @@ export default async function SpotDetailPage({ params }: { params: Promise<{ slu
                   </div>
                 )
               })()}
+              {relatedItineraries.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-bold font-heading flex items-center gap-2"><span>🏎️</span><span>Roadtrip Ini Termasuk Dalam</span></h3>
+                  <p className="text-sm text-muted-foreground mt-1 mb-4">Spot ini bagian dari panduan roadtrip berikut:</p>
+                  <div className="flex flex-col gap-3">
+                    {relatedItineraries.map((it) => (
+                      <Link key={it.id} href={`/roadtrip/${it.slug}`}
+                        className="flex items-center gap-4 rounded-2xl border border-border/50 bg-white p-4 transition-all duration-300 hover:border-primary/30 hover:shadow-md hover:-translate-y-0.5"
+                      >
+                        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-xl">🏎️</span>
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold font-heading">{it.title}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{it.itineraryDuration} · {it.stops.length} destinasi</p>
+                        </div>
+                        <svg className="ml-auto w-5 h-5 text-muted-foreground shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {(() => {
+                const coords = getSpotCoordinates(spot)
+                if (!coords) return null
+                return (
+                  <div>
+                    <div className="border-t border-border/30 pt-8">
+                      <NearbyPlaces
+                        lat={coords.lat}
+                        lng={coords.lng}
+                        category="all"
+                        radius={5000}
+                        limit={6}
+                      />
+                    </div>
+                  </div>
+                )
+              })()}
+
               {spot.tips && (
                 <div className="rounded-2xl bg-gradient-to-br from-primary/[0.05] to-accent/[0.05] border border-border/50 p-6">
                   <h3 className="text-lg font-bold font-heading flex items-center gap-2"><span>💡</span><span>Tips</span></h3>

@@ -27,6 +27,14 @@ export interface SpotData {
   view_count: number
   created_at: string
   updated_at: string
+  location?: { type: "Point"; coordinates: [number, number] }
+}
+
+export function getSpotCoordinates(spot: SpotData): { lat: number; lng: number } | null {
+  if (spot.location?.coordinates) {
+    return { lng: spot.location.coordinates[0], lat: spot.location.coordinates[1] }
+  }
+  return null
 }
 
 export async function getSpots(options?: {
