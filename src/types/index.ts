@@ -72,3 +72,42 @@ export interface Spot {
   popularRoutes?: { from: string; duration: string }[]
   relatedProductIds?: string[]
 }
+
+export interface Itinerary {
+  id: string
+  slug: string
+  title: string
+  itineraryDuration?: string
+  totalDistance?: string
+  roadCondition?: string
+  estimatedCost?: string
+  bestDrivingTime?: string
+  routeFacilities?: string[]
+  mapsEmbedUrl?: string
+  drivingSafetyTips?: string
+  culinaryNotes?: string
+  coverImage?: string
+  stops: ItineraryStop[]
+  isPublished?: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ItineraryStop {
+  id: string
+  stopNumber: number
+  name: string
+  category?: string
+  visitDuration?: string
+  bestVisitHour?: string
+  ticketPrice?: string
+  parkingFee?: string
+  additionalCost?: string
+  physicalEffort?: string
+  spotFacilities?: string[]
+  spotImportantNote?: string
+  description?: string
+  spotSlug?: string
+  lat?: number
+  lng?: number
+}
