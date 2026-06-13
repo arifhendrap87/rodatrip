@@ -1,5 +1,10 @@
 import type { WikiPage } from "./wikipedia"
 
+const PROVINCE_MAP: Record<string, string> = {
+  Jakarta: "DKI Jakarta",
+  Yogyakarta: "DI Yogyakarta",
+}
+
 const REGION_MAP: Record<string, string> = {
   Aceh: "Sumatera",
   "Sumatera Utara": "Sumatera",
@@ -13,8 +18,10 @@ const REGION_MAP: Record<string, string> = {
   "Kepulauan Bangka Belitung": "Sumatera",
   Banten: "Jawa",
   "Jawa Barat": "Jawa",
+  Jakarta: "Jawa",
   "DKI Jakarta": "Jawa",
   "Jawa Tengah": "Jawa",
+  Yogyakarta: "Jawa",
   "DI Yogyakarta": "Jawa",
   "Daerah Istimewa Yogyakarta": "Jawa",
   "Jawa Timur": "Jawa",
@@ -102,13 +109,18 @@ export interface ScrapedSpot {
   distance_from_city: string
 }
 
-export function transformWikiPage(page: WikiPage, province: string): ScrapedSpot {
+function normalizeProvince(province: string): string {
+  return PROVINCE_MAP[province] || province
+}
+
+export function transformWikiPage(page: WikiPage, province: string, _city?: string): ScrapedSpot {
+  const normalizedProvince = normalizeProvince(province)
   const coord = page.coordinates![0]
 
   const description = page.extract || ""
   const category = detectCategory(page.categories)
   const slug = generateSlug(page.title)
-  const region = REGION_MAP[province] || "Jawa"
+  const region = REGION_MAP[normalizedProvince] || "Jawa"
 
   const tags: string[] = []
   if (page.categories) {
@@ -128,7 +140,7 @@ export function transformWikiPage(page: WikiPage, province: string): ScrapedSpot
     slug,
     name: page.title,
     category,
-    province,
+    province: normalizedProvince,
     region,
     latitude: coord.lat,
     longitude: coord.lon,
@@ -147,8 +159,4 @@ export function transformWikiPage(page: WikiPage, province: string): ScrapedSpot
     facilities: [],
     distance_from_city: "",
   }
-}
-
-export function getTargetCategories(province: string): string {
-  return `Kategori:Tempat_wisata_di_${province.replace(/\s+/g, "_")}`
 }

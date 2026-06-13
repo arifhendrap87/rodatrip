@@ -1,4 +1,4 @@
-import { fetchProvinceSpots, type WikiPage } from "./wikipedia"
+import { fetchDaftarList, batchFetchDetails, type WikiPage, type DaftarSpot } from "./wikipedia"
 import { transformWikiPage, type ScrapedSpot } from "./transform"
 import { db } from "@/lib/services/db"
 
@@ -8,14 +8,67 @@ export interface ScrapeResult {
   new: ScrapedSpot[]
   skipped: string[]
   errors: string[]
+  noArticle: number
 }
 
 export async function scrapeProvince(province: string): Promise<ScrapeResult> {
   const errors: string[] = []
-  let pages: WikiPage[] = []
 
   try {
-    pages = await fetchProvinceSpots(province)
+    const allSpots = await fetchDaftarList()
+    const spots = allSpots.filter((s) => s.province === province)
+
+    const withArticle = spots.filter((s) => s.title)
+    const noArticle = spots.length - withArticle.length
+
+    const titles = withArticle.map((s) => s.title!).filter(Boolean)
+
+    if (titles.length === 0) {
+      return {
+        province,
+        totalFound: spots.length,
+        new: [],
+        skipped: [],
+        errors: [],
+        noArticle,
+      }
+    }
+
+    const pages = await batchFetchDetails(titles)
+    const existingSlugs = await getExistingSlugs(province)
+
+    const newSpots: ScrapedSpot[] = []
+    const skipped: string[] = []
+    let noCoords = 0
+
+    for (const spot of withArticle) {
+      const page = pages.get(spot.title!)
+      if (!page) {
+        errors.push(`${spot.name}: no page data returned`)
+        continue
+      }
+
+      if (!page.coordinates || page.coordinates.length === 0) {
+        noCoords++
+        continue
+      }
+
+      const transformed = transformWikiPage(page, province, spot.city)
+      if (existingSlugs.has(transformed.slug)) {
+        skipped.push(transformed.name)
+      } else {
+        newSpots.push(transformed)
+      }
+    }
+
+    return {
+      province,
+      totalFound: spots.length,
+      new: newSpots,
+      skipped,
+      errors,
+      noArticle: noArticle + noCoords,
+    }
   } catch (err) {
     return {
       province,
@@ -23,29 +76,8 @@ export async function scrapeProvince(province: string): Promise<ScrapeResult> {
       new: [],
       skipped: [],
       errors: [(err as Error).message],
+      noArticle: 0,
     }
-  }
-
-  const transformed = pages.map((p) => transformWikiPage(p, province))
-  const existingSlugs = await getExistingSlugs(province)
-
-  const newSpots: ScrapedSpot[] = []
-  const skipped: string[] = []
-
-  for (const spot of transformed) {
-    if (existingSlugs.has(spot.slug)) {
-      skipped.push(spot.name)
-    } else {
-      newSpots.push(spot)
-    }
-  }
-
-  return {
-    province,
-    totalFound: pages.length,
-    new: newSpots,
-    skipped,
-    errors,
   }
 }
 
@@ -64,7 +96,6 @@ export async function saveScrapedSpots(spots: ScrapedSpot[]): Promise<{ saved: n
           region: spot.region,
           location: `POINT(${spot.longitude} ${spot.latitude})`,
           description: spot.description,
-          why_special: "",
           image_url: spot.image_url,
           image_credit: spot.image_credit,
           tags: spot.tags,
@@ -89,11 +120,7 @@ export async function saveScrapedSpots(spots: ScrapedSpot[]): Promise<{ saved: n
 
 async function getExistingSlugs(province: string): Promise<Set<string>> {
   try {
-    const { data } = await db
-      .from("spots")
-      .select("slug")
-      .eq("province", province)
-
+    const { data } = await db.from("spots").select("slug").eq("province", province)
     return new Set(data?.map((s: { slug: string }) => s.slug) || [])
   } catch {
     return new Set()

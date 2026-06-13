@@ -62,6 +62,7 @@ export default function ScrapePage() {
     new: ScrapedSpot[]
     skipped: string[]
     errors: string[]
+    noArticle?: number
   } | null>(null)
   const [selected, setSelected] = useState<Set<string>>(new Set())
 
@@ -93,7 +94,9 @@ export default function ScrapePage() {
       setResult(data)
       setSelected(new Set(data.new.map((s: ScrapedSpot) => s.slug)))
 
-      toast.success(`Ditemukan ${data.new.length} spot baru dari ${data.totalFound} total`)
+      const msg = `Ditemukan ${data.new.length} spot baru dari ${data.totalFound} total` +
+        (data.noArticle > 0 ? ` (${data.noArticle} tanpa artikel)` : "")
+      toast.success(msg)
     } catch (err) {
       toast.error((err as Error).message)
     } finally {
@@ -240,6 +243,17 @@ export default function ScrapePage() {
                     <p className="text-xs text-muted-foreground">di-skip</p>
                   </div>
                 </div>
+                {result.noArticle !== undefined && result.noArticle > 0 && (
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-600 font-semibold text-lg">
+                      {result.noArticle}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">Tanpa Artikel</p>
+                      <p className="text-xs text-muted-foreground">hanya nama (skip)</p>
+                    </div>
+                  </div>
+                )}
                 {result.errors.length > 0 && (
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-red-600 font-semibold text-lg">

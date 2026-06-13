@@ -3,6 +3,7 @@ import { seedProducts } from "./seed-products"
 import { seedPOI } from "./seed-poi"
 import { seedRoutes } from "./seed-routes"
 import { seedBlog } from "./seed-blog"
+import { seedItinerary } from "./seed-itinerary"
 
 async function main() {
   console.log("")
@@ -17,6 +18,7 @@ async function main() {
     poi: await seedPOI(),
     routes: await seedRoutes(),
     blog: await seedBlog(),
+    itineraries: await seedItinerary(),
   }
 
   console.log("")
@@ -30,7 +32,7 @@ async function main() {
   const totalErrors = Object.values(results).reduce((sum, r) => sum + r.errors, 0)
 
   for (const [key, val] of Object.entries(results)) {
-    const icon = { spots: "🏞️", products: "🛒", poi: "📍", routes: "🗺️", blog: "📝" }[key] || "•"
+    const icon = { spots: "🏞️", products: "🛒", poi: "📍", routes: "🗺️", blog: "📝", itineraries: "🏎️" }[key] || "•"
     console.log(`  ${icon} ${key.padEnd(10)} → ${val.inserted} inserted, ${val.skipped} skipped, ${val.errors} errors`)
   }
 

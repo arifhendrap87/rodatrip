@@ -22,6 +22,7 @@ export async function POST(request: Request) {
       new: result.new,
       skipped: result.skipped,
       errors: result.errors,
+      noArticle: result.noArticle,
     })
   } catch (err) {
     return internalError((err as Error).message)

@@ -145,8 +145,33 @@ export const api = {
       request<{ data: Record<string, unknown> }>(`/blog/${slug}`),
   },
 
+  itineraries: {
+    list: () =>
+      request<{ data: Record<string, unknown>[] }>("/itineraries"),
+
+    get: (slug: string) =>
+      request<{ data: Record<string, unknown> }>(`/itineraries/${slug}`),
+  },
+
   admin: {
     stats: () =>
       request<{ data: { spots: number; products: number; waitlist: number; views: number } }>("/admin/stats"),
+
+    itineraries: {
+      list: () =>
+        request<{ data: Record<string, unknown>[] }>("/admin/itineraries"),
+
+      get: (slug: string) =>
+        request<{ data: Record<string, unknown> }>(`/admin/itineraries/${slug}`),
+
+      create: (data: Record<string, unknown>) =>
+        request<{ data: { id: string; slug: string } }>("/admin/itineraries", { method: "POST", body: data }),
+
+      update: (slug: string, data: Record<string, unknown>) =>
+        request<{ data: { id: string; slug: string } }>(`/admin/itineraries/${slug}`, { method: "PUT", body: data }),
+
+      delete: (slug: string) =>
+        request<{ data: { deleted: boolean } }>(`/admin/itineraries/${slug}`, { method: "DELETE" }),
+    },
   },
 }
