@@ -9,18 +9,18 @@ export default function GlobalError({
 }) {
   return (
     <html>
-      <body className="flex min-h-screen items-center justify-center bg-background text-foreground">
-        <div className="text-center px-4">
-          <h1 className="text-6xl font-bold font-heading text-destructive">500</h1>
-          <p className="mt-4 text-xl font-medium font-heading">Terjadi kesalahan</p>
-          <p className="mt-2 text-muted-foreground max-w-md">
-            Maaf, ada sesuatu yang tidak beres. Silakan coba lagi.
+      <body className="flex min-h-screen items-center justify-center p-4">
+        <div className="text-center max-w-md">
+          <div className="text-5xl mb-4">💥</div>
+          <h1 className="text-2xl font-bold font-heading mb-2">Terjadi Kesalahan</h1>
+          <p className="text-muted-foreground mb-6">
+            Maaf, terjadi kesalahan serius pada aplikasi. Silakan coba refresh halaman.
           </p>
           <button
-            onClick={reset}
-            className="mt-8 inline-flex h-10 items-center justify-center rounded-xl bg-primary px-6 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+            onClick={() => reset()}
+            className="inline-flex items-center justify-center rounded-xl bg-primary text-primary-foreground px-6 py-3 text-sm font-semibold shadow-lg transition-all hover:shadow-primary/40"
           >
-            Coba Lagi
+            Refresh Halaman
           </button>
         </div>
       </body>
