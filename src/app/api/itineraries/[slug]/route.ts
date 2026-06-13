@@ -22,11 +22,11 @@ export async function GET(
         .maybeSingle()
 
       if (!spot) {
-        return { ...stop, _err: "not found" }
+        return stop
       }
 
-      const loc = spot.location as Record<string, unknown> | null
-      const coords = loc?.coordinates as [number, number] | undefined
+      const locData = spot.location as Record<string, unknown> | null
+      const coordsArr = locData?.coordinates as [number, number] | undefined
 
       return {
         ...stop,
@@ -34,21 +34,8 @@ export async function GET(
         description: spot.description || undefined,
         ticketPrice: spot.ticket_price || undefined,
         spotFacilities: spot.facilities || undefined,
-        lat: coords?.[1],
-        lng: coords?.[0],
-        _loc: loc ? JSON.stringify(loc) : null,
-      }
-
-      const coords = (spot.location as { type: string; coordinates: [number, number] } | null)?.coordinates
-
-      return {
-        ...stop,
-        category: spot.category,
-        description: spot.description || undefined,
-        ticketPrice: spot.ticket_price || undefined,
-        spotFacilities: spot.facilities || undefined,
-        lat: coords?.[1],
-        lng: coords?.[0],
+        lat: coordsArr?.[1],
+        lng: coordsArr?.[0],
       }
     })
   )
