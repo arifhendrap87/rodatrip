@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from "react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Loader2, Check, Search } from "lucide-react"
+import { Loader2, Check, Search, Plus } from "lucide-react"
+import { QuickSpotModal } from "./QuickSpotModal"
 
 interface SpotResult {
   slug: string
@@ -23,6 +24,7 @@ export function SpotSelect({ value, onSelect }: SpotSelectProps) {
   const [results, setResults] = useState<SpotResult[]>([])
   const [loading, setLoading] = useState(false)
   const [open, setOpen] = useState(false)
+  const [quickOpen, setQuickOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -63,6 +65,14 @@ export function SpotSelect({ value, onSelect }: SpotSelectProps) {
     setOpen(false)
   }
 
+  function handleQuickCreated(slug: string, name: string) {
+    onSelect(slug, name)
+    setQuickOpen(false)
+    setQuery("")
+    setResults([])
+    setOpen(false)
+  }
+
   return (
     <div ref={ref} className="space-y-1.5 relative">
       <Label className="text-xs">Link ke Spot (opsional)</Label>
@@ -93,9 +103,9 @@ export function SpotSelect({ value, onSelect }: SpotSelectProps) {
         </div>
       )}
 
-      {open && results.length > 0 && (
+      {open && (
         <div className="absolute z-50 mt-1 w-full rounded-xl border border-border/50 bg-white shadow-lg overflow-hidden">
-          {results.map((spot) => (
+          {results.length > 0 && results.map((spot) => (
             <button
               key={spot.slug}
               type="button"
@@ -108,14 +118,35 @@ export function SpotSelect({ value, onSelect }: SpotSelectProps) {
               </p>
             </button>
           ))}
+
+          {query.length >= 2 && (
+            <button
+              type="button"
+              onClick={() => setQuickOpen(true)}
+              className="w-full text-left px-4 py-3 hover:bg-primary/5 transition-colors border-t border-border/20 flex items-center gap-3 text-primary"
+            >
+              <Plus className="h-4 w-4 shrink-0" />
+              <div>
+                <p className="text-sm font-medium">Buat Spot Baru "{query}"</p>
+                <p className="text-xs text-muted-foreground">Buat destinasi baru dan langsung link ke stop ini</p>
+              </div>
+            </button>
+          )}
+
+          {results.length === 0 && query.length >= 2 && (
+            <p className="px-4 py-3 text-sm text-muted-foreground text-center">
+              Tidak ditemukan spot dengan nama "{query}"
+            </p>
+          )}
         </div>
       )}
 
-      {open && query.length >= 2 && results.length === 0 && !loading && (
-        <div className="absolute z-50 mt-1 w-full rounded-xl border border-border/50 bg-white p-4 text-center text-sm text-muted-foreground shadow-lg">
-          Tidak ditemukan spot dengan nama "{query}"
-        </div>
-      )}
+      <QuickSpotModal
+        open={quickOpen}
+        defaultName={query}
+        onClose={() => setQuickOpen(false)}
+        onCreated={handleQuickCreated}
+      />
     </div>
   )
 }
