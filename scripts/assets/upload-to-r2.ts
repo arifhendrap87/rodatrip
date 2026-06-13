@@ -41,6 +41,7 @@ async function uploadFile(filePath: string, key: string): Promise<string> {
       Key: key,
       Body: fileBuffer,
       ContentType: contentType,
+      CacheControl: "public, max-age=31536000, immutable",
     })
   )
 

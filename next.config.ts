@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
         hostname: "gaskuy-spot-images.r2.cloudflarestorage.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "images.gaskuy.id",
+        pathname: "/**",
+      },
     ],
   },
 };
