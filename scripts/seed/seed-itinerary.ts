@@ -13,7 +13,7 @@ const ROADTRIPS = [
     maps_embed_url: "https://www.google.com/maps/embed?pb=!1m28!1m12!1m3!...",
     driving_safety_tips: "Selalu pastikan kondisi rem dan tekanan angin ban dalam keadaan prima sebelum memulai road trip di jalur Priangan Timur.",
     culinary_notes: "Coba Nasi TO (Tutug Oncom) Benhil di pusat kota untuk sarapan, dan mampir ke Sentra Anyaman Rajapolah saat arah pulang untuk berburu kerajinan lokal.",
-    cover_image: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/spots/gunung-galunggung.jpg",
+    cover_image: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/prod/spots/gunung-galunggung.jpg",
     stops: [
       {
         stop_number: 1,
@@ -56,7 +56,7 @@ const ROADTRIPS = [
     maps_embed_url: "https://www.google.com/maps/embed?pb=!1m28!1m12!1m3!...",
     driving_safety_tips: "Jalur Puncak rawan longsor saat hujan deras. Selalu cek kondisi cuaca sebelum berangkat dan gunakan lampu utama saat berkabut.",
     culinary_notes: "Jangan lewatkan Sate Maranggi Cianjur sebagai ikon kuliner, dan mampir ke kedai kopi di kawasan Puncak untuk menghangatkan badan.",
-    cover_image: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/spots/kebun-teh-gunung-mas.jpg",
+    cover_image: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/prod/spots/kebun-teh-gunung-mas.jpg",
     stops: [
       {
         stop_number: 1,
@@ -99,7 +99,7 @@ const ROADTRIPS = [
     maps_embed_url: "https://www.google.com/maps/embed?pb=!1m28!1m12!1m3!...",
     driving_safety_tips: "Jalur Ciawi-Cicurug rawan longsor dan pohon tumbang saat hujan deras. Sediakan uang tunai karena tidak semua SPBU menerima kartu.",
     culinary_notes: "Coba Soto Bogor di perjalanan awal, dan Ikan Bakar Cipanas untuk makan malam. Jangan lupa oleh-oleh Roti Unyil Venus dari Kota Bogor.",
-    cover_image: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/dev/spots/kebun-raya-bogor.jpg",
+    cover_image: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/prod/spots/kebun-raya-bogor.jpg",
     stops: [
       {
         stop_number: 1,
