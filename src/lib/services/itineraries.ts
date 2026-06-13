@@ -120,7 +120,7 @@ async function getStopsForItinerary(itineraryId: string): Promise<ItineraryStopR
     }
     for (const row of rows) {
       if (row.spot_slug) {
-        ;(row as Record<string, unknown>).spot = spotMap.get(row.spot_slug) || null
+        ;(row as unknown as Record<string, unknown>).spot = spotMap.get(row.spot_slug) || null
       }
     }
   }
