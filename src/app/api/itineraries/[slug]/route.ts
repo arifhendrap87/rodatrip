@@ -11,18 +11,22 @@ export async function GET(
 
   if (!itinerary || !itinerary.isPublished) return notFound("Itinerary")
 
-  // Re-join spots in the API route for reliability
   const enriched = await Promise.all(
     itinerary.stops.map(async (stop) => {
       if (!stop.spotSlug) return stop
-      const { data: spot } = await db
+
+      const { data: spot, error: spotError } = await db
         .from("spots")
         .select("name, category, description, ticket_price, parking_fee, physical_effort, facilities, location")
         .eq("slug", stop.spotSlug)
         .maybeSingle()
-      if (!spot) return stop
 
-      const coords = spot.location?.coordinates
+      if (!spot || spotError) {
+        return { ...stop, _err: spotError?.message || "not found" }
+      }
+
+      const coords = (spot.location as { type: string; coordinates: [number, number] } | null)?.coordinates
+
       return {
         ...stop,
         category: spot.category || stop.category,
@@ -31,8 +35,8 @@ export async function GET(
         parkingFee: spot.parking_fee || stop.parkingFee,
         physicalEffort: spot.physical_effort || stop.physicalEffort,
         spotFacilities: spot.facilities || stop.spotFacilities,
-        lat: coords?.[1] ?? stop.lat,
-        lng: coords?.[0] ?? stop.lng,
+        lat: coords ? coords[1] : stop.lat,
+        lng: coords ? coords[0] : stop.lng,
       }
     })
   )

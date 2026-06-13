@@ -78,18 +78,10 @@ function getSpotCoordinates(spot: SpotJoin | null): { lat: number; lng: number }
 }
 
 function stopToItineraryStop(row: ItineraryStopRow): ItineraryStop {
-  const s = row.spot
   return {
     id: row.id,
     stopNumber: row.stop_number,
-    name: s?.name || row.name,
-    category: s?.category || undefined,
-    description: s?.description || undefined,
-    ticketPrice: s?.ticket_price || undefined,
-    parkingFee: s?.parking_fee || undefined,
-    physicalEffort: s?.physical_effort || undefined,
-    spotFacilities: s?.facilities || undefined,
-    ...getSpotCoordinates(s),
+    name: row.name,
     visitDuration: row.visit_duration || undefined,
     bestVisitHour: row.best_visit_hour || undefined,
     additionalCost: row.additional_cost || undefined,
@@ -105,27 +97,7 @@ async function getStopsForItinerary(itineraryId: string): Promise<ItineraryStopR
     .eq("itinerary_id", itineraryId)
     .order("stop_number", { ascending: true })
 
-  const rows = (data || []) as ItineraryStopRow[]
-
-  const slugs = rows.map((r) => r.spot_slug).filter(Boolean) as string[]
-  if (slugs.length > 0) {
-    const { data: spotRows } = await db
-      .from("spots")
-      .select("id, slug, name, category, description, ticket_price, parking_fee, physical_effort, facilities, location")
-      .in("slug", slugs)
-
-    const spotMap = new Map<string, SpotJoin>()
-    for (const s of (spotRows || []) as SpotJoin[]) {
-      spotMap.set(s.slug, s)
-    }
-    for (const row of rows) {
-      if (row.spot_slug) {
-        ;(row as unknown as Record<string, unknown>).spot = spotMap.get(row.spot_slug) || null
-      }
-    }
-  }
-
-  return rows as unknown as ItineraryStopRow[]
+  return (data || []) as ItineraryStopRow[]
 }
 
 export async function getItineraries(options?: {
