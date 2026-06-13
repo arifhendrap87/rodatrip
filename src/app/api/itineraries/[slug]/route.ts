@@ -25,6 +25,20 @@ export async function GET(
         return { ...stop, _err: "not found" }
       }
 
+      const loc = spot.location as Record<string, unknown> | null
+      const coords = loc?.coordinates as [number, number] | undefined
+
+      return {
+        ...stop,
+        category: spot.category,
+        description: spot.description || undefined,
+        ticketPrice: spot.ticket_price || undefined,
+        spotFacilities: spot.facilities || undefined,
+        lat: coords?.[1],
+        lng: coords?.[0],
+        _loc: loc ? JSON.stringify(loc) : null,
+      }
+
       const coords = (spot.location as { type: string; coordinates: [number, number] } | null)?.coordinates
 
       return {
