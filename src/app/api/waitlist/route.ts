@@ -12,7 +12,7 @@ const adminClient = createClient(
 
 export async function POST(request: Request) {
   const ip = request.headers.get("x-forwarded-for") || "unknown"
-  const { allowed } = adminLimiter(`waitlist:${ip}`)
+  const { allowed } = await adminLimiter(`waitlist:${ip}`)
   if (!allowed) return unauthorized("Rate limited")
 
   const body = await request.json()

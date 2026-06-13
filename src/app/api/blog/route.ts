@@ -4,7 +4,7 @@ import { getPosts } from "@/lib/services/blog"
 
 export async function GET(request: Request) {
   const ip = request.headers.get("x-forwarded-for") || "unknown"
-  const { allowed } = publicLimiter(`blog:${ip}`)
+  const { allowed } = await publicLimiter(`blog:${ip}`)
   if (!allowed) return badRequest("Rate limited")
 
   const { searchParams } = new URL(request.url)

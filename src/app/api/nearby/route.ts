@@ -5,7 +5,7 @@ import { queryNearbyPlaces } from "@/lib/services/nearby"
 
 export async function GET(request: Request) {
   const ip = request.headers.get("x-forwarded-for") || "unknown"
-  const { allowed } = publicLimiter(`nearby:${ip}`)
+  const { allowed } = await publicLimiter(`nearby:${ip}`)
   if (!allowed) return badRequest("Rate limited")
 
   const { searchParams } = new URL(request.url)

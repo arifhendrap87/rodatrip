@@ -3,6 +3,7 @@
 import { useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import * as Sentry from "@sentry/nextjs"
 
 export default function PageError({
   error,
@@ -12,6 +13,9 @@ export default function PageError({
   reset: () => void
 }) {
   useEffect(() => {
+    if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
+      Sentry.captureException(error)
+    }
     console.error(error)
   }, [error])
 

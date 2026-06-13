@@ -19,7 +19,7 @@ const createOrderSchema = z.object({
 
 export async function POST(request: Request) {
   const ip = request.headers.get("x-forwarded-for") || "unknown"
-  const { allowed } = publicLimiter(`orders:${ip}`)
+  const { allowed } = await publicLimiter(`orders:${ip}`)
   if (!allowed) return badRequest("Rate limited")
 
   const body = await request.json()

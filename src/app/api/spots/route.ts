@@ -7,7 +7,7 @@ import { db } from "@/lib/services/db"
 
 export async function GET(request: Request) {
   const ip = request.headers.get("x-forwarded-for") || "unknown"
-  const { allowed } = publicLimiter(`spots:${ip}`)
+  const { allowed } = await publicLimiter(`spots:${ip}`)
   if (!allowed) return unauthorized("Rate limited")
 
   const { searchParams } = new URL(request.url)
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
   if (!admin) return unauthorized()
 
   const ip = request.headers.get("x-forwarded-for") || "unknown"
-  const { allowed } = adminLimiter(`spots:post:${ip}`)
+  const { allowed } = await adminLimiter(`spots:post:${ip}`)
   if (!allowed) return unauthorized("Rate limited")
 
   const body = await request.json()

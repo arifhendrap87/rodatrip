@@ -3,6 +3,7 @@ import { headers } from "next/headers"
 import "./globals.css"
 import { Navbar } from "@/components/landing/Navbar"
 import { Footer } from "@/components/landing/Footer"
+import { PostHogProvider } from "@/components/PostHogProvider"
 import { SITE_NAME, SITE_DESCRIPTION } from "@/lib/constants"
 
 export const metadata: Metadata = {
@@ -46,9 +47,11 @@ export default async function RootLayout({
   return (
     <html lang="id" className="h-full antialiased">
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <PostHogProvider>
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </PostHogProvider>
       </body>
     </html>
   )
