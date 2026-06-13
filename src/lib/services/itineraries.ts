@@ -107,7 +107,6 @@ async function getStopsForItinerary(itineraryId: string): Promise<ItineraryStopR
 
   const rows = (data || []) as ItineraryStopRow[]
 
-  // Fetch matching spots for all stops
   const slugs = rows.map((r) => r.spot_slug).filter(Boolean) as string[]
   if (slugs.length > 0) {
     const { data: spotRows } = await db
@@ -115,10 +114,13 @@ async function getStopsForItinerary(itineraryId: string): Promise<ItineraryStopR
       .select("id, slug, name, category, description, ticket_price, parking_fee, physical_effort, facilities, location")
       .in("slug", slugs)
 
-    const spotMap = new Map((spotRows || []).map((s: SpotJoin) => [s.slug, s as SpotJoin]))
+    const spotMap = new Map<string, SpotJoin>()
+    for (const s of (spotRows || []) as SpotJoin[]) {
+      spotMap.set(s.slug, s)
+    }
     for (const row of rows) {
       if (row.spot_slug) {
-        ;(row as ItineraryStopRow & { spot: SpotJoin | null }).spot = spotMap.get(row.spot_slug) || null
+        ;(row as Record<string, unknown>).spot = spotMap.get(row.spot_slug) || null
       }
     }
   }
