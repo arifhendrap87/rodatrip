@@ -5,9 +5,14 @@ import type { NextRequest } from "next/server"
 
 const ALLOWED_ORIGINS = [
   "https://gaskuy-roadtrip.vercel.app",
+  "https://gaskuy-roadtrip-git-staging-arifhendrap87s-projects.vercel.app",
   "http://localhost:3000",
   "http://localhost",
 ]
+
+function isAllowedOrigin(origin: string): boolean {
+  return ALLOWED_ORIGINS.some((allowed) => origin === allowed || origin.startsWith(allowed))
+}
 
 export async function middleware(request: NextRequest) {
   const { pathname, origin } = request.nextUrl
@@ -29,7 +34,7 @@ export async function middleware(request: NextRequest) {
   if (pathname.startsWith("/api")) {
     const reqOrigin = request.headers.get("origin")
     if (reqOrigin) {
-      if (ALLOWED_ORIGINS.includes(reqOrigin)) {
+      if (isAllowedOrigin(reqOrigin)) {
         response.headers.set("access-control-allow-origin", reqOrigin)
         response.headers.set("access-control-allow-credentials", "true")
         response.headers.set("access-control-allow-methods", "GET, POST, PUT, DELETE, OPTIONS")
