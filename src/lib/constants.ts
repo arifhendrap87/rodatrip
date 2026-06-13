@@ -70,3 +70,12 @@ export const POPULAR_ROUTES = [
   { label: "Surabaya → Malang", origin: "Surabaya", destination: "Malang" },
   { label: "Jakarta → Surabaya", origin: "Jakarta", destination: "Surabaya" },
 ]
+
+export const SPOT_CATEGORY_DISPLAY: Record<string, { emoji: string; label: string }> = {
+  alam: { emoji: "⛰️", label: "Alam & Petualangan" },
+  kuliner: { emoji: "🍜", label: "Kuliner" },
+  budaya: { emoji: "🏛️", label: "Sejarah & Budaya" },
+  foto: { emoji: "📸", label: "Spot Fotografi" },
+  petualangan: { emoji: "🏞️", label: "Petualangan" },
+  sejarah: { emoji: "🏛️", label: "Sejarah & Budaya" },
+}

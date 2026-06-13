@@ -3,6 +3,7 @@
 import Link from "next/link"
 import type { ItineraryStop } from "@/types"
 import { NearbyPlaces } from "@/components/roadtrip/NearbyPlaces"
+import { SPOT_CATEGORY_DISPLAY } from "@/lib/constants"
 
 interface ItineraryTimelineProps {
   stops: ItineraryStop[]
@@ -36,11 +37,14 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
               <div>
                 <div className="flex items-center flex-wrap gap-2">
                   <h3 className="text-xl font-bold font-heading">{stop.name}</h3>
-                  {stop.category && (
-                    <span className="inline-flex items-center rounded-full border border-border/50 bg-muted/50 px-3 py-0.5 text-xs font-medium">
-                      {stop.category}
-                    </span>
-                  )}
+                  {stop.category && (() => {
+                    const display = SPOT_CATEGORY_DISPLAY[stop.category]
+                    return (
+                      <span className="inline-flex items-center rounded-full border border-border/50 bg-muted/50 px-3 py-0.5 text-xs font-medium">
+                        {display ? `${display.emoji} ${display.label}` : stop.category}
+                      </span>
+                    )
+                  })()}
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-muted-foreground">

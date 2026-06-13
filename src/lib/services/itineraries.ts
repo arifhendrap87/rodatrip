@@ -20,24 +20,30 @@ export interface ItineraryRow {
   updated_at: string
 }
 
+interface SpotJoin {
+  id: string
+  slug: string
+  name: string
+  category: string
+  description: string | null
+  ticket_price: string | null
+  parking_fee: string | null
+  physical_effort: string | null
+  facilities: string[] | null
+  location: { type: "Point"; coordinates: [number, number] } | null
+}
+
 export interface ItineraryStopRow {
   id: string
   itinerary_id: string
   stop_number: number
   name: string
-  category: string | null
   visit_duration: string | null
   best_visit_hour: string | null
-  ticket_price: string | null
-  parking_fee: string | null
   additional_cost: string | null
-  physical_effort: string | null
-  spot_facilities: string[] | null
   spot_important_note: string | null
-  description: string | null
   spot_slug: string | null
-  lat: number | null
-  lng: number | null
+  spot: SpotJoin | null
   created_at: string
   updated_at: string
 }
@@ -64,25 +70,42 @@ function rowToItinerary(row: ItineraryRow, stops: ItineraryStopRow[]): Itinerary
   }
 }
 
+function getSpotCoordinates(spot: SpotJoin | null): { lat: number; lng: number } | null {
+  if (spot?.location?.coordinates) {
+    return { lng: spot.location.coordinates[0], lat: spot.location.coordinates[1] }
+  }
+  return null
+}
+
 function stopToItineraryStop(row: ItineraryStopRow): ItineraryStop {
+  const s = row.spot
   return {
     id: row.id,
     stopNumber: row.stop_number,
-    name: row.name,
-    category: row.category || undefined,
+    name: s?.name || row.name,
+    category: s?.category || undefined,
+    description: s?.description || undefined,
+    ticketPrice: s?.ticket_price || undefined,
+    parkingFee: s?.parking_fee || undefined,
+    physicalEffort: s?.physical_effort || undefined,
+    spotFacilities: s?.facilities || undefined,
+    ...getSpotCoordinates(s),
     visitDuration: row.visit_duration || undefined,
     bestVisitHour: row.best_visit_hour || undefined,
-    ticketPrice: row.ticket_price || undefined,
-    parkingFee: row.parking_fee || undefined,
     additionalCost: row.additional_cost || undefined,
-    physicalEffort: row.physical_effort || undefined,
-    spotFacilities: row.spot_facilities || undefined,
     spotImportantNote: row.spot_important_note || undefined,
-    description: row.description || undefined,
     spotSlug: row.spot_slug || undefined,
-    lat: row.lat ?? undefined,
-    lng: row.lng ?? undefined,
   }
+}
+
+async function getStopsForItinerary(itineraryId: string): Promise<ItineraryStopRow[]> {
+  const { data } = await db
+    .from("itinerary_stops")
+    .select("id, itinerary_id, stop_number, name, visit_duration, best_visit_hour, additional_cost, spot_important_note, spot_slug, spot:spots!spot_slug(id, slug, name, category, description, ticket_price, parking_fee, physical_effort, facilities, location)")
+    .eq("itinerary_id", itineraryId)
+    .order("stop_number", { ascending: true })
+
+  return (data || []) as ItineraryStopRow[]
 }
 
 export async function getItineraries(options?: {
@@ -96,20 +119,14 @@ export async function getItineraries(options?: {
     }
 
     const { data, error } = await query.order("created_at", { ascending: false })
-
     if (error) return []
 
     const rows = data as ItineraryRow[]
-
     const itineraries: Itinerary[] = []
-    for (const row of rows) {
-      const { data: stops } = await db
-        .from("itinerary_stops")
-        .select("*")
-        .eq("itinerary_id", row.id)
-        .order("stop_number", { ascending: true })
 
-      itineraries.push(rowToItinerary(row, (stops || []) as ItineraryStopRow[]))
+    for (const row of rows) {
+      const stops = await getStopsForItinerary(row.id)
+      itineraries.push(rowToItinerary(row, stops))
     }
 
     return itineraries
@@ -128,13 +145,8 @@ export async function getItineraryBySlug(slug: string): Promise<Itinerary | null
 
     if (error || !row) return null
 
-    const { data: stops } = await db
-      .from("itinerary_stops")
-      .select("*")
-      .eq("itinerary_id", (row as ItineraryRow).id)
-      .order("stop_number", { ascending: true })
-
-    return rowToItinerary(row as ItineraryRow, (stops || []) as ItineraryStopRow[])
+    const stops = await getStopsForItinerary((row as ItineraryRow).id)
+    return rowToItinerary(row as ItineraryRow, stops)
   } catch {
     return null
   }
@@ -184,19 +196,11 @@ export async function createItinerary(data: {
         itinerary_id: (row as { id: string }).id,
         stop_number: stop.stopNumber,
         name: stop.name,
-        category: stop.category || null,
         visit_duration: stop.visitDuration || null,
         best_visit_hour: stop.bestVisitHour || null,
-        ticket_price: stop.ticketPrice || null,
-        parking_fee: stop.parkingFee || null,
         additional_cost: stop.additionalCost || null,
-        physical_effort: stop.physicalEffort || null,
-        spot_facilities: stop.spotFacilities || null,
         spot_important_note: stop.spotImportantNote || null,
-        description: stop.description || null,
         spot_slug: stop.spotSlug || null,
-        lat: stop.lat ?? null,
-        lng: stop.lng ?? null,
       }))
 
       const { error: stopsError } = await db
@@ -262,19 +266,11 @@ export async function updateItinerary(
           itinerary_id: (row as { id: string }).id,
           stop_number: stop.stopNumber,
           name: stop.name,
-          category: stop.category || null,
           visit_duration: stop.visitDuration || null,
           best_visit_hour: stop.bestVisitHour || null,
-          ticket_price: stop.ticketPrice || null,
-          parking_fee: stop.parkingFee || null,
           additional_cost: stop.additionalCost || null,
-          physical_effort: stop.physicalEffort || null,
-          spot_facilities: stop.spotFacilities || null,
           spot_important_note: stop.spotImportantNote || null,
-          description: stop.description || null,
           spot_slug: stop.spotSlug || null,
-          lat: stop.lat ?? null,
-          lng: stop.lng ?? null,
         }))
 
         const { error: stopsError } = await db
@@ -325,13 +321,8 @@ export async function getItinerariesBySpotSlug(spotSlug: string): Promise<Itiner
 
     const itineraries: Itinerary[] = []
     for (const row of rows as ItineraryRow[]) {
-      const { data: stopRows } = await db
-        .from("itinerary_stops")
-        .select("*")
-        .eq("itinerary_id", row.id)
-        .order("stop_number", { ascending: true })
-
-      itineraries.push(rowToItinerary(row, (stopRows || []) as ItineraryStopRow[]))
+      const stopRows = await getStopsForItinerary(row.id)
+      itineraries.push(rowToItinerary(row, stopRows))
     }
 
     return itineraries
