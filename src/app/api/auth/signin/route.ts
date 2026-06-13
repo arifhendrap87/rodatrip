@@ -1,8 +1,19 @@
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
 import { success, unauthorized } from "@/lib/api/response"
+import { getRateLimiter } from "@/lib/api/rate-limit"
+
+const loginLimiter = getRateLimiter(5)
 
 export async function POST(request: Request) {
+  const ip = request.headers.get("x-forwarded-for") || "unknown"
+  const { allowed, retryAfter } = await loginLimiter(`login:${ip}`)
+  if (!allowed) {
+    return new Response(JSON.stringify({
+      error: { message: `Too many attempts. Try again in ${retryAfter}s.` }
+    }), { status: 429, headers: { "Retry-After": String(retryAfter) } })
+  }
+
   const { email, password } = await request.json()
 
   if (!email || !password) {
