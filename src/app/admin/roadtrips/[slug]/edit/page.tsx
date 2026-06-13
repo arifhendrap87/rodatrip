@@ -10,21 +10,16 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { ArrowLeft, Save, Loader2, Plus, Trash2 } from "lucide-react"
 import Link from "next/link"
+import { SpotSelect } from "@/components/admin/SpotSelect"
 
 interface StopForm {
   key: string
   stopNumber: number
   name: string
-  category: string
   visitDuration: string
   bestVisitHour: string
-  ticketPrice: string
-  parkingFee: string
   additionalCost: string
-  physicalEffort: string
-  spotFacilities: string
   spotImportantNote: string
-  description: string
   spotSlug: string
 }
 
@@ -35,16 +30,10 @@ function createEmptyStop(stopNumber: number): StopForm {
     key: `stop-${++stopKeyCounter}`,
     stopNumber,
     name: "",
-    category: "",
     visitDuration: "",
     bestVisitHour: "",
-    ticketPrice: "",
-    parkingFee: "",
     additionalCost: "",
-    physicalEffort: "",
-    spotFacilities: "",
     spotImportantNote: "",
-    description: "",
     spotSlug: "",
   }
 }
@@ -54,18 +43,10 @@ function stopToForm(stop: any, index: number): StopForm {
     key: `stop-${++stopKeyCounter}`,
     stopNumber: index + 1,
     name: stop.name || "",
-    category: stop.category || "",
     visitDuration: stop.visitDuration || stop.visit_duration || "",
     bestVisitHour: stop.bestVisitHour || stop.best_visit_hour || "",
-    ticketPrice: stop.ticketPrice || stop.ticket_price || "",
-    parkingFee: stop.parkingFee || stop.parking_fee || "",
     additionalCost: stop.additionalCost || stop.additional_cost || "",
-    physicalEffort: stop.physicalEffort || stop.physical_effort || "",
-    spotFacilities: Array.isArray(stop.spotFacilities || stop.spot_facilities)
-      ? (stop.spotFacilities || stop.spot_facilities).join(", ")
-      : "",
     spotImportantNote: stop.spotImportantNote || stop.spot_important_note || "",
-    description: stop.description || "",
     spotSlug: stop.spotSlug || stop.spot_slug || "",
   }
 }
@@ -87,6 +68,7 @@ export default function EditRoadtripPage() {
     mapsEmbedUrl: "",
     drivingSafetyTips: "",
     culinaryNotes: "",
+    coverImage: "",
     isPublished: false,
   })
   const [stops, setStops] = useState<StopForm[]>([])
@@ -109,6 +91,7 @@ export default function EditRoadtripPage() {
           mapsEmbedUrl: data.mapsEmbedUrl || data.maps_embed_url || "",
           drivingSafetyTips: data.drivingSafetyTips || data.driving_safety_tips || "",
           culinaryNotes: data.culinaryNotes || data.culinary_notes || "",
+          coverImage: data.coverImage || data.cover_image || "",
           isPublished: data.isPublished || data.is_published || false,
         })
         setStops(
@@ -144,6 +127,14 @@ export default function EditRoadtripPage() {
     )
   }
 
+  function handleSpotSelect(key: string, slug: string, name: string) {
+    setStops((prev) =>
+      prev.map((s) =>
+        s.key === key ? { ...s, spotSlug: slug, name: name || s.name } : s
+      )
+    )
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSaving(true)
@@ -161,24 +152,17 @@ export default function EditRoadtripPage() {
       mapsEmbedUrl: form.mapsEmbedUrl || undefined,
       drivingSafetyTips: form.drivingSafetyTips || undefined,
       culinaryNotes: form.culinaryNotes || undefined,
+      coverImage: form.coverImage || undefined,
       isPublished: form.isPublished,
       stops: stops
         .filter((s) => s.name.trim())
         .map((s) => ({
           stopNumber: s.stopNumber,
           name: s.name,
-          category: s.category || undefined,
           visitDuration: s.visitDuration || undefined,
           bestVisitHour: s.bestVisitHour || undefined,
-          ticketPrice: s.ticketPrice || undefined,
-          parkingFee: s.parkingFee || undefined,
           additionalCost: s.additionalCost || undefined,
-          physicalEffort: s.physicalEffort || undefined,
-          spotFacilities: s.spotFacilities
-            ? s.spotFacilities.split(",").map((f) => f.trim()).filter(Boolean)
-            : undefined,
           spotImportantNote: s.spotImportantNote || undefined,
-          description: s.description || undefined,
           spotSlug: s.spotSlug || undefined,
         })),
     }
@@ -290,6 +274,15 @@ export default function EditRoadtripPage() {
                 onChange={(e) => updateField("mapsEmbedUrl", e.target.value)}
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="coverImage">Cover Image URL</Label>
+              <Input
+                id="coverImage"
+                value={form.coverImage}
+                onChange={(e) => updateField("coverImage", e.target.value)}
+                placeholder="https://pub-...r2.dev/dev/spots/..."
+              />
+            </div>
           </CardContent>
         </Card>
 
@@ -334,21 +327,20 @@ export default function EditRoadtripPage() {
                 </div>
 
                 <div className="space-y-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">Nama Destinasi *</Label>
+                    <Input
+                      value={stop.name}
+                      onChange={(e) => updateStop(stop.key, "name", e.target.value)}
+                    />
+                  </div>
+
+                  <SpotSelect
+                    value={stop.spotSlug}
+                    onSelect={(slug, name) => handleSpotSelect(stop.key, slug, name)}
+                  />
+
                   <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="space-y-1.5">
-                      <Label className="text-xs">Nama Destinasi *</Label>
-                      <Input
-                        value={stop.name}
-                        onChange={(e) => updateStop(stop.key, "name", e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-xs">Kategori</Label>
-                      <Input
-                        value={stop.category}
-                        onChange={(e) => updateStop(stop.key, "category", e.target.value)}
-                      />
-                    </div>
                     <div className="space-y-1.5">
                       <Label className="text-xs">Estimasi Waktu Kunjungan</Label>
                       <Input
@@ -364,61 +356,19 @@ export default function EditRoadtripPage() {
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="text-xs">Harga Tiket</Label>
-                      <Input
-                        value={stop.ticketPrice}
-                        onChange={(e) => updateStop(stop.key, "ticketPrice", e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-xs">Biaya Parkir</Label>
-                      <Input
-                        value={stop.parkingFee}
-                        onChange={(e) => updateStop(stop.key, "parkingFee", e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-1.5">
                       <Label className="text-xs">Biaya Tambahan</Label>
                       <Input
                         value={stop.additionalCost}
                         onChange={(e) => updateStop(stop.key, "additionalCost", e.target.value)}
                       />
                     </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-xs">Tingkat Effort Fisik</Label>
-                      <Input
-                        value={stop.physicalEffort}
-                        onChange={(e) => updateStop(stop.key, "physicalEffort", e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-xs">Fasilitas (comma-separated)</Label>
-                      <Input
-                        value={stop.spotFacilities}
-                        onChange={(e) => updateStop(stop.key, "spotFacilities", e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-xs">Spot Slug</Label>
-                      <Input
-                        value={stop.spotSlug}
-                        onChange={(e) => updateStop(stop.key, "spotSlug", e.target.value)}
-                      />
-                    </div>
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-xs">Catatan Penting Pengendara</Label>
-                    <Input
+                    <Textarea
                       value={stop.spotImportantNote}
                       onChange={(e) => updateStop(stop.key, "spotImportantNote", e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label className="text-xs">Deskripsi</Label>
-                    <Textarea
-                      value={stop.description}
-                      onChange={(e) => updateStop(stop.key, "description", e.target.value)}
-                      rows={3}
+                      rows={2}
                     />
                   </div>
                 </div>

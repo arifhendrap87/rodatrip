@@ -10,21 +10,16 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { ArrowLeft, Save, Loader2, Plus, Trash2 } from "lucide-react"
 import Link from "next/link"
+import { SpotSelect } from "@/components/admin/SpotSelect"
 
 interface StopForm {
   key: string
   stopNumber: number
   name: string
-  category: string
   visitDuration: string
   bestVisitHour: string
-  ticketPrice: string
-  parkingFee: string
   additionalCost: string
-  physicalEffort: string
-  spotFacilities: string
   spotImportantNote: string
-  description: string
   spotSlug: string
 }
 
@@ -35,16 +30,10 @@ function createEmptyStop(stopNumber: number): StopForm {
     key: `stop-${++stopKeyCounter}`,
     stopNumber,
     name: "",
-    category: "",
     visitDuration: "",
     bestVisitHour: "",
-    ticketPrice: "",
-    parkingFee: "",
     additionalCost: "",
-    physicalEffort: "",
-    spotFacilities: "",
     spotImportantNote: "",
-    description: "",
     spotSlug: "",
   }
 }
@@ -63,6 +52,7 @@ export default function NewRoadtripPage() {
     mapsEmbedUrl: "",
     drivingSafetyTips: "",
     culinaryNotes: "",
+    coverImage: "",
     isPublished: false,
   })
   const [stops, setStops] = useState<StopForm[]>([createEmptyStop(1)])
@@ -88,13 +78,12 @@ export default function NewRoadtripPage() {
     )
   }
 
-  function generateSlug(title: string) {
-    return title
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .replace(/-+/g, "-")
-      .trim()
+  function handleSpotSelect(key: string, slug: string, name: string) {
+    setStops((prev) =>
+      prev.map((s) =>
+        s.key === key ? { ...s, spotSlug: slug, name: name || s.name } : s
+      )
+    )
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -114,24 +103,17 @@ export default function NewRoadtripPage() {
       mapsEmbedUrl: form.mapsEmbedUrl || undefined,
       drivingSafetyTips: form.drivingSafetyTips || undefined,
       culinaryNotes: form.culinaryNotes || undefined,
+      coverImage: form.coverImage || undefined,
       isPublished: form.isPublished,
       stops: stops
         .filter((s) => s.name.trim())
         .map((s) => ({
           stopNumber: s.stopNumber,
           name: s.name,
-          category: s.category || undefined,
           visitDuration: s.visitDuration || undefined,
           bestVisitHour: s.bestVisitHour || undefined,
-          ticketPrice: s.ticketPrice || undefined,
-          parkingFee: s.parkingFee || undefined,
           additionalCost: s.additionalCost || undefined,
-          physicalEffort: s.physicalEffort || undefined,
-          spotFacilities: s.spotFacilities
-            ? s.spotFacilities.split(",").map((f) => f.trim()).filter(Boolean)
-            : undefined,
           spotImportantNote: s.spotImportantNote || undefined,
-          description: s.description || undefined,
           spotSlug: s.spotSlug || undefined,
         })),
     }
@@ -174,7 +156,7 @@ export default function NewRoadtripPage() {
                 id="title"
                 value={form.title}
                 onChange={(e) => updateField("title", e.target.value)}
-                placeholder="e.g. Road Trip Tasikmalaya: Menyusuri Jalur Pegunungan hingga Pantai Selatan"
+                placeholder="e.g. Road Trip Tasikmalaya: Menyusuri Jalur Pegunungan"
                 required
               />
             </div>
@@ -203,7 +185,7 @@ export default function NewRoadtripPage() {
                   id="estimatedCost"
                   value={form.estimatedCost}
                   onChange={(e) => updateField("estimatedCost", e.target.value)}
-                  placeholder="e.g. Bensin & Tol: ± Rp 400.000"
+                  placeholder="e.g. Bensin: ± Rp 400.000"
                 />
               </div>
             </div>
@@ -243,6 +225,15 @@ export default function NewRoadtripPage() {
                 placeholder="https://www.google.com/maps/embed?pb=..."
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="coverImage">Cover Image URL</Label>
+              <Input
+                id="coverImage"
+                value={form.coverImage}
+                onChange={(e) => updateField("coverImage", e.target.value)}
+                placeholder="https://pub-...r2.dev/dev/spots/..."
+              />
+            </div>
           </CardContent>
         </Card>
 
@@ -266,7 +257,7 @@ export default function NewRoadtripPage() {
               </p>
             )}
 
-            {stops.map((stop, index) => (
+            {stops.map((stop) => (
               <div key={stop.key} className="rounded-xl border border-border/50 p-5 space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -287,23 +278,21 @@ export default function NewRoadtripPage() {
                 </div>
 
                 <div className="space-y-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">Nama Destinasi *</Label>
+                    <Input
+                      value={stop.name}
+                      onChange={(e) => updateStop(stop.key, "name", e.target.value)}
+                      placeholder="e.g. Gunung Galunggung"
+                    />
+                  </div>
+
+                  <SpotSelect
+                    value={stop.spotSlug}
+                    onSelect={(slug, name) => handleSpotSelect(stop.key, slug, name)}
+                  />
+
                   <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="space-y-1.5">
-                      <Label className="text-xs">Nama Destinasi *</Label>
-                      <Input
-                        value={stop.name}
-                        onChange={(e) => updateStop(stop.key, "name", e.target.value)}
-                        placeholder="e.g. Gunung Galunggung"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-xs">Kategori</Label>
-                      <Input
-                        value={stop.category}
-                        onChange={(e) => updateStop(stop.key, "category", e.target.value)}
-                        placeholder="e.g. ⛰️ Alam & Petualangan"
-                      />
-                    </div>
                     <div className="space-y-1.5">
                       <Label className="text-xs">Estimasi Waktu Kunjungan</Label>
                       <Input
@@ -321,22 +310,6 @@ export default function NewRoadtripPage() {
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="text-xs">Harga Tiket</Label>
-                      <Input
-                        value={stop.ticketPrice}
-                        onChange={(e) => updateStop(stop.key, "ticketPrice", e.target.value)}
-                        placeholder="e.g. Rp 15.000 / orang"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-xs">Biaya Parkir</Label>
-                      <Input
-                        value={stop.parkingFee}
-                        onChange={(e) => updateStop(stop.key, "parkingFee", e.target.value)}
-                        placeholder="e.g. Motor: Rp 5.000 | Mobil: Rp 15.000"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
                       <Label className="text-xs">Biaya Tambahan</Label>
                       <Input
                         value={stop.additionalCost}
@@ -344,46 +317,14 @@ export default function NewRoadtripPage() {
                         placeholder="e.g. Ojek kawah: Rp 25.000"
                       />
                     </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-xs">Tingkat Effort Fisik</Label>
-                      <Input
-                        value={stop.physicalEffort}
-                        onChange={(e) => updateStop(stop.key, "physicalEffort", e.target.value)}
-                        placeholder="e.g. Sedang - Berat"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-xs">Fasilitas (comma-separated)</Label>
-                      <Input
-                        value={stop.spotFacilities}
-                        onChange={(e) => updateStop(stop.key, "spotFacilities", e.target.value)}
-                        placeholder="Toilet, Warung, Area Parkir"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-xs">Spot Slug (link ke spot-istimewa)</Label>
-                      <Input
-                        value={stop.spotSlug}
-                        onChange={(e) => updateStop(stop.key, "spotSlug", e.target.value)}
-                        placeholder="gunung-galunggung"
-                      />
-                    </div>
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-xs">Catatan Penting Pengendara</Label>
-                    <Input
+                    <Textarea
                       value={stop.spotImportantNote}
                       onChange={(e) => updateStop(stop.key, "spotImportantNote", e.target.value)}
                       placeholder="Peringatan khusus untuk pengendara..."
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label className="text-xs">Deskripsi</Label>
-                    <Textarea
-                      value={stop.description}
-                      onChange={(e) => updateStop(stop.key, "description", e.target.value)}
-                      placeholder="Deskripsi perjalanan di destinasi ini..."
-                      rows={3}
+                      rows={2}
                     />
                   </div>
                 </div>
