@@ -101,11 +101,29 @@ function stopToItineraryStop(row: ItineraryStopRow): ItineraryStop {
 async function getStopsForItinerary(itineraryId: string): Promise<ItineraryStopRow[]> {
   const { data } = await db
     .from("itinerary_stops")
-    .select("id, itinerary_id, stop_number, name, visit_duration, best_visit_hour, additional_cost, spot_important_note, spot_slug, created_at, updated_at, spot:spots!spot_slug(id, slug, name, category, description, ticket_price, parking_fee, physical_effort, facilities, location)")
+    .select("*")
     .eq("itinerary_id", itineraryId)
     .order("stop_number", { ascending: true })
 
-  return (data || []) as unknown as ItineraryStopRow[]
+  const rows = (data || []) as ItineraryStopRow[]
+
+  // Fetch matching spots for all stops
+  const slugs = rows.map((r) => r.spot_slug).filter(Boolean) as string[]
+  if (slugs.length > 0) {
+    const { data: spotRows } = await db
+      .from("spots")
+      .select("id, slug, name, category, description, ticket_price, parking_fee, physical_effort, facilities, location")
+      .in("slug", slugs)
+
+    const spotMap = new Map((spotRows || []).map((s: SpotJoin) => [s.slug, s as SpotJoin]))
+    for (const row of rows) {
+      if (row.spot_slug) {
+        ;(row as ItineraryStopRow & { spot: SpotJoin | null }).spot = spotMap.get(row.spot_slug) || null
+      }
+    }
+  }
+
+  return rows as unknown as ItineraryStopRow[]
 }
 
 export async function getItineraries(options?: {
