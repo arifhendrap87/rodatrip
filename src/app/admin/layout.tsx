@@ -10,14 +10,12 @@ import {
   LayoutDashboard,
   MapPin,
   ShoppingBag,
-  Route,
   Map,
   Mail,
   BarChart3,
   Settings,
   LogOut,
   Menu,
-  X,
 } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useState } from "react"
@@ -26,9 +24,7 @@ const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/spots", label: "Spots", icon: MapPin },
   { href: "/admin/products", label: "Products", icon: ShoppingBag },
-  { href: "/admin/poi", label: "POI", icon: Route },
   { href: "/admin/roadtrips", label: "Roadtrips", icon: Map },
-  { href: "/admin/routes", label: "Routes", icon: Route },
   { href: "/admin/waitlist", label: "Waitlist", icon: Mail },
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/admin/settings", label: "Settings", icon: Settings },
