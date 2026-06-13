@@ -101,11 +101,11 @@ function stopToItineraryStop(row: ItineraryStopRow): ItineraryStop {
 async function getStopsForItinerary(itineraryId: string): Promise<ItineraryStopRow[]> {
   const { data } = await db
     .from("itinerary_stops")
-    .select("id, itinerary_id, stop_number, name, visit_duration, best_visit_hour, additional_cost, spot_important_note, spot_slug, spot:spots!spot_slug(id, slug, name, category, description, ticket_price, parking_fee, physical_effort, facilities, location)")
+    .select("id, itinerary_id, stop_number, name, visit_duration, best_visit_hour, additional_cost, spot_important_note, spot_slug, created_at, updated_at, spot:spots!spot_slug(id, slug, name, category, description, ticket_price, parking_fee, physical_effort, facilities, location)")
     .eq("itinerary_id", itineraryId)
     .order("stop_number", { ascending: true })
 
-  return (data || []) as ItineraryStopRow[]
+  return (data || []) as unknown as ItineraryStopRow[]
 }
 
 export async function getItineraries(options?: {
