@@ -8,6 +8,19 @@ export const geoPointSchema = z.object({
   lng: z.number().min(-180).max(180),
 })
 
+export const nearbyPlaceSchema = z.object({
+  name: z.string().min(1),
+  distance: z.string().optional(),
+  price: z.string().optional(),
+  maps_url: z.string().optional(),
+  nearby_restaurants: z.array(z.object({
+    name: z.string().min(1),
+    distance: z.string().optional(),
+    price: z.string().optional(),
+    maps_url: z.string().optional(),
+  })).optional(),
+})
+
 export const createSpotSchema = z.object({
   name: z.string().min(1).max(255),
   category: z.enum(SPOT_CATEGORIES),
@@ -35,6 +48,8 @@ export const createSpotSchema = z.object({
   facilities: z.array(z.string()).optional(),
   distanceFromCity: z.string().optional(),
   isFeatured: z.boolean().optional(),
+  nearbyHotels: z.array(nearbyPlaceSchema).optional(),
+  nearbyRestaurants: z.array(nearbyPlaceSchema).optional(),
 })
 
 export const updateSpotSchema = createSpotSchema.partial()

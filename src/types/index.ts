@@ -93,6 +93,14 @@ export interface Itinerary {
   updatedAt: string
 }
 
+export interface NearbyPlace {
+  name: string
+  distance?: string
+  maps_url?: string
+  price?: string
+  nearby_restaurants?: NearbyPlace[]
+}
+
 export interface ItineraryStop {
   id: string
   stopNumber: number
@@ -104,6 +112,8 @@ export interface ItineraryStop {
   roadAccess?: string
   rating?: number
   imageUrl?: string
+  province?: string
+  tips?: string
   lat?: number
   lng?: number
   physicalEffort?: string
@@ -114,4 +124,6 @@ export interface ItineraryStop {
   additionalCost?: string
   spotImportantNote?: string
   spotSlug?: string
+  nearbyHotels?: NearbyPlace[]
+  nearbyRestaurants?: NearbyPlace[]
 }

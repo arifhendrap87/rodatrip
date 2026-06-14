@@ -16,6 +16,7 @@ import {
   Settings,
   LogOut,
   Menu,
+  Sparkles,
 } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useState } from "react"
@@ -25,6 +26,7 @@ const navItems = [
   { href: "/admin/spots", label: "Spots", icon: MapPin },
   { href: "/admin/products", label: "Products", icon: ShoppingBag },
   { href: "/admin/roadtrips", label: "Roadtrips", icon: Map },
+  { href: "/admin/prompt-generator", label: "Prompt GPT", icon: Sparkles },
   { href: "/admin/waitlist", label: "Waitlist", icon: Mail },
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/admin/settings", label: "Settings", icon: Settings },

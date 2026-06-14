@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Search, Edit, Trash2, ExternalLink, EyeOff } from "lucide-react"
+import { Plus, Search, Edit, Trash2, ExternalLink, EyeOff, FileDown } from "lucide-react"
 
 export default function RoadtripsPage() {
   const router = useRouter()
@@ -54,12 +54,20 @@ export default function RoadtripsPage() {
             Manage curated road trip itineraries ({roadtrips.length} total)
           </p>
         </div>
-        <Link href="/admin/roadtrips/new">
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Roadtrip
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href="/admin/roadtrips/import">
+            <Button variant="outline">
+              <FileDown className="mr-2 h-4 w-4" />
+              Import from JSON
+            </Button>
+          </Link>
+          <Link href="/admin/roadtrips/new">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Roadtrip
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <Card className="mb-6">

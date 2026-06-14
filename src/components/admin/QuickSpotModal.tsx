@@ -36,8 +36,10 @@ export function QuickSpotModal({ open, defaultName, onClose, onCreated }: QuickS
     ticket_price: "",
     parking_fee: "",
     opening_hours: "",
-    best_time: "",
-    estimated_time: "",
+    best_visit_hour: "",
+    visit_duration: "",
+    additional_cost: "",
+    spot_important_note: "",
     physical_effort: "",
     road_access: "",
     rating: "",
@@ -74,8 +76,10 @@ export function QuickSpotModal({ open, defaultName, onClose, onCreated }: QuickS
         ticketPrice: form.ticket_price || undefined,
         parkingFee: form.parking_fee || undefined,
         openingHours: form.opening_hours || undefined,
-        bestTime: form.best_time || undefined,
-        estimatedTime: form.estimated_time || undefined,
+        bestVisitHour: form.best_visit_hour || undefined,
+        visitDuration: form.visit_duration || undefined,
+        additionalCost: form.additional_cost || undefined,
+        spotImportantNote: form.spot_important_note || undefined,
         physicalEffort: form.physical_effort || undefined,
         roadAccess: form.road_access || undefined,
         rating: form.rating ? parseFloat(form.rating) : undefined,
@@ -160,19 +164,30 @@ export function QuickSpotModal({ open, defaultName, onClose, onCreated }: QuickS
               <Input value={form.opening_hours} onChange={(e) => update("opening_hours", e.target.value)} placeholder="06.00 - 17.00 WIB" />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs">⏱️ Estimasi Waktu</Label>
-              <Input value={form.estimated_time} onChange={(e) => update("estimated_time", e.target.value)} placeholder="2 - 3 Jam" />
+              <Label className="text-xs">⏱️ Durasi Kunjungan</Label>
+              <Input value={form.visit_duration} onChange={(e) => update("visit_duration", e.target.value)} placeholder="2 - 3 Jam" />
             </div>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label className="text-xs">🕐 Waktu Terbaik</Label>
-              <Input value={form.best_time} onChange={(e) => update("best_time", e.target.value)} placeholder="08.00 - 11.00 WIB" />
+              <Input value={form.best_visit_hour} onChange={(e) => update("best_visit_hour", e.target.value)} placeholder="08.00 - 11.00 WIB" />
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs">🏃 Effort Fisik</Label>
               <Input value={form.physical_effort} onChange={(e) => update("physical_effort", e.target.value)} placeholder="Ringan / Sedang / Berat" />
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label className="text-xs">💸 Biaya Tambahan</Label>
+              <Input value={form.additional_cost} onChange={(e) => update("additional_cost", e.target.value)} placeholder="Ojek kawah Rp 25.000" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">⚠️ Catatan Penting</Label>
+              <Input value={form.spot_important_note} onChange={(e) => update("spot_important_note", e.target.value)} placeholder="Catatan untuk pengendara" />
             </div>
           </div>
 

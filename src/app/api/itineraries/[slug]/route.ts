@@ -17,7 +17,7 @@ export async function GET(
 
       const { data: spot } = await db
         .from("spots")
-        .select("category, description, ticket_price, facilities, location")
+        .select("name, category, description, facilities, location, opening_hours, road_access, rating, image_url, nearby_hotels_jsonb, nearby_restaurants_jsonb")
         .eq("slug", stop.spotSlug)
         .maybeSingle()
 
@@ -30,10 +30,16 @@ export async function GET(
 
       return {
         ...stop,
+        name: spot.name || stop.name,
         category: spot.category,
         description: spot.description || undefined,
-        ticketPrice: spot.ticket_price || undefined,
+        openingHours: spot.opening_hours || undefined,
+        roadAccess: spot.road_access || undefined,
+        rating: spot.rating ?? undefined,
+        imageUrl: spot.image_url || undefined,
         spotFacilities: spot.facilities || undefined,
+        nearbyHotels: (spot.nearby_hotels_jsonb as { name: string; distance?: string; maps_url?: string }[]) || undefined,
+        nearbyRestaurants: (spot.nearby_restaurants_jsonb as { name: string; distance?: string; maps_url?: string }[]) || undefined,
         lat: coordsArr?.[1],
         lng: coordsArr?.[0],
       }

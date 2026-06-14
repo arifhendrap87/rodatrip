@@ -45,6 +45,11 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
                       </span>
                     )
                   })()}
+                  {stop.province && (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-border/30 bg-background px-3 py-0.5 text-xs text-muted-foreground">
+                      📍 {stop.province}
+                    </span>
+                  )}
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-muted-foreground">
@@ -131,6 +136,74 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
                 </div>
               )}
 
+              {stop.nearbyHotels && stop.nearbyHotels.length > 0 && (
+                <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4">
+                  <p className="text-xs font-semibold font-heading text-blue-700 uppercase tracking-wider flex items-center gap-1 mb-1.5">
+                    🏨 Hotel Terdekat
+                  </p>
+                  <ul className="space-y-2">
+                    {stop.nearbyHotels.map((h, i) => (
+                      <li key={i}>
+                        <div className="flex items-start gap-2 text-sm text-blue-600">
+                          <span>•</span>
+                          <span className="flex-1">
+                            {h.name}
+                            {h.distance ? ` (${h.distance})` : ''}
+                            {h.price ? <span className="text-blue-400"> - {h.price}</span> : ''}
+                          </span>
+                          {h.maps_url && (
+                            <a href={h.maps_url} target="_blank" rel="noopener noreferrer"
+                              className="text-blue-500 hover:text-blue-700 shrink-0 underline text-xs">Petunjuk Arah</a>
+                          )}
+                        </div>
+                        {h.nearby_restaurants && h.nearby_restaurants.length > 0 && (
+                          <ul className="ml-4 mt-1 space-y-0.5 border-l-2 border-blue-100 pl-3">
+                            {h.nearby_restaurants.map((r, j) => (
+                              <li key={j} className="flex items-start gap-2 text-xs text-blue-500">
+                                <span>🍜</span>
+                                <span className="flex-1">
+                                  {r.name}{r.distance ? ` (${r.distance})` : ''}
+                                  {r.price ? <span className="text-blue-400"> - {r.price}</span> : ''}
+                                </span>
+                                {r.maps_url && (
+                                  <a href={r.maps_url} target="_blank" rel="noopener noreferrer"
+                                    className="text-blue-400 hover:text-blue-600 shrink-0 underline">Petunjuk Arah</a>
+                                )}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {stop.nearbyRestaurants && stop.nearbyRestaurants.length > 0 && (
+                <div className="rounded-xl border border-orange-100 bg-orange-50/50 p-4">
+                  <p className="text-xs font-semibold font-heading text-orange-700 uppercase tracking-wider flex items-center gap-1 mb-1.5">
+                    🍜 Kuliner Terdekat
+                  </p>
+                  <ul className="space-y-1">
+                    {stop.nearbyRestaurants.map((r, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-orange-600">
+                        <span>•</span>
+                        <span className="flex-1">
+                          {r.name}{r.distance ? ` (${r.distance})` : ''}
+                          {r.price ? <span className="text-orange-400"> - {r.price}</span> : ''}
+                        </span>
+                        {r.maps_url && (
+                          <a href={r.maps_url} target="_blank" rel="noopener noreferrer"
+                            className="text-orange-500 hover:text-orange-700 shrink-0 underline text-xs">
+                            Petunjuk Arah
+                          </a>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               {stop.spotImportantNote && (
                 <div className="rounded-xl border border-red-200 bg-red-50/80 p-4">
                   <div className="flex items-start gap-2">
@@ -138,6 +211,18 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
                     <div>
                       <p className="text-xs font-semibold text-red-600">Catatan Penting Pengendara</p>
                       <p className="mt-1 text-sm text-red-500 leading-relaxed">{stop.spotImportantNote}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {stop.tips && (
+                <div className="rounded-xl border border-amber-200 bg-amber-50/80 p-4">
+                  <div className="flex items-start gap-2">
+                    <span className="text-lg shrink-0">💡</span>
+                    <div>
+                      <p className="text-xs font-semibold text-amber-700">Tips</p>
+                      <p className="mt-0.5 text-sm text-amber-600">{stop.tips}</p>
                     </div>
                   </div>
                 </div>

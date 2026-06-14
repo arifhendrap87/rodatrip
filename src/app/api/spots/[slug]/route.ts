@@ -6,10 +6,11 @@ import { getSpotBySlug } from "@/lib/services/spots"
 import { db } from "@/lib/services/db"
 
 function camelToSnake(obj: Record<string, unknown>): Record<string, unknown> {
+  const JSONB_SUFFIX_KEYS = new Set(["nearby_hotels", "nearby_restaurants"])
   const result: Record<string, unknown> = {}
   for (const [key, value] of Object.entries(obj)) {
     const snakeKey = key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`)
-    result[snakeKey] = value
+    result[JSONB_SUFFIX_KEYS.has(snakeKey) ? `${snakeKey}_jsonb` : snakeKey] = value
   }
   return result
 }
