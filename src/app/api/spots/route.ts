@@ -40,9 +40,17 @@ export async function POST(request: Request) {
 
   const slug = parsed.data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
 
+  // Map camelCase from validator to snake_case for DB
+  const { location, ...rest } = parsed.data
+  const insertData: Record<string, unknown> = {
+    slug,
+    location: `POINT(${location.lng} ${location.lat})`,
+    ...camelToSnake(rest),
+  }
+
   const { data, error: dbError } = await db
     .from("spots")
-    .insert([{ ...parsed.data, slug, location: `POINT(${parsed.data.location.lng} ${parsed.data.location.lat})` }])
+    .insert(insertData)
     .select("id, slug, name, created_at")
     .single()
 
@@ -52,4 +60,13 @@ export async function POST(request: Request) {
   await logAudit({ userId: admin.id, action: "CREATE", entityType: "spots", entityId: data.id, newValue: parsed.data })
 
   return success(data, 201)
+}
+
+function camelToSnake(obj: Record<string, unknown>): Record<string, unknown> {
+  const result: Record<string, unknown> = {}
+  for (const [key, value] of Object.entries(obj)) {
+    const snakeKey = key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`)
+    result[snakeKey] = value
+  }
+  return result
 }

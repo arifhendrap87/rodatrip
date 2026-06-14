@@ -44,26 +44,16 @@ export default function NewSpotPage() {
   const router = useRouter()
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({
-    name: "",
-    slug: "",
-    category: "",
-    province: "Jawa Barat",
-    region: "Jawa",
-    lat: "",
-    lng: "",
-    description: "",
-    why_special: "",
-    tips: "",
-    rating: "4.5",
-    best_time: "",
-    opening_hours: "",
-    estimated_time: "",
-    ticket_price: "",
-    road_access: "",
-    facilities: "",
-    distance_from_city: "",
-    tags: "",
-    is_featured: false,
+    name: "", slug: "", category: "alam", province: "Jawa Barat",
+    region: "Jawa", lat: "", lng: "",
+    description: "", why_special: "", tips: "",
+    rating: "4.5", best_time: "", opening_hours: "",
+    estimated_time: "", ticket_price: "", parking_fee: "",
+    road_access: "", physical_effort: "",
+    visit_duration: "", best_visit_hour: "",
+    additional_cost: "", spot_important_note: "",
+    facilities: "", distance_from_city: "",
+    tags: "", image_url: "", is_featured: false,
   })
 
   function generateSlug(name: string) {
@@ -93,22 +83,28 @@ export default function NewSpotPage() {
       category: form.category,
       province: form.province,
       region: form.region,
-      location: `POINT(${form.lng} ${form.lat})`,
+      location: { lat: parseFloat(form.lat) || 0, lng: parseFloat(form.lng) || 0 },
       description: form.description,
-      why_special: form.why_special,
+      whySpecial: form.why_special,
       tips: form.tips,
-      rating: parseFloat(form.rating),
-      best_time: form.best_time,
-      opening_hours: form.opening_hours,
-      estimated_time: form.estimated_time,
-      ticket_price: form.ticket_price,
-      road_access: form.road_access,
+      rating: parseFloat(form.rating) || undefined,
+      bestTime: form.best_time,
+      openingHours: form.opening_hours,
+      estimatedTime: form.estimated_time,
+      ticketPrice: form.ticket_price,
+      parkingFee: form.parking_fee,
+      visitDuration: form.visit_duration,
+      bestVisitHour: form.best_visit_hour,
+      additionalCost: form.additional_cost,
+      spotImportantNote: form.spot_important_note,
+      physicalEffort: form.physical_effort,
+      roadAccess: form.road_access,
       facilities: form.facilities.split(",").map((f) => f.trim()).filter(Boolean),
-      distance_from_city: form.distance_from_city,
+      distanceFromCity: form.distance_from_city,
       tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
-      is_featured: form.is_featured,
-      image_url: "",
-      image_credit: "Unsplash",
+      isFeatured: form.is_featured,
+      imageUrl: form.image_url || "",
+      imageCredit: "Unsplash",
     }
 
     try {
@@ -389,6 +385,34 @@ export default function NewSpotPage() {
                   }
                   placeholder="e.g. Mobil & Motor — aspal mulus"
                 />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="parking_fee">🅿️ Parking Fee</Label>
+                <Input id="parking_fee" value={form.parking_fee} onChange={(e) => setForm((f) => ({ ...f, parking_fee: e.target.value }))} placeholder="Motor: Rp 5.000 | Mobil: Rp 15.000" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="physical_effort">🏃 Physical Effort</Label>
+                <Input id="physical_effort" value={form.physical_effort} onChange={(e) => setForm((f) => ({ ...f, physical_effort: e.target.value }))} placeholder="Ringan / Sedang / Berat" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="visit_duration">⏱️ Visit Duration</Label>
+                <Input id="visit_duration" value={form.visit_duration} onChange={(e) => setForm((f) => ({ ...f, visit_duration: e.target.value }))} placeholder="2 - 3 Jam" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="best_visit_hour">🕐 Best Visit Hour</Label>
+                <Input id="best_visit_hour" value={form.best_visit_hour} onChange={(e) => setForm((f) => ({ ...f, best_visit_hour: e.target.value }))} placeholder="08.00 - 11.00 WIB" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="additional_cost">💸 Additional Cost</Label>
+                <Input id="additional_cost" value={form.additional_cost} onChange={(e) => setForm((f) => ({ ...f, additional_cost: e.target.value }))} placeholder="Ojek kawah Rp 25.000" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="spot_important_note">⚠️ Important Note</Label>
+                <Input id="spot_important_note" value={form.spot_important_note} onChange={(e) => setForm((f) => ({ ...f, spot_important_note: e.target.value }))} placeholder="Catatan penting untuk pengendara" />
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="image_url">🖼️ Image URL</Label>
+                <Input id="image_url" value={form.image_url} onChange={(e) => setForm((f) => ({ ...f, image_url: e.target.value }))} placeholder="https://pub-...r2.dev/prod/spots/..." />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="facilities">Facilities (comma-separated)</Label>

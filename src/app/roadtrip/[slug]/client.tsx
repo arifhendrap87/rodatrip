@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import type { Itinerary } from "@/types"
 import { ItineraryTimeline } from "./ItineraryTimeline"
+import { parseEmbedUrl } from "@/lib/embed"
 
 interface RoadtripDetailClientProps {
   itinerary: Itinerary
@@ -122,20 +123,23 @@ export function RoadtripDetailClient({ itinerary }: RoadtripDetailClientProps) {
           </div>
         )}
 
-        {itinerary.mapsEmbedUrl && (
-          <div className="rounded-2xl overflow-hidden border border-border/50 shadow-sm">
-            <iframe
-              src={itinerary.mapsEmbedUrl}
-              width="100%"
-              height="400"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Peta Rute"
-            />
-          </div>
-        )}
+        {(() => {
+          const parsed = parseEmbedUrl(itinerary.mapsEmbedUrl || "")
+          if (!parsed) return null
+          return (
+            <div className="rounded-2xl overflow-hidden border border-border/50 shadow-sm">
+              {parsed.type === "embed" ? (
+                <iframe src={parsed.url} width="100%" height="400" style={{ border: 0 }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+              ) : (
+                <a href={parsed.url} target="_blank" rel="noopener noreferrer"
+                   className="flex items-center justify-center gap-2 bg-primary/5 hover:bg-primary/10 text-primary font-medium py-10 px-4 transition-colors rounded-2xl">
+                  <span className="text-2xl">📍</span>
+                  <span className="text-base font-semibold">Buka Rute di Google Maps</span>
+                </a>
+              )}
+            </div>
+          )
+        })()}
 
         <div>
           <h2 className="text-2xl font-bold font-heading mb-8 flex items-center gap-3">

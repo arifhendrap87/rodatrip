@@ -41,7 +41,15 @@ export default function EditSpotPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [form, setForm] = useState<any>({})
+  const [form, setForm] = useState<any>({
+    name: "", category: "", province: "", region: "",
+    description: "", why_special: "", tips: "",
+    rating: "", best_time: "", opening_hours: "",
+    estimated_time: "", ticket_price: "", road_access: "",
+    distance_from_city: "", facilities: "", tags: "",
+    lat: "", lng: "", image_url: "", image_credit: "",
+    is_featured: false,
+  })
 
   useEffect(() => {
     const slug = params.id as string
@@ -50,11 +58,33 @@ export default function EditSpotPage() {
         const data = res.data
         if (data) {
           setForm({
-            ...data,
-            lat: (data.location as { coordinates?: number[] })?.coordinates?.[0] || "",
-            lng: (data.location as { coordinates?: number[] })?.coordinates?.[1] || "",
+            name: data.name || "",
+            category: data.category || "",
+            province: data.province || "",
+            region: data.region || "",
+            description: data.description || "",
+            why_special: data.why_special || "",
+            tips: data.tips || "",
+            rating: data.rating ?? "",
+            best_time: data.best_time || "",
+            opening_hours: data.opening_hours || "",
+            estimated_time: data.estimated_time || "",
+            ticket_price: data.ticket_price || "",
+            parking_fee: data.parking_fee || "",
+            road_access: data.road_access || "",
+            physical_effort: data.physical_effort || "",
+            visit_duration: data.visit_duration || "",
+            best_visit_hour: data.best_visit_hour || "",
+            additional_cost: data.additional_cost || "",
+            spot_important_note: data.spot_important_note || "",
+            distance_from_city: data.distance_from_city || "",
             facilities: ((data.facilities as string[]) || []).join(", "),
             tags: ((data.tags as string[]) || []).join(", "),
+            lat: (data.location as { coordinates?: number[] })?.coordinates?.[1] || "",
+            lng: (data.location as { coordinates?: number[] })?.coordinates?.[0] || "",
+            image_url: data.image_url || "",
+            image_credit: data.image_credit || "",
+            is_featured: data.is_featured || false,
           })
         }
         setLoading(false)
@@ -72,18 +102,27 @@ export default function EditSpotPage() {
       province: form.province,
       region: form.region,
       description: form.description,
-      why_special: form.why_special,
+      whySpecial: form.why_special,
       tips: form.tips,
-      rating: parseFloat(form.rating),
-      best_time: form.best_time,
-      opening_hours: form.opening_hours,
-      estimated_time: form.estimated_time,
-      ticket_price: form.ticket_price,
-      road_access: form.road_access,
+      rating: parseFloat(form.rating) || null,
+      bestTime: form.best_time,
+      openingHours: form.opening_hours,
+      estimatedTime: form.estimated_time,
+      ticketPrice: form.ticket_price,
+      parkingFee: form.parking_fee,
+      roadAccess: form.road_access,
+      physicalEffort: form.physical_effort,
+      visitDuration: form.visit_duration,
+      bestVisitHour: form.best_visit_hour,
+      additionalCost: form.additional_cost,
+      spotImportantNote: form.spot_important_note,
+      distanceFromCity: form.distance_from_city,
+      location: { lat: parseFloat(form.lat) || 0, lng: parseFloat(form.lng) || 0 },
       facilities: form.facilities.split(",").map((f: string) => f.trim()).filter(Boolean),
-      distance_from_city: form.distance_from_city,
       tags: form.tags.split(",").map((t: string) => t.trim()).filter(Boolean),
-      is_featured: form.is_featured,
+      imageUrl: form.image_url,
+      imageCredit: form.image_credit,
+      isFeatured: form.is_featured,
     }
 
     try {

@@ -30,6 +30,14 @@ interface SpotJoin {
   parking_fee: string | null
   physical_effort: string | null
   facilities: string[] | null
+  opening_hours: string | null
+  road_access: string | null
+  rating: number | null
+  image_url: string | null
+  visit_duration: string | null
+  best_visit_hour: string | null
+  additional_cost: string | null
+  spot_important_note: string | null
   location: { type: "Point"; coordinates: [number, number] } | null
 }
 
@@ -37,11 +45,6 @@ export interface ItineraryStopRow {
   id: string
   itinerary_id: string
   stop_number: number
-  name: string
-  visit_duration: string | null
-  best_visit_hour: string | null
-  additional_cost: string | null
-  spot_important_note: string | null
   spot_slug: string | null
   spot: SpotJoin | null
   created_at: string
@@ -78,14 +81,28 @@ function getSpotCoordinates(spot: SpotJoin | null): { lat: number; lng: number }
 }
 
 function stopToItineraryStop(row: ItineraryStopRow): ItineraryStop {
+  const s = row.spot
+  const loc = s?.location?.coordinates
   return {
     id: row.id,
     stopNumber: row.stop_number,
-    name: row.name,
-    visitDuration: row.visit_duration || undefined,
-    bestVisitHour: row.best_visit_hour || undefined,
-    additionalCost: row.additional_cost || undefined,
-    spotImportantNote: row.spot_important_note || undefined,
+    name: s?.name || "",
+    category: s?.category || undefined,
+    description: s?.description || undefined,
+    openingHours: s?.opening_hours || undefined,
+    facilities: s?.facilities || undefined,
+    roadAccess: s?.road_access || undefined,
+    rating: s?.rating ?? undefined,
+    imageUrl: s?.image_url || undefined,
+    lat: loc?.[1] ?? undefined,
+    lng: loc?.[0] ?? undefined,
+    physicalEffort: s?.physical_effort || undefined,
+    ticketPrice: s?.ticket_price || undefined,
+    parkingFee: s?.parking_fee || undefined,
+    visitDuration: s?.visit_duration || undefined,
+    bestVisitHour: s?.best_visit_hour || undefined,
+    additionalCost: s?.additional_cost || undefined,
+    spotImportantNote: s?.spot_important_note || undefined,
     spotSlug: row.spot_slug || undefined,
   }
 }
@@ -97,7 +114,28 @@ async function getStopsForItinerary(itineraryId: string): Promise<ItineraryStopR
     .eq("itinerary_id", itineraryId)
     .order("stop_number", { ascending: true })
 
-  return (data || []) as ItineraryStopRow[]
+  const rows = (data || []) as ItineraryStopRow[]
+
+  // Fetch matching spots for all stops
+  const slugs = rows.map((r) => r.spot_slug).filter(Boolean) as string[]
+  if (slugs.length > 0) {
+    const { data: spotRows } = await db
+      .from("spots")
+      .select("id, slug, name, category, description, ticket_price, parking_fee, physical_effort, facilities, opening_hours, road_access, rating, image_url, location, visit_duration, best_visit_hour, additional_cost, spot_important_note")
+      .in("slug", slugs)
+
+    const spotMap = new Map<string, SpotJoin>()
+    for (const s of (spotRows || []) as SpotJoin[]) {
+      spotMap.set(s.slug, s)
+    }
+    for (const row of rows) {
+      if (row.spot_slug) {
+        ;(row as unknown as Record<string, unknown>).spot = spotMap.get(row.spot_slug) || null
+      }
+    }
+  }
+
+  return rows as unknown as ItineraryStopRow[]
 }
 
 export async function getItineraries(options?: {
@@ -158,7 +196,7 @@ export async function createItinerary(data: {
   culinaryNotes?: string
   coverImage?: string
   isPublished?: boolean
-  stops?: Omit<ItineraryStop, "id">[]
+  stops?: { stopNumber: number; spotSlug: string }[]
 }): Promise<{ id: string; slug: string } | null> {
   try {
     const { data: row, error } = await db
@@ -187,12 +225,7 @@ export async function createItinerary(data: {
       const stopRows = data.stops.map((stop) => ({
         itinerary_id: (row as { id: string }).id,
         stop_number: stop.stopNumber,
-        name: stop.name,
-        visit_duration: stop.visitDuration || null,
-        best_visit_hour: stop.bestVisitHour || null,
-        additional_cost: stop.additionalCost || null,
-        spot_important_note: stop.spotImportantNote || null,
-        spot_slug: stop.spotSlug || null,
+        spot_slug: stop.spotSlug,
       }))
 
       const { error: stopsError } = await db
@@ -223,7 +256,7 @@ export async function updateItinerary(
     culinaryNotes?: string
     coverImage?: string
     isPublished?: boolean
-    stops?: Omit<ItineraryStop, "id">[]
+    stops?: { stopNumber: number; spotSlug: string }[]
   }
 ): Promise<{ id: string; slug: string } | null> {
   try {
@@ -257,12 +290,7 @@ export async function updateItinerary(
         const stopRows = data.stops.map((stop) => ({
           itinerary_id: (row as { id: string }).id,
           stop_number: stop.stopNumber,
-          name: stop.name,
-          visit_duration: stop.visitDuration || null,
-          best_visit_hour: stop.bestVisitHour || null,
-          additional_cost: stop.additionalCost || null,
-          spot_important_note: stop.spotImportantNote || null,
-          spot_slug: stop.spotSlug || null,
+          spot_slug: stop.spotSlug,
         }))
 
         const { error: stopsError } = await db

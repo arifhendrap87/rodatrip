@@ -2,20 +2,7 @@ import { z } from "zod"
 
 export const itineraryStopSchema = z.object({
   stopNumber: z.number().int().min(1),
-  name: z.string().min(1),
-  category: z.string().optional(),
-  visitDuration: z.string().optional(),
-  bestVisitHour: z.string().optional(),
-  ticketPrice: z.string().optional(),
-  parkingFee: z.string().optional(),
-  additionalCost: z.string().optional(),
-  physicalEffort: z.string().optional(),
-  spotFacilities: z.array(z.string()).optional(),
-  spotImportantNote: z.string().optional(),
-  description: z.string().optional(),
-  spotSlug: z.string().optional(),
-  lat: z.number().min(-90).max(90).optional(),
-  lng: z.number().min(-180).max(180).optional(),
+  spotSlug: z.string().min(1),
 })
 
 export const createItinerarySchema = z.object({

@@ -58,6 +58,16 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
                       <span>🕐</span> Waktu Terbaik: {stop.bestVisitHour}
                     </span>
                   )}
+                  {stop.openingHours && (
+                    <span className="inline-flex items-center gap-1">
+                      <span>🚪</span> Buka: {stop.openingHours}
+                    </span>
+                  )}
+                  {stop.rating && (
+                    <span className="inline-flex items-center gap-1">
+                      <span>⭐</span> {stop.rating}/5
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -87,6 +97,16 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
                 </div>
               )}
 
+              {stop.roadAccess && (
+                <div className="flex items-start gap-3 rounded-xl border border-border/40 bg-white/60 p-4">
+                  <span className="text-lg shrink-0">🚗</span>
+                  <div>
+                    <p className="text-xs font-semibold font-heading text-muted-foreground uppercase tracking-wider">Akses Jalan</p>
+                    <p className="text-sm mt-1">{stop.roadAccess}</p>
+                  </div>
+                </div>
+              )}
+
               {stop.physicalEffort && (
                 <div className="rounded-xl border border-border/40 bg-white/60 p-4">
                   <p className="text-xs font-semibold font-heading text-muted-foreground uppercase tracking-wider">
@@ -96,13 +116,13 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
                 </div>
               )}
 
-              {stop.spotFacilities && stop.spotFacilities.length > 0 && (
+              {stop.facilities && stop.facilities.length > 0 && (
                 <div>
                   <p className="text-xs font-semibold font-heading text-muted-foreground uppercase tracking-wider mb-2">
                     Fasilitas di Lokasi
                   </p>
                   <div className="flex flex-wrap gap-1.5">
-                    {stop.spotFacilities.map((f) => (
+                    {stop.facilities.map((f) => (
                       <span key={f} className="inline-flex items-center rounded-md border border-border/30 bg-muted/30 px-2.5 py-1 text-xs font-medium text-muted-foreground">
                         {f}
                       </span>

@@ -5,6 +5,15 @@ import { getServerAdmin } from "@/lib/api/auth"
 import { getSpotBySlug } from "@/lib/services/spots"
 import { db } from "@/lib/services/db"
 
+function camelToSnake(obj: Record<string, unknown>): Record<string, unknown> {
+  const result: Record<string, unknown> = {}
+  for (const [key, value] of Object.entries(obj)) {
+    const snakeKey = key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`)
+    result[snakeKey] = value
+  }
+  return result
+}
+
 export async function GET(_request: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const spot = await getSpotBySlug(slug)
@@ -24,7 +33,15 @@ export async function PUT(request: Request, { params }: { params: Promise<{ slug
   const { data: existing } = await db.from("spots").select("id, slug, name, view_count").eq("slug", slug).single()
   if (!existing) return notFound("Spot")
 
-  const { error } = await db.from("spots").update(parsed.data).eq("slug", slug)
+  const { location, ...rest } = parsed.data
+  const updateData: Record<string, unknown> = {
+    ...camelToSnake(rest),
+  }
+  if (location) {
+    updateData.location = `POINT(${location.lng} ${location.lat})`
+  }
+
+  const { error } = await db.from("spots").update(updateData).eq("slug", slug)
   if (error) return new Response(JSON.stringify({ error: { message: error.message } }), { status: 500 })
 
   const { logAudit } = await import("@/lib/api/audit")

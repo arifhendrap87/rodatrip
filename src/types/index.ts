@@ -98,16 +98,20 @@ export interface ItineraryStop {
   stopNumber: number
   name: string
   category?: string
-  visitDuration?: string
-  bestVisitHour?: string
-  ticketPrice?: string
-  parkingFee?: string
-  additionalCost?: string
-  physicalEffort?: string
-  spotFacilities?: string[]
-  spotImportantNote?: string
   description?: string
-  spotSlug?: string
+  openingHours?: string
+  facilities?: string[]
+  roadAccess?: string
+  rating?: number
+  imageUrl?: string
   lat?: number
   lng?: number
+  physicalEffort?: string
+  ticketPrice?: string
+  parkingFee?: string
+  visitDuration?: string
+  bestVisitHour?: string
+  additionalCost?: string
+  spotImportantNote?: string
+  spotSlug?: string
 }
