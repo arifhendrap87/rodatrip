@@ -1,4 +1,4 @@
-import { supabase, log, divider } from "./config"
+import { supabase } from "./config"
 
 const DATA = {
   slug: "road-trip-malang-menyisir-eksotisme-pantai-perawan-di-jalur-lintas-selatan",
@@ -14,29 +14,49 @@ const DATA = {
   culinary_notes: "Menikmati kesegaran Es Kelapa Muda langsung dari buahnya di sepanjang bibir Pantai Balekambang. \nMencicipi kuliner laut segar seperti Ikan Bakar Sambal Korek di warung-warung makan sekitar Pantai Sendang Biru sebelum menyeberang ke area Tiga Warna.",
   cover_image: "",
   stops: [
-    { stop_number: 1, name: "Pantai Balekambang", visit_duration: "2 - 3 Jam", best_visit_hour: "08.00 - 11.00 WIB", additional_cost: "Retribusi jembatan penyeberangan ke pulau karang Rp 5.000", spot_important_note: "Area parkir sangat luas dan teduh di bawah pohon kelapa. Hati-hati dengan korosi air laut, sebaiknya bilas atau cuci kendaraan Anda setelah pulang dari area pantai ini." },
-    { stop_number: 2, name: "Pantai Gondomayit", visit_duration: "1 - 2 Jam", best_visit_hour: "11.30 - 13.30 WIB", additional_cost: "Biaya kebersihan toilet umum Rp 2.000", spot_important_note: "Akses jalan masuk dari jalur utama JLS agak menyempit dan masih berupa tanah berpasir padat. Pengendara mobil dengan ground clearance rendah disarankan untuk ekstra hati-hati memilih lajur." },
-    { stop_number: 3, name: "Pantai Clungup", visit_duration: "1 - 1.5 Jam", best_visit_hour: "14.00 - 15.30 WIB", additional_cost: "Jasa titip kantong plastik sampah (wajib) Rp 10.000", spot_important_note: "Kendaraan roda empat hanya bisa masuk sampai ke kantong parkir utama CMC (Clungup Mangrove Conservation). Dari sana, perjalanan ke bibir pantai harus dilanjutkan dengan berjalan kaki atau sewa ojek lokal." },
-    { stop_number: 4, name: "Pantai Tiga Warna", visit_duration: "2 - 2.5 Jam", best_visit_hour: "15.30 - 18.00 WIB", additional_cost: "Sewa pemandu wisata lokal (guide wajib) Rp 150.000 per kelompok", spot_important_note: "Karena merupakan kawasan konservasi terikat, pastikan Anda sudah melakukan reservasi kuota kunjungan terlebih dahulu sebelum berangkat. Area parkir dijaga ketat oleh petugas lokal, pastikan kunci ganda kendaraan Anda." },
+    {
+      stop_number: 1,
+      name: "Pantai Balekambang",
+      visit_duration: "2 - 3 Jam",
+      best_visit_hour: "08.00 - 11.00 WIB",
+      additional_cost: "Retribusi jembatan penyeberangan ke pulau karang Rp 5.000",
+      spot_important_note: "Area parkir sangat luas dan teduh di bawah pohon kelapa. Hati-hati dengan korosi air laut, sebaiknya bilas atau cuci kendaraan Anda setelah pulang dari area pantai ini.",
+    },
+    {
+      stop_number: 2,
+      name: "Pantai Gondomayit",
+      visit_duration: "1 - 2 Jam",
+      best_visit_hour: "11.30 - 13.30 WIB",
+      additional_cost: "Biaya kebersihan toilet umum Rp 2.000",
+      spot_important_note: "Akses jalan masuk dari jalur utama JLS agak menyempit dan masih berupa tanah berpasir padat. Pengendara mobil dengan ground clearance rendah disarankan untuk ekstra hati-hati memilih lajur.",
+    },
+    {
+      stop_number: 3,
+      name: "Pantai Clungup",
+      visit_duration: "1 - 1.5 Jam",
+      best_visit_hour: "14.00 - 15.30 WIB",
+      additional_cost: "Jasa titip kantong plastik sampah (wajib) Rp 10.000",
+      spot_important_note: "Kendaraan roda empat hanya bisa masuk sampai ke kantong parkir utama CMC (Clungup Mangrove Conservation). Dari sana, perjalanan ke bibir pantai harus dilanjutkan dengan berjalan kaki atau sewa ojek lokal.",
+    },
+    {
+      stop_number: 4,
+      name: "Pantai Tiga Warna",
+      visit_duration: "2 - 2.5 Jam",
+      best_visit_hour: "15.30 - 18.00 WIB",
+      additional_cost: "Sewa pemandu wisata lokal (guide wajib) Rp 150.000 per kelompok",
+      spot_important_note: "Karena merupakan kawasan konservasi terikat, pastikan Anda sudah melakukan reservasi kuota kunjungan terlebih dahulu sebelum berangkat. Area parkir dijaga ketat oleh petugas lokal, pastikan kunci ganda kendaraan Anda.",
+    },
   ],
 }
 
-export async function seedItinerary() {
-  log("🏎️", "Seeding roadtrip itineraries...")
+async function main() {
+  console.log("")
+  console.log("  ╔═══════════════════════════════════════╗")
+  console.log("  ║   Seed Single Roadtrip                ║")
+  console.log("  ╚═══════════════════════════════════════╝")
+  console.log("")
 
-  const { data: existing } = await supabase
-    .from("itineraries")
-    .select("id")
-    .eq("slug", DATA.slug)
-    .maybeSingle()
-
-  if (existing) {
-    log("⏭️", `${DATA.title} already exists, skipping`)
-    divider()
-    log("📊", "Itineraries: 0 inserted, 1 skipped, 0 errors")
-    return { inserted: 0, skipped: 1, errors: 0 }
-  }
-
+  // Create itinerary
   const { data: itinerary, error } = await supabase
     .from("itineraries")
     .insert({
@@ -57,13 +77,14 @@ export async function seedItinerary() {
     .select("id")
     .single()
 
-  if (error || !itinerary) {
-    log("❌", `Failed: ${error?.message}`)
-    divider()
-    log("📊", "Itineraries: 0 inserted, 0 skipped, 1 errors")
-    return { inserted: 0, skipped: 0, errors: 1 }
+  if (error) {
+    console.log("  ❌ Error creating itinerary:", error.message)
+    process.exit(1)
   }
 
+  console.log("  ✅ Itinerary created:", DATA.title)
+
+  // Create stops
   const stopRows = DATA.stops.map((stop) => ({
     itinerary_id: itinerary.id,
     stop_number: stop.stop_number,
@@ -74,18 +95,20 @@ export async function seedItinerary() {
     spot_important_note: stop.spot_important_note || null,
   }))
 
-  const { error: stopsError } = await supabase.from("itinerary_stops").insert(stopRows)
+  const { error: stopsError } = await supabase
+    .from("itinerary_stops")
+    .insert(stopRows)
 
   if (stopsError) {
-    log("❌", `Stops failed: ${stopsError.message}`)
+    console.log("  ❌ Error creating stops:", stopsError.message)
     await supabase.from("itineraries").delete().eq("id", itinerary.id)
-    divider()
-    log("📊", "Itineraries: 0 inserted, 0 skipped, 1 errors")
-    return { inserted: 0, skipped: 0, errors: 1 }
+    process.exit(1)
   }
 
-  log("✅", `Created "${DATA.title}" with ${stopRows.length} stops`)
-  divider()
-  log("📊", "Itineraries: 1 inserted, 0 skipped, 0 errors")
-  return { inserted: 1, skipped: 0, errors: 0 }
+  console.log(`  ✅ ${stopRows.length} stops created`)
+  console.log("")
+  console.log("  ✅ Seed complete!")
+  console.log("")
 }
+
+main()
