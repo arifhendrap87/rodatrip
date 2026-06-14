@@ -1,15 +1,36 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import type { ItineraryStop } from "@/types"
 import { NearbyPlaces } from "@/components/roadtrip/NearbyPlaces"
 import { SPOT_CATEGORY_DISPLAY } from "@/lib/constants"
+
+function fixMapsUrl(url?: string): string {
+  if (!url || !url.includes("maps/")) return url || ""
+  const origin = url.match(/[?&]origin=([^&]+)/)?.[1]
+  const dest = url.match(/[?&]destination=([^&]+)/)?.[1]
+  if (origin && dest) return `https://www.google.com/maps/dir/${origin}/${dest}`
+  if (dest) return `https://www.google.com/maps/dir//${dest}`
+  return url
+}
 
 interface ItineraryTimelineProps {
   stops: ItineraryStop[]
 }
 
 export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
+  const [expanded, setExpanded] = useState<Set<number>>(new Set(stops.map(s => s.stopNumber)))
+
+  function toggleStop(num: number) {
+    setExpanded(prev => {
+      const next = new Set(prev)
+      if (next.has(num)) next.delete(num)
+      else next.add(num)
+      return next
+    })
+  }
+
   if (stops.length === 0) {
     return (
       <div className="py-12 text-center text-muted-foreground">
@@ -20,7 +41,9 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
 
   return (
     <div className="relative">
-      {stops.map((stop, index) => (
+      {stops.map((stop, index) => {
+        const isOpen = expanded.has(stop.stopNumber)
+        return (
         <div key={stop.id || stop.stopNumber} className="relative pb-12 last:pb-0">
           {index < stops.length - 1 && (
             <div className="absolute left-6 top-16 bottom-0 w-0.5 bg-gradient-to-b from-primary/30 to-primary/5" />
@@ -28,53 +51,58 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
 
           <div className="flex gap-6">
             <div className="relative flex shrink-0 flex-col items-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-white text-sm font-bold shadow-md">
+              <button onClick={() => toggleStop(stop.stopNumber)}
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-white text-sm font-bold shadow-md hover:opacity-90 transition-opacity">
                 {stop.stopNumber}
-              </div>
+              </button>
             </div>
 
-            <div className="flex-1 min-w-0 space-y-4">
-              <div>
-                <div className="flex items-center flex-wrap gap-2">
-                  <h3 className="text-xl font-bold font-heading">{stop.name}</h3>
-                  {stop.category && (() => {
-                    const display = SPOT_CATEGORY_DISPLAY[stop.category]
-                    return (
-                      <span className="inline-flex items-center rounded-full border border-border/50 bg-muted/50 px-3 py-0.5 text-xs font-medium">
-                        {display ? `${display.emoji} ${display.label}` : stop.category}
-                      </span>
-                    )
-                  })()}
-                  {stop.province && (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-border/30 bg-background px-3 py-0.5 text-xs text-muted-foreground">
-                      📍 {stop.province}
-                    </span>
-                  )}
-                </div>
+            <div className="flex-1 min-w-0">
+              <button onClick={() => toggleStop(stop.stopNumber)}
+                className="w-full flex items-center gap-2 text-left mb-1">
+                <h3 className="text-xl font-bold font-heading flex-1">{stop.name}</h3>
+                <span className={`text-muted-foreground text-xs transition-transform ${isOpen ? '' : '-rotate-90'}`}>▼</span>
+              </button>
 
-                <div className="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-muted-foreground">
-                  {stop.visitDuration && (
-                    <span className="inline-flex items-center gap-1">
-                      <span>⏱️</span> Estimasi: {stop.visitDuration}
+              <div className="flex flex-wrap items-center gap-2">
+                {stop.category && (() => {
+                  const display = SPOT_CATEGORY_DISPLAY[stop.category]
+                  return (
+                    <span className="inline-flex items-center rounded-full border border-border/50 bg-muted/50 px-3 py-0.5 text-xs font-medium">
+                      {display ? `${display.emoji} ${display.label}` : stop.category}
                     </span>
-                  )}
-                  {stop.bestVisitHour && (
-                    <span className="inline-flex items-center gap-1">
-                      <span>🕐</span> Waktu Terbaik: {stop.bestVisitHour}
-                    </span>
-                  )}
-                  {stop.openingHours && (
-                    <span className="inline-flex items-center gap-1">
-                      <span>🚪</span> Buka: {stop.openingHours}
-                    </span>
-                  )}
-                  {stop.rating && (
-                    <span className="inline-flex items-center gap-1">
-                      <span>⭐</span> {stop.rating}/5
-                    </span>
-                  )}
-                </div>
+                  )
+                })()}
+                {stop.province && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-border/30 bg-background px-3 py-0.5 text-xs text-muted-foreground">
+                    📍 {stop.province}
+                  </span>
+                )}
+                {stop.rating && (
+                  <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">⭐ {stop.rating}/5</span>
+                )}
               </div>
+
+              <div className="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-muted-foreground">
+                {stop.visitDuration && (
+                  <span className="inline-flex items-center gap-1">
+                    <span>⏱️</span> Estimasi: {stop.visitDuration}
+                  </span>
+                )}
+                {stop.bestVisitHour && (
+                  <span className="inline-flex items-center gap-1">
+                    <span>🕐</span> Waktu Terbaik: {stop.bestVisitHour}
+                  </span>
+                )}
+                {stop.openingHours && (
+                  <span className="inline-flex items-center gap-1">
+                    <span>🚪</span> Buka: {stop.openingHours}
+                  </span>
+                )}
+              </div>
+
+              {isOpen && (
+                <div className="space-y-4 mt-4">
 
               {(stop.ticketPrice || stop.parkingFee || stop.additionalCost) && (
                 <div className="rounded-xl border border-border/40 bg-white/60 p-4 space-y-2">
@@ -152,7 +180,7 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
                             {h.price ? <span className="text-blue-400"> - {h.price}</span> : ''}
                           </span>
                           {h.maps_url && (
-                            <a href={h.maps_url} target="_blank" rel="noopener noreferrer"
+                            <a href={fixMapsUrl(h.maps_url)} target="_blank" rel="noopener noreferrer"
                               className="text-blue-500 hover:text-blue-700 shrink-0 underline text-xs">Petunjuk Arah</a>
                           )}
                         </div>
@@ -166,7 +194,7 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
                                   {r.price ? <span className="text-blue-400"> - {r.price}</span> : ''}
                                 </span>
                                 {r.maps_url && (
-                                  <a href={r.maps_url} target="_blank" rel="noopener noreferrer"
+                                  <a href={fixMapsUrl(r.maps_url)} target="_blank" rel="noopener noreferrer"
                                     className="text-blue-400 hover:text-blue-600 shrink-0 underline">Petunjuk Arah</a>
                                 )}
                               </li>
@@ -193,7 +221,7 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
                           {r.price ? <span className="text-orange-400"> - {r.price}</span> : ''}
                         </span>
                         {r.maps_url && (
-                          <a href={r.maps_url} target="_blank" rel="noopener noreferrer"
+                          <a href={fixMapsUrl(r.maps_url)} target="_blank" rel="noopener noreferrer"
                             className="text-orange-500 hover:text-orange-700 shrink-0 underline text-xs">
                             Petunjuk Arah
                           </a>
@@ -257,6 +285,8 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
                   />
                 </div>
               )}
+              </div>
+              )}
             </div>
           </div>
 
@@ -266,7 +296,8 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
             </div>
           )}
         </div>
-      ))}
+        )
+      })}
     </div>
   )
 }

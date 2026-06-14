@@ -153,15 +153,16 @@ function getDurasi(days: number): string {
 }
 
 function getStopRange(days: number): string {
-  if (days <= 1) return "2-3"
-  if (days === 2) return "3-4"
-  if (days === 3) return "4-5"
-  if (days === 4) return "5-6"
-  return "5-7"
+  if (days <= 1) return "3"
+  if (days === 2) return "6"
+  if (days === 3) return "9"
+  return "9"
 }
 
 function getMaxStops(days: number): number {
-  return parseInt(getStopRange(days).split("-").pop() || "3")
+  if (days <= 1) return 3
+  if (days === 2) return 6
+  return 9
 }
 
 function generateMapsUrl(maxStops: number): string {
@@ -175,7 +176,7 @@ function generateMapsUrl(maxStops: number): string {
   return `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${dest}&waypoints=${waypoints.join("|")}&travelmode=driving`
 }
 
-export function generatePrompt(provinsi: string, kota: string, subTema: string, days: number): string {
+export function generatePrompt(provinsi: string, kota: string, days: number): string {
   const durasi = getDurasi(days)
   const stopsRange = getStopRange(days)
   const mapsUrl = generateMapsUrl(getMaxStops(days))
@@ -184,7 +185,7 @@ export function generatePrompt(provinsi: string, kota: string, subTema: string, 
 Buatkan 1 data roadtrip itinerary dalam format JSON.
 
 ## TEMA
-Roadtrip di ${kota}, ${provinsi} — ${subTema}
+Roadtrip di ${kota}, ${provinsi}
 
 ## KRITERIA
 - ${stopsRange} destinasi (stops) searah secara geografis di ${kota}, ${provinsi}

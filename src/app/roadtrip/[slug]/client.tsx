@@ -2,12 +2,49 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import type { Itinerary } from "@/types"
+import type { Itinerary, ItineraryStop } from "@/types"
 import { ItineraryTimeline } from "./ItineraryTimeline"
 import { parseEmbedUrl } from "@/lib/embed"
 
 interface RoadtripDetailClientProps {
   itinerary: Itinerary
+}
+
+function fixMapsUrl(url: string): string {
+  if (!url || !url.includes("maps/")) return url
+  const origin = url.match(/[?&]origin=([^&]+)/)?.[1]
+  const dest = url.match(/[?&]destination=([^&]+)/)?.[1]
+  const waypoints = url.match(/[?&]waypoints=([^&]+)/)?.[1]
+
+  if (origin && dest) {
+    const parts = [origin]
+    if (waypoints) parts.push(...waypoints.split("|"))
+    parts.push(dest)
+    return `https://www.google.com/maps/dir/${parts.join("/")}`
+  }
+  if (dest) {
+    const parts: string[] = []
+    if (waypoints) parts.push(...waypoints.split("|"))
+    parts.push(dest)
+    return `https://www.google.com/maps/dir//${parts.join("/")}`
+  }
+  return url
+}
+
+function buildDirectionsFromUserUrl(stops: ItineraryStop[]): string {
+  if (stops.length < 2) return ""
+  const stopsParam = stops.map(s => encodeURIComponent(s.name)).join("/")
+  return `https://www.google.com/maps/dir/My+Location/${stopsParam}`
+}
+
+function buildDirectionsFromStartUrl(stops: ItineraryStop[]): string {
+  if (stops.length < 2) return ""
+  const first = encodeURIComponent(stops[0].name)
+  const last = encodeURIComponent(stops[stops.length - 1].name)
+  const middle = stops.slice(1, -1).map(s => encodeURIComponent(s.name)).join("|")
+  let url = `https://www.google.com/maps/dir/?api=1&origin=${first}&destination=${last}&travelmode=driving`
+  if (middle) url += `&waypoints=${middle}`
+  return url
 }
 
 export function RoadtripDetailClient({ itinerary }: RoadtripDetailClientProps) {
@@ -129,9 +166,23 @@ export function RoadtripDetailClient({ itinerary }: RoadtripDetailClientProps) {
           return (
             <div className="rounded-2xl overflow-hidden border border-border/50 shadow-sm">
               {parsed.type === "embed" ? (
-                <iframe src={parsed.url} width="100%" height="400" style={{ border: 0 }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+                <>
+                  <iframe src={parsed.url} width="100%" height="400" style={{ border: 0 }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+                  <div className="flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-border/30">
+                    <a href={buildDirectionsFromUserUrl(itinerary.stops)} target="_blank" rel="noopener noreferrer"
+                       className="flex flex-1 items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 transition-colors text-sm">
+                      <span>📍</span>
+                      Rute dari Lokasi Saya
+                    </a>
+                    <a href={fixMapsUrl(buildDirectionsFromStartUrl(itinerary.stops))} target="_blank" rel="noopener noreferrer"
+                       className="flex flex-1 items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 transition-colors text-sm">
+                      <span>🏁</span>
+                      Rute dari Titik Awal
+                    </a>
+                  </div>
+                </>
               ) : (
-                <a href={parsed.url} target="_blank" rel="noopener noreferrer"
+                <a href={fixMapsUrl(parsed.url)} target="_blank" rel="noopener noreferrer"
                    className="flex items-center justify-center gap-2 bg-primary/5 hover:bg-primary/10 text-primary font-medium py-10 px-4 transition-colors rounded-2xl">
                   <span className="text-2xl">📍</span>
                   <span className="text-base font-semibold">Buka Rute di Google Maps</span>

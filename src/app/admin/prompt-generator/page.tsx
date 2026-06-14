@@ -10,17 +10,15 @@ import { Copy, Sparkles, Check, FileDown } from "lucide-react"
 import { PROVINSI_DATA, PROVINSI_KEYS, generatePrompt, type KotaItem } from "./data"
 
 function getStopRange(days: number): string {
-  if (days <= 1) return "2-3"
-  if (days === 2) return "3-4"
-  if (days === 3) return "4-5"
-  if (days === 4) return "5-6"
-  return "5-7"
+  if (days <= 1) return "3"
+  if (days === 2) return "6"
+  if (days === 3) return "9"
+  return "9"
 }
 
 export default function PromptGeneratorPage() {
   const [provinsi, setProvinsi] = useState("Jawa Barat")
   const [kota, setKota] = useState("Bandung")
-  const [subTema, setSubTema] = useState("kuliner, pantai, pegunungan")
   const [days, setDays] = useState(2)
   const [copied, setCopied] = useState(false)
 
@@ -35,7 +33,7 @@ export default function PromptGeneratorPage() {
     }
   }
 
-  const prompt = generatePrompt(provinsi, kota, subTema, days)
+  const prompt = generatePrompt(provinsi, kota, days)
 
   function handleCopy() {
     navigator.clipboard.writeText(prompt)
@@ -92,21 +90,12 @@ export default function PromptGeneratorPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>Sub Tema</Label>
-                <Input
-                  value={subTema}
-                  onChange={(e) => setSubTema(e.target.value)}
-                  placeholder="kuliner, pantai, pegunungan, budaya"
-                />
-              </div>
-
-              <div className="space-y-2">
                 <Label>Durasi (hari)</Label>
                 <div className="flex items-center gap-3">
                   <input
                     type="range"
                     min={1}
-                    max={7}
+                    max={3}
                     value={days}
                     onChange={(e) => setDays(parseInt(e.target.value))}
                     className="flex-1"
@@ -130,10 +119,6 @@ export default function PromptGeneratorPage() {
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Kota</span>
                   <span className="font-medium">{kota}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Sub Tema</span>
-                  <span className="font-medium">{subTema}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Durasi</span>
