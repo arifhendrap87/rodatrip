@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Loader2 } from "lucide-react"
+import { ImageUpload } from "@/components/ui/image-upload"
 
 interface QuickSpotModalProps {
   open: boolean
@@ -207,10 +208,7 @@ export function QuickSpotModal({ open, defaultName, onClose, onCreated }: QuickS
             <Input value={form.facilities} onChange={(e) => update("facilities", e.target.value)} placeholder="Parkir, Toilet, Mushola, Warung" />
           </div>
 
-          <div className="space-y-1.5">
-            <Label className="text-xs">🖼️ URL Gambar</Label>
-            <Input value={form.image_url} onChange={(e) => update("image_url", e.target.value)} placeholder="https://pub-...r2.dev/prod/spots/..." />
-          </div>
+            <ImageUpload value={form.image_url} onChange={(v) => update("image_url", v)} label="🖼️ Gambar" folder="spots" placeholder="https://pub-xxx.r2.dev/prod/spots/..." />
 
           <div className="space-y-1.5">
             <Label className="text-xs">Deskripsi</Label>

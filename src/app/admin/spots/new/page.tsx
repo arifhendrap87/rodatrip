@@ -22,6 +22,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import TiptapEditor from "@/components/ui/tiptap/tiptap-editor"
+import { ImageUpload } from "@/components/ui/image-upload"
 
 const CATEGORIES = [
   { value: "alam", label: "Alam" },
@@ -411,8 +412,7 @@ export default function NewSpotPage() {
                 <Input id="spot_important_note" value={form.spot_important_note} onChange={(e) => setForm((f) => ({ ...f, spot_important_note: e.target.value }))} placeholder="Catatan penting untuk pengendara" />
               </div>
               <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="image_url">🖼️ Image URL</Label>
-                <Input id="image_url" value={form.image_url} onChange={(e) => setForm((f) => ({ ...f, image_url: e.target.value }))} placeholder="https://pub-...r2.dev/prod/spots/..." />
+                <ImageUpload value={form.image_url} onChange={(v) => setForm((f) => ({ ...f, image_url: v }))} label="🖼️ Image" folder="spots" placeholder="https://pub-xxx.r2.dev/prod/spots/..." />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="facilities">Facilities (comma-separated)</Label>

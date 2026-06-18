@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { ArrowLeft, Save, Loader2, Plus, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { SpotSelect } from "@/components/admin/SpotSelect"
+import { ImageUpload } from "@/components/ui/image-upload"
 
 interface StopForm { key: string; stopNumber: number; name: string; spotSlug: string }
 let stopKeyCounter = 0
@@ -89,7 +90,7 @@ export default function EditRoadtripPage() {
             <div className="space-y-2"><Label>Waktu Terbaik</Label><Input value={form.bestDrivingTime} onChange={(e) => updateField("bestDrivingTime", e.target.value)} /></div>
             <div className="space-y-2"><Label>Fasilitas Jalur</Label><Input value={form.routeFacilities} onChange={(e) => updateField("routeFacilities", e.target.value)} /></div>
             <div className="space-y-2"><Label>Maps Embed URL</Label><Input value={form.mapsEmbedUrl} onChange={(e) => updateField("mapsEmbedUrl", e.target.value)} /></div>
-            <div className="space-y-2"><Label>Cover Image</Label><Input value={form.coverImage} onChange={(e) => updateField("coverImage", e.target.value)} /></div>
+            <ImageUpload value={form.coverImage} onChange={(v) => updateField("coverImage", v)} label="Cover Banner" folder="cover" placeholder="https://pub-xxx.r2.dev/prod/cover/..." />
           </CardContent>
         </Card>
         <Card>

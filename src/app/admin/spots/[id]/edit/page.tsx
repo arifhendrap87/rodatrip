@@ -18,6 +18,7 @@ import { ArrowLeft, Save, Loader2, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import TiptapEditor from "@/components/ui/tiptap/tiptap-editor"
+import { ImageUpload } from "@/components/ui/image-upload"
 
 const CATEGORIES = [
   { value: "alam", label: "Alam" },
@@ -252,6 +253,7 @@ export default function EditSpotPage() {
                   onChange={(e) => setForm((f: any) => ({ ...f, distance_from_city: e.target.value }))} />
               </div>
             </div>
+            <ImageUpload value={form.image_url} onChange={(v) => setForm((f: any) => ({ ...f, image_url: v }))} label="🖼️ Image" folder="spots" />
           </CardContent>
         </Card>
 
