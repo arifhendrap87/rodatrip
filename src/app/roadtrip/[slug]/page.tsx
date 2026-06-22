@@ -17,6 +17,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       description: `Panduan roadtrip ${itinerary.title}: ${itinerary.itineraryDuration}`,
       locale: "id_ID",
       type: "article",
+      url: `https://gaskuy-roadtrip.vercel.app/roadtrip/${slug}`,
+      images: itinerary.coverImage ? [{ url: itinerary.coverImage, width: 1200, height: 630 }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${itinerary.title} — ${SITE_NAME}`,
+      description: `Panduan roadtrip ${itinerary.title}: ${itinerary.itineraryDuration}`,
+      images: itinerary.coverImage ? [itinerary.coverImage] : undefined,
     },
   }
 }

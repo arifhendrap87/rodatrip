@@ -23,6 +23,7 @@ import {
 import Link from "next/link"
 import TiptapEditor from "@/components/ui/tiptap/tiptap-editor"
 import { ImageUpload } from "@/components/ui/image-upload"
+import { ImageGallery, type GalleryImage } from "@/components/admin/ImageGallery"
 
 const CATEGORIES = [
   { value: "alam", label: "Alam" },
@@ -55,6 +56,7 @@ export default function NewSpotPage() {
     additional_cost: "", spot_important_note: "",
     facilities: "", distance_from_city: "",
     tags: "", image_url: "", is_featured: false,
+    images: [] as GalleryImage[],
   })
 
   function generateSlug(name: string) {
@@ -106,6 +108,7 @@ export default function NewSpotPage() {
       isFeatured: form.is_featured,
       imageUrl: form.image_url || "",
       imageCredit: "Unsplash",
+      images: form.images.length > 0 ? form.images.map((img, i) => ({ ...img, sort_order: i })) : undefined,
     }
 
     try {
@@ -411,9 +414,6 @@ export default function NewSpotPage() {
                 <Label htmlFor="spot_important_note">⚠️ Important Note</Label>
                 <Input id="spot_important_note" value={form.spot_important_note} onChange={(e) => setForm((f) => ({ ...f, spot_important_note: e.target.value }))} placeholder="Catatan penting untuk pengendara" />
               </div>
-              <div className="space-y-2 sm:col-span-2">
-                <ImageUpload value={form.image_url} onChange={(v) => setForm((f) => ({ ...f, image_url: v }))} label="🖼️ Image" folder="spots" placeholder="https://pub-xxx.r2.dev/prod/spots/..." />
-              </div>
               <div className="space-y-2">
                 <Label htmlFor="facilities">Facilities (comma-separated)</Label>
                 <Input
@@ -436,6 +436,23 @@ export default function NewSpotPage() {
                   placeholder="alam, foto, bandung"
                 />
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Gallery */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Gallery</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ImageUpload value={form.image_url} onChange={(v) => setForm((f: any) => ({ ...f, image_url: v }))} label="🖼️ Cover Image" folder="spots" placeholder="https://pub-xxx.r2.dev/prod/spots/..." />
+            <div className="mt-4">
+              <ImageGallery
+                images={form.images as GalleryImage[]}
+                onChange={(v) => setForm((f: any) => ({ ...f, images: v }))}
+                folder="spots"
+              />
             </div>
           </CardContent>
         </Card>

@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Loader2, Search, Check } from "lucide-react"
+import { Loader2, Search, Check, Upload, Trash2 } from "lucide-react"
 
 interface MediaItem {
   id: string
@@ -16,17 +16,21 @@ interface MediaItem {
 interface ImagePickerProps {
   open: boolean
   onClose: () => void
-  onSelect: (url: string) => void
+  onSelect: (urls: string[]) => void
+  multi?: boolean
 }
 
-export function ImagePicker({ open, onClose, onSelect }: ImagePickerProps) {
+export function ImagePicker({ open, onClose, onSelect, multi = false }: ImagePickerProps) {
   const [items, setItems] = useState<MediaItem[]>([])
   const [loading, setLoading] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [search, setSearch] = useState("")
-  const [selected, setSelected] = useState<string | null>(null)
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (!open) return
+    setSelected(new Set())
     fetchMedia()
   }, [open])
 
@@ -41,17 +45,61 @@ export function ImagePicker({ open, onClose, onSelect }: ImagePickerProps) {
     setLoading(false)
   }
 
+  async function handleUpload(file: File) {
+    const maxSize = 10 * 1024 * 1024
+    if (file.size > maxSize) { alert("File maksimal 10MB"); return }
+    const allowed = ["image/jpeg", "image/png", "image/webp", "image/avif"]
+    if (!allowed.includes(file.type)) { alert("Tipe file harus jpg, png, webp, atau avif"); return }
+
+    setUploading(true)
+    const formData = new FormData()
+    formData.append("file", file)
+    formData.append("folder", "spots")
+
+    try {
+      await fetch("/api/media", { method: "POST", body: formData })
+      await fetchMedia()
+    } catch (err) {
+      alert("Gagal upload: " + (err as Error).message)
+    }
+    setUploading(false)
+  }
+
+  async function handleDelete(id: string, filename: string) {
+    if (!confirm(`Hapus "${filename}"?`)) return
+    await fetch(`/api/media/${id}`, { method: "DELETE" })
+    setSelected((prev) => { const next = new Set(prev); const item = items.find(i => i.id === id); if (item) next.delete(item.url); return next })
+    await fetchMedia()
+  }
+
+  function toggleSelect(url: string) {
+    if (multi) {
+      setSelected((prev) => {
+        const next = new Set(prev)
+        if (next.has(url)) next.delete(url)
+        else next.add(url)
+        return next
+      })
+    } else {
+      setSelected(new Set([url]))
+    }
+  }
+
   function handleSelect() {
-    if (!selected) return
-    onSelect(selected)
+    if (selected.size === 0) return
+    onSelect([...selected])
     onClose()
   }
+
+  const count = selected.size
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) onClose() }}>
       <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-y-auto rounded-2xl">
         <DialogHeader>
-          <DialogTitle className="font-heading">Pilih dari Media Library</DialogTitle>
+          <DialogTitle className="font-heading">
+            {multi ? "Pilih Gambar (multi)" : "Pilih dari Media Library"}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="flex items-center gap-3 mb-4">
@@ -70,26 +118,49 @@ export function ImagePicker({ open, onClose, onSelect }: ImagePickerProps) {
           </Button>
         </div>
 
+        <div
+          onClick={() => fileRef.current?.click()}
+          className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border/30 bg-muted/10 p-4 mb-4 hover:bg-muted/20 transition-colors"
+        >
+          {uploading ? (
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+          ) : (
+            <>
+              <Upload className="h-5 w-5 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground font-medium">Upload gambar baru</span>
+              <span className="text-xs text-muted-foreground">JPG, PNG, WebP, AVIF — maks 10MB</span>
+            </>
+          )}
+          <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" className="hidden" ref={fileRef}
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUpload(f); e.target.value = "" }} />
+        </div>
+
         {loading ? (
           <div className="py-12 text-center text-muted-foreground">Loading...</div>
         ) : items.length === 0 ? (
           <div className="py-12 text-center text-muted-foreground">
-            <p>Belum ada file. Upload dulu di halaman Media.</p>
+            <p>Belum ada file. Upload gambar di atas.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-[50vh] overflow-y-auto p-1">
-            {items.map((item) => (
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-[40vh] overflow-y-auto p-1">
+            {items.map((item) => {
+              const isSelected = selected.has(item.url)
+              return (
               <button
                 key={item.id}
-                onClick={() => setSelected(selected === item.url ? null : item.url)}
+                onClick={() => toggleSelect(item.url)}
                 className={`group relative aspect-[4/3] rounded-xl overflow-hidden border-2 transition-all bg-muted ${
-                  selected === item.url
+                  isSelected
                     ? "border-primary ring-2 ring-primary/20"
                     : "border-transparent hover:border-border/50"
                 }`}
               >
                 <img src={item.url} alt={item.filename} className="w-full h-full object-cover" loading="lazy" />
-                {selected === item.url && (
+                <span onClick={(e) => { e.stopPropagation(); handleDelete(item.id, item.filename) }}
+                  className="absolute top-1 left-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                  <Trash2 className="h-3 w-3" />
+                </span>
+                {isSelected && (
                   <div className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-white">
                     <Check className="h-3 w-3" />
                   </div>
@@ -98,13 +169,16 @@ export function ImagePicker({ open, onClose, onSelect }: ImagePickerProps) {
                   <p className="text-[10px] text-white truncate">{item.filename}</p>
                 </div>
               </button>
-            ))}
+              )
+            })}
           </div>
         )}
 
         <div className="flex items-center justify-end gap-3 pt-4 border-t border-border/30">
           <Button variant="outline" onClick={onClose}>Batal</Button>
-          <Button onClick={handleSelect} disabled={!selected}>Pilih</Button>
+          <Button onClick={handleSelect} disabled={count === 0}>
+            Pilih{count > 0 ? ` (${count})` : ""}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

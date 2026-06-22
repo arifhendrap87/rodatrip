@@ -34,7 +34,7 @@ export default function SpotsPage() {
 
   useEffect(() => {
     fetchSpots()
-  }, [])
+  }, [search, categoryFilter, provinceFilter])
 
   async function fetchSpots() {
     setLoading(true)

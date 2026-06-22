@@ -1,7 +1,7 @@
 import { success, badRequest, unauthorized, internalError } from "@/lib/api/response"
 import { getServerAdmin } from "@/lib/api/auth"
 import { adminLimiter } from "@/lib/api/rate-limit"
-import { uploadImage } from "@/lib/r2"
+import { uploadImage } from "@/lib/storage"
 
 export async function POST(request: Request) {
   const admin = await getServerAdmin()

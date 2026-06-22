@@ -43,6 +43,7 @@ interface SpotJoin {
   nearby_hotels_jsonb: unknown[] | null
   nearby_restaurants_jsonb: unknown[] | null
   location: { type: "Point"; coordinates: [number, number] } | null
+  images: unknown[] | null
 }
 
 export interface ItineraryStopRow {
@@ -111,6 +112,7 @@ function stopToItineraryStop(row: ItineraryStopRow): ItineraryStop {
     spotImportantNote: s?.spot_important_note || undefined,
     nearbyHotels: (s?.nearby_hotels_jsonb as NearbyPlace[]) || undefined,
     nearbyRestaurants: (s?.nearby_restaurants_jsonb as NearbyPlace[]) || undefined,
+    images: (s?.images as { url: string; alt?: string; sort_order?: number }[]) || undefined,
     spotSlug: row.spot_slug || undefined,
   }
 }
@@ -129,7 +131,7 @@ async function getStopsForItinerary(itineraryId: string): Promise<ItineraryStopR
   if (slugs.length > 0) {
     const { data: spotRows } = await db
       .from("spots")
-      .select("id, slug, name, category, province, description, ticket_price, parking_fee, facilities, opening_hours, road_access, rating, image_url, visit_duration, best_visit_hour, additional_cost, spot_important_note, physical_effort, tips, location, nearby_hotels_jsonb, nearby_restaurants_jsonb")
+      .select("id, slug, name, category, province, description, ticket_price, parking_fee, facilities, opening_hours, road_access, rating, image_url, visit_duration, best_visit_hour, additional_cost, spot_important_note, physical_effort, tips, location, images, nearby_hotels_jsonb, nearby_restaurants_jsonb")
       .in("slug", slugs)
 
     const spotMap = new Map<string, SpotJoin>()

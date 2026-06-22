@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import Link from "next/link"
 import type { Itinerary, ItineraryStop } from "@/types"
 import { ItineraryTimeline } from "./ItineraryTimeline"
@@ -63,15 +64,22 @@ export function RoadtripDetailClient({ itinerary }: RoadtripDetailClientProps) {
 
   return (
     <div className="min-h-screen">
-      <section className="relative overflow-hidden bg-gradient-to-b from-primary/[0.08] via-accent/[0.03] to-background py-20 sm:py-28">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-primary/5 blur-3xl" />
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-accent/5 blur-3xl" />
-        </div>
-        <div className="relative mx-auto max-w-4xl px-4 sm:px-6">
+      <section className={`relative overflow-hidden pt-28 pb-20 sm:pt-36 sm:pb-28 ${itinerary.coverImage ? 'text-white' : ''}`}>
+        {itinerary.coverImage ? (
+          <>
+            <Image src={itinerary.coverImage} alt="" fill className="object-cover" unoptimized priority />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          </>
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.08] via-accent/[0.03] to-background pointer-events-none">
+            <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-primary/5 blur-3xl" />
+            <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-accent/5 blur-3xl" />
+          </div>
+        )}
+        <div className="relative z-10 mx-auto max-w-4xl px-4 sm:px-6">
           <Link
             href="/roadtrip"
-            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
+            className={`inline-flex items-center gap-1.5 text-sm transition-colors mb-6 ${itinerary.coverImage ? 'text-white/70 hover:text-white' : 'text-muted-foreground hover:text-foreground'}`}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M19 12H5" /><path d="m12 19-7-7 7-7" />
@@ -83,7 +91,7 @@ export function RoadtripDetailClient({ itinerary }: RoadtripDetailClientProps) {
             {itinerary.title}
           </h1>
 
-          <div className="mt-6 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+          <div className={`mt-6 flex flex-wrap items-center gap-4 text-sm ${itinerary.coverImage ? 'text-white/80' : 'text-muted-foreground'}`}>
             {itinerary.itineraryDuration && (
               <span className="inline-flex items-center gap-1.5">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -102,7 +110,7 @@ export function RoadtripDetailClient({ itinerary }: RoadtripDetailClientProps) {
             )}
             <button
               onClick={handleShare}
-              className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors ml-auto"
+              className={`inline-flex items-center gap-1.5 transition-colors ml-auto ${itinerary.coverImage ? 'text-white/70 hover:text-white' : 'text-muted-foreground hover:text-primary'}`}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />

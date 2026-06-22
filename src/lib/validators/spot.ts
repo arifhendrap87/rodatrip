@@ -50,6 +50,11 @@ export const createSpotSchema = z.object({
   isFeatured: z.boolean().optional(),
   nearbyHotels: z.array(nearbyPlaceSchema).optional(),
   nearbyRestaurants: z.array(nearbyPlaceSchema).optional(),
+  images: z.array(z.object({
+    url: z.string().min(1),
+    alt: z.string().optional(),
+    sort_order: z.number().optional(),
+  })).optional(),
 })
 
 export const updateSpotSchema = createSpotSchema.partial()

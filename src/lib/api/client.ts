@@ -70,6 +70,8 @@ export const api = {
       const qs = params ? `?${new URLSearchParams(params)}` : ""
       return request<{ data: Record<string, unknown>[]; pagination: { total: number; limit: number; offset: number; hasMore: boolean } }>(`/products${qs}`)
     },
+    get: (id: string) =>
+      request<{ data: Record<string, unknown> }>(`/products/${id}`),
 
     create: (data: Record<string, unknown>) =>
       request<{ data: { id: string; slug: string } }>("/products", { method: "POST", body: data }),

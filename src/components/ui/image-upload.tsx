@@ -123,7 +123,7 @@ export function ImageUpload({ value, onChange, label, folder = "spots", placehol
       <ImagePicker
         open={pickerOpen}
         onClose={() => setPickerOpen(false)}
-        onSelect={(url) => { setPreview(url); onChange(url) }}
+        onSelect={(urls) => { const url = urls[0]; if (url) { setPreview(url); onChange(url) } }}
       />
     </div>
   )

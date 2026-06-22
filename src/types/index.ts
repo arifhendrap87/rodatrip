@@ -101,6 +101,12 @@ export interface NearbyPlace {
   nearby_restaurants?: NearbyPlace[]
 }
 
+export interface ImageItem {
+  url: string
+  alt?: string
+  sort_order?: number
+}
+
 export interface ItineraryStop {
   id: string
   stopNumber: number
@@ -126,4 +132,5 @@ export interface ItineraryStop {
   spotSlug?: string
   nearbyHotels?: NearbyPlace[]
   nearbyRestaurants?: NearbyPlace[]
+  images?: ImageItem[]
 }

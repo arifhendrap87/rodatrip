@@ -64,6 +64,7 @@ export default async function RoadtripListPage() {
                           src={itinerary.coverImage}
                           alt={itinerary.title}
                           fill
+                          unoptimized
                           className="object-cover transition-all duration-700 group-hover:scale-110"
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         />
@@ -80,11 +81,24 @@ export default async function RoadtripListPage() {
                         </div>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-2 p-6">
-                        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-lg">🏎️</span>
-                        <div className="text-xs text-muted-foreground">
-                          <p className="font-medium text-foreground font-heading">{itinerary.itineraryDuration || "Roadtrip"}</p>
-                          {itinerary.totalDistance && <p>{itinerary.totalDistance}</p>}
+                      <div className="relative aspect-[16/9] overflow-hidden bg-muted">
+                        <Image
+                          src="/images/roadtrip-default.svg"
+                          alt="Roadtrip default"
+                          fill
+                          unoptimized
+                          className="object-cover opacity-60"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                        <div className="absolute bottom-3 left-3 flex items-center gap-2">
+                          <span className="rounded-full bg-white/90 backdrop-blur-sm px-3 py-1 text-xs font-medium shadow-sm">
+                            {itinerary.itineraryDuration || "Roadtrip"}
+                          </span>
+                          {itinerary.totalDistance && (
+                            <span className="rounded-full bg-white/90 backdrop-blur-sm px-3 py-1 text-xs font-medium shadow-sm">
+                              {itinerary.totalDistance}
+                            </span>
+                          )}
                         </div>
                       </div>
                     )}

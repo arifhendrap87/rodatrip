@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { ArrowLeft, Save, Loader2, Plus, Trash2 } from "lucide-react"
+import { ArrowLeft, Save, Loader2, Plus, Trash2, ExternalLink } from "lucide-react"
 import Link from "next/link"
 import { SpotSelect } from "@/components/admin/SpotSelect"
 import { ImageUpload } from "@/components/ui/image-upload"
@@ -129,6 +129,14 @@ export default function EditRoadtripPage() {
         <div className="flex items-center gap-3">
           <Button type="submit" disabled={saving}>{saving ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</> : <><Save className="mr-2 h-4 w-4" /> Update</>}</Button>
           <Link href="/admin/roadtrips"><Button variant="outline">Cancel</Button></Link>
+          <div className="flex-1" />
+          <Button type="button" variant="outline" onClick={() => window.open(
+            `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://gaskuy-roadtrip.vercel.app/roadtrip/${slug}`)}`,
+            "_blank", "width=600,height=400"
+          )}>
+            <ExternalLink className="mr-2 h-4 w-4" />
+            Share ke Facebook
+          </Button>
         </div>
       </form>
     </div>

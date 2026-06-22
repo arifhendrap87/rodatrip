@@ -1,7 +1,7 @@
 import { success, paginated, badRequest, unauthorized, internalError } from "@/lib/api/response"
 import { getServerAdmin } from "@/lib/api/auth"
 import { adminLimiter } from "@/lib/api/rate-limit"
-import { uploadImage } from "@/lib/r2"
+import { uploadImage } from "@/lib/storage"
 import { db } from "@/lib/services/db"
 
 export async function GET(request: Request) {
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
       .select("id, url, filename, key, folder, created_at")
       .single()
 
-    if (error) return internalError("Gagal simpan ke database")
+    if (error) return internalError(`Gagal simpan ke database: ${error.message}`)
 
     return success(data, 201)
   } catch {

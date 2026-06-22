@@ -101,6 +101,12 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
                 )}
               </div>
 
+              {stop.imageUrl && (
+                <div className="mt-3 rounded-xl overflow-hidden border border-border/30 bg-muted">
+                  <img src={stop.imageUrl} alt={stop.name} className="w-full aspect-[16/7] object-cover" loading="lazy" />
+                </div>
+              )}
+
               {isOpen && (
                 <div className="space-y-4 mt-4">
 
@@ -181,7 +187,7 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
                           </span>
                           {h.maps_url && (
                             <a href={fixMapsUrl(h.maps_url)} target="_blank" rel="noopener noreferrer"
-                              className="text-blue-500 hover:text-blue-700 shrink-0 underline text-xs">Petunjuk Arah</a>
+                              className="text-blue-500 hover:text-blue-700 shrink-0 text-xs font-medium flex items-center gap-0.5"><span>📍</span>Petunjuk Arah</a>
                           )}
                         </div>
                         {h.nearby_restaurants && h.nearby_restaurants.length > 0 && (
@@ -195,7 +201,7 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
                                 </span>
                                 {r.maps_url && (
                                   <a href={fixMapsUrl(r.maps_url)} target="_blank" rel="noopener noreferrer"
-                                    className="text-blue-400 hover:text-blue-600 shrink-0 underline">Petunjuk Arah</a>
+                                    className="text-blue-400 hover:text-blue-600 shrink-0 text-xs font-medium flex items-center gap-0.5"><span>📍</span>Petunjuk Arah</a>
                                 )}
                               </li>
                             ))}
@@ -222,8 +228,8 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
                         </span>
                         {r.maps_url && (
                           <a href={fixMapsUrl(r.maps_url)} target="_blank" rel="noopener noreferrer"
-                            className="text-orange-500 hover:text-orange-700 shrink-0 underline text-xs">
-                            Petunjuk Arah
+                            className="text-orange-500 hover:text-orange-700 shrink-0 text-xs font-medium flex items-center gap-0.5">
+                            <span>📍</span>Petunjuk Arah
                           </a>
                         )}
                       </li>
@@ -260,6 +266,22 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   {stop.description}
                 </p>
+              )}
+
+              {stop.images && stop.images.length > 0 && (
+                <div className="grid grid-cols-3 gap-2">
+                  {stop.images.slice(0, 5).map((img, i) => (
+                    <a key={i} href={img.url} target="_blank" rel="noopener noreferrer"
+                      className={`relative aspect-[4/3] rounded-lg overflow-hidden border border-border/30 bg-muted hover:opacity-90 transition-opacity ${i === 0 ? 'col-span-2 row-span-2' : ''}`}>
+                      <img src={img.url} alt={img.alt || ""} className="w-full h-full object-cover" loading="lazy" />
+                      {i === 4 && stop.images && stop.images.length > 5 && (
+                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                          <span className="text-white font-bold text-lg">+{stop.images.length - 5}</span>
+                        </div>
+                      )}
+                    </a>
+                  ))}
+                </div>
               )}
 
               {stop.spotSlug && (

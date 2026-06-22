@@ -19,6 +19,7 @@ import Link from "next/link"
 import { useParams } from "next/navigation"
 import TiptapEditor from "@/components/ui/tiptap/tiptap-editor"
 import { ImageUpload } from "@/components/ui/image-upload"
+import { ImageGallery, type GalleryImage } from "@/components/admin/ImageGallery"
 
 const CATEGORIES = [
   { value: "alam", label: "Alam" },
@@ -50,6 +51,7 @@ export default function EditSpotPage() {
     distance_from_city: "", facilities: "", tags: "",
     lat: "", lng: "", image_url: "", image_credit: "",
     is_featured: false,
+    images: [],
   })
 
   useEffect(() => {
@@ -86,6 +88,7 @@ export default function EditSpotPage() {
             image_url: data.image_url || "",
             image_credit: data.image_credit || "",
             is_featured: data.is_featured || false,
+            images: data.images || [],
           })
         }
         setLoading(false)
@@ -124,6 +127,7 @@ export default function EditSpotPage() {
       imageUrl: form.image_url,
       imageCredit: form.image_credit,
       isFeatured: form.is_featured,
+      images: form.images?.length > 0 ? form.images : undefined,
     }
 
     try {
@@ -254,6 +258,19 @@ export default function EditSpotPage() {
               </div>
             </div>
             <ImageUpload value={form.image_url} onChange={(v) => setForm((f: any) => ({ ...f, image_url: v }))} label="🖼️ Image" folder="spots" />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Gallery</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ImageGallery
+              images={form.images as GalleryImage[]}
+              onChange={(v) => setForm((f: any) => ({ ...f, images: v }))}
+              folder="spots"
+            />
           </CardContent>
         </Card>
 

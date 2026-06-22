@@ -1,6 +1,7 @@
 import { api } from "@/lib/api/client"
+import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { MapPin, ShoppingBag, Mail, Eye } from "lucide-react"
+import { MapPin, ShoppingBag, Mail, Eye, ArrowRight } from "lucide-react"
 
 async function getStats() {
   try {
@@ -8,6 +9,15 @@ async function getStats() {
     return res.data
   } catch {
     return { spots: 0, products: 0, waitlist: 0, views: 0 }
+  }
+}
+
+async function getRecentSpots() {
+  try {
+    const res = await api.spots.list({ limit: "6", offset: "0" })
+    return (res.data || []) as { id: string; slug: string; name: string; category: string; province: string; rating: number; created_at: string; image_url: string }[]
+  } catch {
+    return []
   }
 }
 
@@ -19,7 +29,7 @@ const statsCards = [
 ]
 
 export default async function AdminDashboard() {
-  const stats = await getStats()
+  const [stats, recentSpots] = await Promise.all([getStats(), getRecentSpots()])
 
   return (
     <div>
@@ -57,14 +67,10 @@ export default async function AdminDashboard() {
               href="/admin/spots/new"
               className="flex items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-muted"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                +
-              </div>
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">+</div>
               <div>
                 <p className="font-medium">Add New Spot</p>
-                <p className="text-sm text-muted-foreground">
-                  Create a new destination guide
-                </p>
+                <p className="text-sm text-muted-foreground">Create a new destination guide</p>
               </div>
             </a>
 
@@ -72,43 +78,57 @@ export default async function AdminDashboard() {
               href="/admin/products/new"
               className="flex items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-muted"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
-                +
-              </div>
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-600">+</div>
               <div>
                 <p className="font-medium">Add New Product</p>
-                <p className="text-sm text-muted-foreground">
-                  Add a product to the e-commerce store
-                </p>
+                <p className="text-sm text-muted-foreground">Add a product to the e-commerce store</p>
               </div>
             </a>
 
             <a
-              href="/spot-istimewa"
+              href="/"
               target="_blank"
               className="flex items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-muted"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 text-purple-600">
-                →
-              </div>
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 text-purple-600">→</div>
               <div>
                 <p className="font-medium">View Public Site</p>
-                <p className="text-sm text-muted-foreground">
-                  Open the frontend in a new tab
-                </p>
+                <p className="text-sm text-muted-foreground">Open the frontend in a new tab</p>
               </div>
             </a>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Recent Spots</CardTitle>
+            <Link href="/admin/spots" className="text-sm text-primary hover:text-primary/80 flex items-center gap-1">
+              View all <ArrowRight className="h-3 w-3" />
+            </Link>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Spot list will appear here after Supabase connection.
-            </p>
+            {recentSpots.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-8 text-center">Belum ada spot. Buat spot baru untuk memulai.</p>
+            ) : (
+              <div className="space-y-3">
+                {recentSpots.map((spot) => (
+                  <Link key={spot.id} href={`/admin/spots/${spot.slug}/edit`}
+                    className="flex items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-muted">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted text-lg overflow-hidden">
+                      {spot.image_url ? (
+                        <img src={spot.image_url} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <MapPin className="h-5 w-5 text-muted-foreground" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate">{spot.name}</p>
+                      <p className="text-xs text-muted-foreground">{spot.province} · {spot.category} {spot.rating ? `· ⭐ ${spot.rating}` : ''}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

@@ -1,6 +1,6 @@
 import { success, notFound, unauthorized } from "@/lib/api/response"
 import { getServerAdmin } from "@/lib/api/auth"
-import { deleteImage } from "@/lib/r2"
+import { deleteImage } from "@/lib/storage"
 import { db } from "@/lib/services/db"
 
 export async function DELETE(
@@ -20,13 +20,10 @@ export async function DELETE(
 
   if (findError || !media) return notFound("Media")
 
-  const keyParts = media.key.split("/")
-  const r2Key = keyParts.length >= 3 ? keyParts.slice(0, 3).join("/") : media.key
-
   try {
-    await deleteImage(r2Key)
+    await deleteImage(media.key)
   } catch {
-    // proceed even if R2 delete fails
+    // proceed even if storage delete fails
   }
 
   await db.from("media").delete().eq("id", id)

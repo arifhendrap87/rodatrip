@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" fill="none">
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e8f4f8"/>
+      <stop offset="60%" stop-color="#f5e6d3"/>
+      <stop offset="100%" stop-color="#d4d9c8"/>
+    </linearGradient>
+    <linearGradient id="mountain1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7a9e6b"/>
+      <stop offset="100%" stop-color="#5a7d4a"/>
+    </linearGradient>
+    <linearGradient id="mountain2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6b8e5c"/>
+      <stop offset="100%" stop-color="#4d6e3e"/>
+    </linearGradient>
+    <linearGradient id="road" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#555"/>
+      <stop offset="100%" stop-color="#333"/>
+    </linearGradient>
+  </defs>
+  <!-- Mountain back -->
+  <path d="M0 500 L200 300 L350 450 L500 250 L700 420 L850 280 L1050 450 L1200 350 L1400 480 L1600 380 L1600 900 L0 900 Z" fill="url(#mountain2)" opacity="0.4"/>
+  <!-- Mountain front -->
+  <path d="M0 550 L150 380 L300 500 L450 320 L650 480 L800 350 L1000 500 L1150 400 L1350 520 L1600 450 L1600 900 L0 900 Z" fill="url(#mountain1)" opacity="0.6"/>
+  <!-- Road -->
+  <path d="M200 900 Q400 700 550 620 Q700 550 800 530 Q900 510 1000 490 Q1200 450 1400 400 L1600 370 L1600 900 Z" fill="url(#road)" opacity="0.5"/>
+  <!-- Road line -->
+  <path d="M200 900 Q400 700 550 620 Q700 550 800 530 Q900 510 1000 490 Q1200 450 1400 400 L1600 370" stroke="#ffcc00" stroke-width="3" stroke-dasharray="20 15" opacity="0.6" fill="none"/>
+  <!-- Sun -->
+  <circle cx="1300" cy="150" r="60" fill="#ffd700" opacity="0.3"/>
+  <circle cx="1300" cy="150" r="40" fill="#ffec8b" opacity="0.5"/>
+  <!-- Trees left -->
+  <g opacity="0.4">
+    <path d="M100 520 L110 460 L120 520 Z" fill="#4a7a3a"/>
+    <path d="M50 550 L60 480 L70 550 Z" fill="#5a8a4a"/>
+    <path d="M150 500 L160 440 L170 500 Z" fill="#4a7a3a"/>
+  </g>
+  <!-- Trees right -->
+  <g opacity="0.4">
+    <path d="M1450 480 L1460 420 L1470 480 Z" fill="#4a7a3a"/>
+    <path d="M1500 460 L1510 400 L1520 460 Z" fill="#5a8a4a"/>
+  </g>
+  <!-- Car -->
+  <g transform="translate(750, 500) scale(0.8)">
+    <rect x="-30" y="-15" width="60" height="20" rx="5" fill="#e74c3c"/>
+    <rect x="-20" y="-25" width="40" height="12" rx="3" fill="#e74c3c"/>
+    <rect x="-15" y="-22" width="15" height="8" rx="2" fill="#87ceeb" opacity="0.7"/>
+    <rect x="5" y="-22" width="15" height="8" rx="2" fill="#87ceeb" opacity="0.7"/>
+    <circle cx="-18" cy="5" r="5" fill="#333"/>
+    <circle cx="18" cy="5" r="5" fill="#333"/>
+  </g>
+</svg>
