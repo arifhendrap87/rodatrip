@@ -107,7 +107,7 @@ export const mockProducts: Product[] = [
     category: "Lifestyle & Merch",
     price: 65000,
     image_url: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/prod/products/prod-11.jpg",
-    description: "Tumbler stainless steel dengan desain Gaskuy. Tahan panas 12 jam.",
+    description: "Tumbler stainless steel dengan desain RodaTrip. Tahan panas 12 jam.",
     rating: 4.6,
     margin_pct: 60,
   },

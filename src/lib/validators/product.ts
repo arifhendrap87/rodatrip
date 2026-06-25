@@ -16,6 +16,11 @@ export const createProductSchema = z.object({
   rating: z.number().min(0).max(5).optional(),
   stockQuantity: z.number().int().min(0).optional(),
   isFeatured: z.boolean().optional(),
+  source: z.string().optional(),
+  external_id: z.string().optional(),
+  weight: z.number().int().optional(),
+  dimensions: z.string().optional(),
+  tokopedia_url: z.string().url().optional().or(z.literal("")),
 })
 
 export const updateProductSchema = createProductSchema.partial()

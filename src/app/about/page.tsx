@@ -25,14 +25,14 @@ export default function AboutPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="grid gap-12 lg:grid-cols-2 items-center">
             <div>
-              <h2 className="text-3xl font-bold font-heading">Kenapa Gaskuy?</h2>
+              <h2 className="text-3xl font-bold font-heading">Kenapa RodaTrip?</h2>
               <p className="mt-4 text-muted-foreground leading-relaxed text-lg">
                 Roadtrip di Indonesia punya tantangan tersendiri. Mulai dari infrastruktur jalan yang
                 belum merata, minimnya informasi SPBU dan bengkel di jalur alternatif, sampai
                 kesulitan mencari perlengkapan roadtrip yang terpercaya.
               </p>
               <p className="mt-4 text-muted-foreground leading-relaxed">
-                Gaskuy hadir untuk menjawab tantangan itu. Kami mengkurasi spot-spot terbaik,
+                RodaTrip hadir untuk menjawab tantangan itu. Kami mengkurasi spot-spot terbaik,
                 menyediakan informasi POI yang akurat, dan merekomendasikan perlengkapan roadtrip
                 berkualitas — semua dalam satu platform.
               </p>

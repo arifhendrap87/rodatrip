@@ -181,7 +181,7 @@ export function generatePrompt(provinsi: string, kota: string, days: number): st
   const stopsRange = getStopRange(days)
   const mapsUrl = generateMapsUrl(getMaxStops(days))
 
-  return `Kamu adalah content writer travel untuk platform "Gaskuy Roadtrip Indonesia".
+  return `Kamu adalah content writer travel untuk platform "RodaTrip".
 Buatkan 1 data roadtrip itinerary dalam format JSON.
 
 ## TEMA

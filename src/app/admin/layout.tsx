@@ -59,7 +59,7 @@ export default function AdminLayout({
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
           G
         </div>
-        <span className="font-heading text-lg font-bold">Gaskuy Admin</span>
+        <span className="font-heading text-lg font-bold">RodaTrip</span>
       </div>
 
       <nav className="flex-1 space-y-1 p-2">

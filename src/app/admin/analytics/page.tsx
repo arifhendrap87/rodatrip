@@ -16,12 +16,14 @@ export default function AnalyticsPage() {
   const [spotViews, setSpotViews] = useState<any[]>([])
   const [categoryData, setCategoryData] = useState<any[]>([])
   const [dailyViews, setDailyViews] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetchAnalytics()
   }, [timeRange])
 
   async function fetchAnalytics() {
+    setLoading(true)
     const days = timeRange === "7d" ? 7 : timeRange === "30d" ? 30 : 90
 
     const [spotsRes, categoriesRes, viewsRes] = await Promise.all([
@@ -48,6 +50,21 @@ export default function AnalyticsPage() {
     if (viewsRes?.data) {
       setDailyViews(viewsRes.data)
     }
+    setLoading(false)
+  }
+
+  if (loading) {
+    return (
+      <div>
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold font-heading">Analytics</h1>
+            <p className="text-muted-foreground">Track your platform performance</p>
+          </div>
+        </div>
+        <div className="py-20 text-center text-muted-foreground">Memuat data...</div>
+      </div>
+    )
   }
 
   return (

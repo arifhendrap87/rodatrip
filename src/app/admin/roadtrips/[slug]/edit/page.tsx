@@ -12,6 +12,7 @@ import { ArrowLeft, Save, Loader2, Plus, Trash2, ExternalLink } from "lucide-rea
 import Link from "next/link"
 import { SpotSelect } from "@/components/admin/SpotSelect"
 import { ImageUpload } from "@/components/ui/image-upload"
+import { toast } from "sonner"
 
 interface StopForm { key: string; stopNumber: number; name: string; spotSlug: string }
 let stopKeyCounter = 0
@@ -64,7 +65,7 @@ export default function EditRoadtripPage() {
       stops: stops.filter((s) => s.spotSlug).map((s) => ({ stopNumber: s.stopNumber, spotSlug: s.spotSlug })),
     }
     try { await api.admin.itineraries.update(slug, data as unknown as Record<string, unknown>); router.push("/admin/roadtrips") }
-    catch (err) { alert("Error: " + (err as Error).message) }
+    catch (err) { toast.error("Error: " + (err as Error).message) }
     setSaving(false)
   }
 

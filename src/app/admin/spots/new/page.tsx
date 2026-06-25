@@ -24,6 +24,7 @@ import Link from "next/link"
 import TiptapEditor from "@/components/ui/tiptap/tiptap-editor"
 import { ImageUpload } from "@/components/ui/image-upload"
 import { ImageGallery, type GalleryImage } from "@/components/admin/ImageGallery"
+import { toast } from "sonner"
 
 const CATEGORIES = [
   { value: "alam", label: "Alam" },
@@ -115,7 +116,7 @@ export default function NewSpotPage() {
       await api.spots.create(spotData as unknown as Record<string, unknown>)
       router.push("/admin/spots")
     } catch (err) {
-      alert("Error: " + (err as Error).message)
+      toast.error("Error: " + (err as Error).message)
     }
     setSaving(false)
   }

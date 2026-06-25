@@ -20,6 +20,7 @@ import { useParams } from "next/navigation"
 import TiptapEditor from "@/components/ui/tiptap/tiptap-editor"
 import { ImageUpload } from "@/components/ui/image-upload"
 import { ImageGallery, type GalleryImage } from "@/components/admin/ImageGallery"
+import { toast } from "sonner"
 
 const CATEGORIES = [
   { value: "alam", label: "Alam" },
@@ -134,7 +135,7 @@ export default function EditSpotPage() {
       await api.spots.update(params.id as string, updates)
       router.push("/admin/spots")
     } catch (err) {
-      alert("Error: " + (err as Error).message)
+      toast.error("Error: " + (err as Error).message)
     }
     setSaving(false)
   }

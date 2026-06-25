@@ -11,10 +11,17 @@ import { cn } from "@/lib/utils"
 export function Navbar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [siteName, setSiteName] = useState(SITE_NAME)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener("scroll", onScroll, { passive: true })
+    fetch("/api/admin/settings")
+      .then((r) => r.json())
+      .then((json) => {
+        if (json.data?.site_name) setSiteName(json.data.site_name)
+      })
+      .catch(() => {})
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
 
@@ -30,7 +37,7 @@ export function Navbar() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2 group">
           <Logo className="h-7 w-7 transition-transform duration-300 group-hover:scale-110" />
-          <span className="text-lg font-bold tracking-tight" style={{ fontFamily: "var(--font-display)" }}>{SITE_NAME}</span>
+          <span className="text-lg font-bold tracking-tight" style={{ fontFamily: "var(--font-display)" }}>{siteName}</span>
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">

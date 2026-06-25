@@ -28,7 +28,7 @@ export function WaitlistSection() {
           Mulai Petualanganmu
         </h2>
         <p className="mt-4 text-lg text-muted-foreground">
-          Daftar sekarang dan jadi yang pertama mencoba Gaskuy.
+          Daftar sekarang dan jadi yang pertama mencoba RodaTrip.
         </p>
 
         {!submitted ? (

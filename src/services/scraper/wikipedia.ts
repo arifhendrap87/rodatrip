@@ -37,7 +37,7 @@ async function fetchPageHTML(page: string): Promise<string> {
   })
 
   const res = await fetch(`${WIKIPEDIA_API}?${params}`, {
-    headers: { "User-Agent": "Gaskuy/1.0 (roadtrip-app)" },
+    headers: { "User-Agent": "RodaTrip/1.0 (roadtrip-app)" },
   })
 
   if (!res.ok) throw new Error(`Wikipedia parse API error: ${res.status}`)
@@ -184,7 +184,7 @@ export async function batchFetchDetails(titles: string[]): Promise<Map<string, W
     })
 
     const res = await fetch(`${WIKIPEDIA_API}?${params}`, {
-      headers: { "User-Agent": "Gaskuy/1.0 (roadtrip-app)" },
+      headers: { "User-Agent": "RodaTrip/1.0 (roadtrip-app)" },
     })
 
     if (!res.ok) throw new Error(`Wikipedia query API error: ${res.status}`)

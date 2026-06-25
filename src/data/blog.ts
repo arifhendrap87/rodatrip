@@ -25,13 +25,13 @@ Pastikan mesin, oli, rem, ban, dan lampu dalam kondisi prima. Jangan lupa cek te
 SIM, STNK, dan KTP jangan sampai ketinggalan. Foto dokumen dan simpan di cloud sebagai cadangan.
 
 ## 3. Rencanakan Rute dengan Baik
-Gunakan fitur Peta Gaskuy untuk merencanakan rute terbaik, lengkap dengan POI di sepanjang jalan.
+Gunakan fitur Peta RodaTrip untuk merencanakan rute terbaik, lengkap dengan POI di sepanjang jalan.
 
 ## 4. Bawa Perlengkapan Darurat
 P3K, segitiga pengaman, kabel jumper, dan senter wajib ada di mobil.
 
 ## 5. Atur Budget Perjalanan
-Hitung estimasi BBM, tol, makan, dan akomodasi. Cek fitur kalkulasi biaya di Gaskuy.
+Hitung estimasi BBM, tol, makan, dan akomodasi. Cek fitur kalkulasi biaya di RodaTrip.
 
 ## 6. Cek Cuaca
 Pantau prakiraan cuaca di rute yang akan dilewati untuk antisipasi kondisi jalan.
@@ -40,7 +40,7 @@ Pantau prakiraan cuaca di rute yang akan dilewati untuk antisipasi kondisi jalan
 Jangan memaksakan diri. Istirahat setiap 3-4 jam perjalanan untuk menjaga konsentrasi.`,
     image: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/prod/blog/persiapan-roadtrip-jauh.jpg",
     category: "Tips & Trik",
-    author: "Tim Gaskuy",
+    author: "Tim RodaTrip",
     date: "2026-05-25",
     readTime: "5 menit",
     tags: ["persiapan", "tips", "safety", "roadtrip"],
@@ -67,7 +67,7 @@ Air terjun tersembunyi di kawasan Bandung Selatan. Trekking ringan dengan pemand
 Danau dengan pulau kecil di tengahnya, konon tempat berseminya cinta. Romantis banget buat couple.`,
     image: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/prod/blog/destinasi-wisata-jawa-barat.jpg",
     category: "Destinasi",
-    author: "Tim Gaskuy",
+    author: "Tim RodaTrip",
     date: "2026-05-20",
     readTime: "4 menit",
     tags: ["jawa-barat", "hidden-gem", "destinasi", "nature"],
@@ -102,7 +102,7 @@ Jalur selatan menawarkan pemandangan yang lebih bervariasi dibanding jalur pantu
 - Bawa camilan dan air mineral yang cukup`,
     image: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/prod/blog/rute-jakarta-yogyakarta.jpg",
     category: "Rute",
-    author: "Tim Gaskuy",
+    author: "Tim RodaTrip",
     date: "2026-05-15",
     readTime: "7 menit",
     tags: ["rute", "jakarta", "yogyakarta", "jalur-selatan"],
@@ -144,7 +144,7 @@ Jendela terbuka di kecepatan tinggi meningkatkan drag dan konsumsi BBM.
 Gunakan aplikasi untuk membandingkan harga BBM di SPBU sepanjang rute.`,
     image: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/prod/blog/hemat-bbm-saat-roadtrip.jpg",
     category: "Tips & Trik",
-    author: "Tim Gaskuy",
+    author: "Tim RodaTrip",
     date: "2026-05-10",
     readTime: "6 menit",
     tags: ["bbm", "hemat", "tips", "budget"],
@@ -186,7 +186,7 @@ Tidak semua SPBU atau pedagang di pinggir jalan menerima pembayaran digital.
 Biar perut tetap terisi dan perjalanan tetap menyenangkan.`,
     image: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/prod/blog/perlengkapan-wajib-mobil.jpg",
     category: "Perlengkapan",
-    author: "Tim Gaskuy",
+    author: "Tim RodaTrip",
     date: "2026-05-05",
     readTime: "5 menit",
     tags: ["perlengkapan", "safety", "tips", "mobil"],
@@ -228,7 +228,7 @@ Bakso ukuran jumbo dengan kuah kaldu sapi yang gurih. Cocok banget buat ngisi pe
 **Harga:** Rp 25.000 - Rp 40.000 per porsi`,
     image: "https://pub-1a37d792e7bc411380f4fed507dc7100.r2.dev/prod/blog/kuliner-wajib-coba-saat-roadtrip.jpg",
     category: "Kuliner",
-    author: "Tim Gaskuy",
+    author: "Tim RodaTrip",
     date: "2026-04-28",
     readTime: "6 menit",
     tags: ["kuliner", "makanan", "jawa", "rekomendasi"],

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Upload, Search, Loader2, Trash2, Copy, Check, ExternalLink } from "lucide-react"
+import { toast } from "sonner"
 import {
   Select,
   SelectContent,
@@ -50,10 +51,10 @@ export default function MediaPage() {
 
   async function handleUpload(file: File) {
     const maxSize = 10 * 1024 * 1024
-    if (file.size > maxSize) { alert("File maksimal 10MB"); return }
+    if (file.size > maxSize) { toast.error("File maksimal 10MB"); return }
 
     const allowed = ["image/jpeg", "image/png", "image/webp", "image/avif"]
-    if (!allowed.includes(file.type)) { alert("Tipe file harus jpg, png, webp, atau avif"); return }
+    if (!allowed.includes(file.type)) { toast.error("Tipe file harus jpg, png, webp, atau avif"); return }
 
     setUploading(true)
     const formData = new FormData()
@@ -64,7 +65,7 @@ export default function MediaPage() {
       await fetch("/api/media", { method: "POST", body: formData })
       fetchMedia()
     } catch (err) {
-      alert("Gagal upload: " + (err as Error).message)
+      toast.error("Gagal upload: " + (err as Error).message)
     }
     setUploading(false)
   }

@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { ArrowLeft, Save, Loader2, Plus, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { SpotSelect } from "@/components/admin/SpotSelect"
+import { toast } from "sonner"
 import { RoadtripPreview } from "@/components/admin/RoadtripPreview"
 
 interface StopForm {
@@ -59,7 +60,7 @@ export default function NewRoadtripPage() {
     try {
       await api.admin.itineraries.create(data as unknown as Record<string, unknown>)
       router.push("/admin/roadtrips")
-    } catch (err) { alert("Error: " + (err as Error).message) }
+    } catch (err) { toast.error("Error: " + (err as Error).message) }
     setSaving(false)
   }
 

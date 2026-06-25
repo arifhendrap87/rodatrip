@@ -1,21 +1,30 @@
-import { api } from "@/lib/api/client"
+import { db } from "@/lib/services/db"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { MapPin, ShoppingBag, Mail, Eye, ArrowRight } from "lucide-react"
+import { MapPin, ShoppingBag, Map, Mail, Eye, ArrowRight } from "lucide-react"
 
 async function getStats() {
   try {
-    const res = await api.admin.stats()
-    return res.data
+    const { count: spots } = await db.from("spots").select("*", { count: "exact", head: true }).limit(1)
+    const { count: products } = await db.from("products").select("*", { count: "exact", head: true }).limit(1)
+    const { count: roadtrips } = await db.from("itineraries").select("*", { count: "exact", head: true }).limit(1)
+    const { count: waitlist } = await db.from("waitlist").select("*", { count: "exact", head: true }).limit(1)
+    const { data: viewsData } = await db.from("spots").select("view_count")
+    const views = viewsData?.reduce((sum: number, s: any) => sum + (s.view_count || 0), 0) || 0
+    return { spots: spots || 0, products: products || 0, roadtrips: roadtrips || 0, waitlist: waitlist || 0, views }
   } catch {
-    return { spots: 0, products: 0, waitlist: 0, views: 0 }
+    return { spots: 0, products: 0, roadtrips: 0, waitlist: 0, views: 0 }
   }
 }
 
 async function getRecentSpots() {
   try {
-    const res = await api.spots.list({ limit: "6", offset: "0" })
-    return (res.data || []) as { id: string; slug: string; name: string; category: string; province: string; rating: number; created_at: string; image_url: string }[]
+    const { data } = await db
+      .from("spots")
+      .select("id, slug, name, category, province, rating, created_at, image_url")
+      .order("created_at", { ascending: false })
+      .limit(6)
+    return (data || []) as { id: string; slug: string; name: string; category: string; province: string; rating: number; created_at: string; image_url: string }[]
   } catch {
     return []
   }
@@ -24,6 +33,7 @@ async function getRecentSpots() {
 const statsCards = [
   { label: "Total Spots", key: "spots" as const, icon: MapPin, color: "text-emerald-600", bg: "bg-emerald-50" },
   { label: "Total Products", key: "products" as const, icon: ShoppingBag, color: "text-blue-600", bg: "bg-blue-50" },
+  { label: "Roadtrips", key: "roadtrips" as const, icon: Map, color: "text-rose-600", bg: "bg-rose-50" },
   { label: "Waitlist", key: "waitlist" as const, icon: Mail, color: "text-purple-600", bg: "bg-purple-50" },
   { label: "Page Views", key: "views" as const, icon: Eye, color: "text-orange-600", bg: "bg-orange-50" },
 ]
@@ -38,7 +48,7 @@ export default async function AdminDashboard() {
         <p className="text-muted-foreground">Overview of your platform</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {statsCards.map((card) => {
           const Icon = card.icon
           return (

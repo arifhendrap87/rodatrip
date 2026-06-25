@@ -8,7 +8,7 @@ const testimonials = [
     name: "Budi",
     role: "Roadtripper Jakarta",
     avatar: "B",
-    text: "Akhirnya ada platform khusus roadtrip Indonesia. Biasanya buka Google Maps + Instagram + Twitter buat cari info jalan. Sekarang cukup Gaskuy.",
+    text: "Akhirnya ada platform khusus roadtrip Indonesia. Biasanya buka Google Maps + Instagram + Twitter buat cari info jalan. Sekarang cukup RodaTrip.",
     rating: 5,
   },
   {
@@ -48,7 +48,7 @@ export function Testimonials() {
             Apa Kata Mereka
           </h2>
           <p className="mt-4 text-muted-foreground max-w-xl mx-auto">
-            Yang udah cobain Gaskuy — bukan kita yang bilang.
+            Yang udah cobain RodaTrip — bukan kita yang bilang.
           </p>
         </motion.div>
 

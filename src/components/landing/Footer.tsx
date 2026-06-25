@@ -1,3 +1,6 @@
+"use client"
+
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Logo } from "@/components/icons"
 import {
@@ -9,6 +12,16 @@ import {
 } from "@/lib/constants"
 
 export function Footer() {
+  const [siteName, setSiteName] = useState(SITE_NAME)
+
+  useEffect(() => {
+    fetch("/api/admin/settings")
+      .then((r) => r.json())
+      .then((json) => {
+        if (json.data?.site_name) setSiteName(json.data.site_name)
+      })
+      .catch(() => {})
+  }, [])
   return (
     <footer className="border-t border-border/30 bg-gradient-to-b from-transparent to-muted/30 py-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
@@ -16,7 +29,7 @@ export function Footer() {
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center gap-2 group">
               <Logo className="h-6 w-6 transition-transform duration-300 group-hover:scale-110" />
-              <span className="font-bold font-heading">{SITE_NAME}</span>
+              <span className="font-bold font-heading">{siteName}</span>
             </Link>
             <p className="mt-3 max-w-xs text-sm text-muted-foreground leading-relaxed">
               Platform POI, info jalan, dan perlengkapan roadtrip untuk roadtripper Indonesia.
@@ -75,7 +88,7 @@ export function Footer() {
 
         <div className="mt-12 relative pt-6 text-center text-sm text-muted-foreground">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-          &copy; {new Date().getFullYear()} {SITE_NAME}. All rights reserved.
+          &copy; {new Date().getFullYear()} {siteName}. All rights reserved.
         </div>
       </div>
     </footer>

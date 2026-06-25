@@ -36,7 +36,7 @@ function LoginForm() {
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/5 to-accent/5 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-heading">Admin Gaskuy</CardTitle>
+          <CardTitle className="text-2xl font-heading">Admin Panel</CardTitle>
           <CardDescription>Masuk ke dashboard admin</CardDescription>
         </CardHeader>
         <CardContent>

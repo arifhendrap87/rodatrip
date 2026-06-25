@@ -19,6 +19,11 @@ export interface Product {
   description: string
   rating: number
   margin_pct?: number
+  source?: string
+  external_id?: string
+  weight?: number
+  dimensions?: string
+  tokopedia_url?: string
 }
 
 export interface Route {

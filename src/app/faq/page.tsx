@@ -5,24 +5,24 @@ import { cn } from "@/lib/utils"
 
 const faqs = [
   {
-    q: "Apa itu Gaskuy?",
-    a: "Gaskuy adalah platform POI (Point of Interest), info jalan, dan perlengkapan roadtrip untuk roadtripper Indonesia. Kami membantu kamu merencanakan perjalanan dengan spot-spot istimewa, rute lengkap dengan POI, dan perlengkapan roadtrip berkualitas.",
+    q: "Apa itu RodaTrip?",
+    a: "RodaTrip adalah platform POI (Point of Interest), info jalan, dan perlengkapan roadtrip untuk roadtripper Indonesia. Kami membantu kamu merencanakan perjalanan dengan spot-spot istimewa, rute lengkap dengan POI, dan perlengkapan roadtrip berkualitas.",
   },
   {
-    q: "Apakah Gaskuy gratis?",
-    a: "Ya! Gaskuy gratis selamanya untuk semua fitur dasar. Kamu bisa menjelajahi spot, merencanakan rute, dan melihat estimasi biaya tanpa biaya sepeser pun.",
+    q: "Apakah RodaTrip gratis?",
+    a: "Ya! RodaTrip gratis selamanya untuk semua fitur dasar. Kamu bisa menjelajahi spot, merencanakan rute, dan melihat estimasi biaya tanpa biaya sepeser pun.",
   },
   {
     q: "Bagaimana cara mendaftar?",
     a: "Kamu bisa mendaftar melalui form waitlist di halaman utama. Kami akan mengirimkan notifikasi via email begitu platform siap digunakan.",
   },
   {
-    q: "Apa saja kategori spot di Gaskuy?",
-    a: "Spot di Gaskuy dikategorikan menjadi: SPBU, Kuliner, Bengkel, Spot Foto, dan Info Jalan. Masing-masing kategori membantu kamu menemukan tempat yang kamu butuhkan di sepanjang rute.",
+    q: "Apa saja kategori spot di RodaTrip?",
+    a: "Spot di RodaTrip dikategorikan menjadi: SPBU, Kuliner, Bengkel, Spot Foto, dan Info Jalan. Masing-masing kategori membantu kamu menemukan tempat yang kamu butuhkan di sepanjang rute.",
   },
   {
     q: "Bagaimana cara merencanakan rute?",
-    a: "Kunjungi halaman Peta, masukkan kota asal dan tujuan, lalu pilih kendaraan kamu. Gaskuy akan menampilkan rute lengkap dengan POI di sepanjang jalan dan estimasi biaya perjalanan.",
+    a: "Kunjungi halaman Peta, masukkan kota asal dan tujuan, lalu pilih kendaraan kamu. RodaTrip akan menampilkan rute lengkap dengan POI di sepanjang jalan dan estimasi biaya perjalanan.",
   },
   {
     q: "Apakah estimasi biaya akurat?",
@@ -34,7 +34,7 @@ const faqs = [
   },
   {
     q: "Apakah ada aplikasi mobile?",
-    a: "Saat ini Gaskuy tersedia dalam versi website. Rencana pengembangan aplikasi mobile masih dalam tahap perencanaan. Pantau terus info terbaru melalui blog dan media sosial kami.",
+    a: "Saat ini RodaTrip tersedia dalam versi website. Rencana pengembangan aplikasi mobile masih dalam tahap perencanaan. Pantau terus info terbaru melalui blog dan media sosial kami.",
   },
   {
     q: "Bagaimana cara berkontribusi?",
@@ -63,7 +63,7 @@ export default function FAQPage() {
             </span>
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
-            Temukan jawaban untuk pertanyaan yang sering diajukan tentang Gaskuy.
+            Temukan jawaban untuk pertanyaan yang sering diajukan tentang RodaTrip.
           </p>
         </div>
       </section>

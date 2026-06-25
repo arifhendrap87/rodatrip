@@ -13,7 +13,7 @@ export default function WaitlistThanksPage() {
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold font-heading">Kamu Terdaftar! 🎉</h1>
         <p className="mt-4 text-muted-foreground leading-relaxed">
-          Terima kasih sudah mendaftar ke waitlist Gaskuy. Kami akan memberi kabar begitu platform siap digunakan.
+          Terima kasih sudah mendaftar ke waitlist RodaTrip. Kami akan memberi kabar begitu platform siap digunakan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
           Sambil menunggu, yuk jelajahi spot-spot istimewa yang sudah kami kurasi.

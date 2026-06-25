@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft, Save, Loader2 } from "lucide-react"
 import Link from "next/link"
+import { toast } from "sonner"
 
 const CATEGORIES = [
   "Safety & Darurat", "Comfort", "Gadget & Mount",
@@ -23,7 +24,8 @@ export default function EditProductPage() {
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({
     name: "", slug: "", category: "", price: "", description: "", rating: "4.5",
-    image_url: "", stock_quantity: "0",
+    imageUrl: "", stockQuantity: "0",
+    source: "", external_id: "", weight: "", dimensions: "", tokopedia_url: "",
   })
 
   useEffect(() => {
@@ -34,8 +36,11 @@ export default function EditProductPage() {
         setForm({
           name: d.name || "", slug: d.slug || "",
           category: d.category || "", price: d.price?.toString() || "", description: d.description || "",
-          rating: d.rating?.toString() || "4.5", image_url: d.image_url || "",
-          stock_quantity: d.stock_quantity?.toString() || "0",
+          rating: d.rating?.toString() || "4.5", imageUrl: d.image_url || "",
+          stockQuantity: d.stock_quantity?.toString() || "0",
+          source: d.source || "", external_id: d.external_id || "",
+          weight: d.weight?.toString() || "", dimensions: d.dimensions || "",
+          tokopedia_url: d.tokopedia_url || "",
         })
       } catch { router.push("/admin/products") }
       setLoading(false)
@@ -54,11 +59,17 @@ export default function EditProductPage() {
       await api.products.update(params.id as string, {
         name: form.name, slug: form.slug || generateSlug(form.name), category: form.category,
         price: parseInt(form.price), description: form.description, rating: parseFloat(form.rating),
-        image_url: form.image_url, stock_quantity: parseInt(form.stock_quantity),
+        imageUrl: form.imageUrl || undefined,
+        stockQuantity: form.stockQuantity ? parseInt(form.stockQuantity) : undefined,
+        source: form.source || undefined,
+        external_id: form.external_id || undefined,
+        weight: form.weight ? parseInt(form.weight) : undefined,
+        dimensions: form.dimensions || undefined,
+        tokopedia_url: form.tokopedia_url || undefined,
       })
       router.push("/admin/products")
     } catch (err) {
-      alert("Error: " + (err as Error).message)
+      toast.error("Error: " + (err as Error).message)
     }
     setSaving(false)
   }
@@ -99,7 +110,27 @@ export default function EditProductPage() {
               </div>
               <div className="space-y-2 sm:col-span-2">
                 <Label>Description</Label>
-                <Input value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
+                <Input value={form.description} onChange={(e) => setForm((f: any) => ({ ...f, description: e.target.value }))} />
+              </div>
+              <div className="space-y-2">
+                <Label>Sumber</Label>
+                <Input value={form.source} onChange={(e) => setForm((f: any) => ({ ...f, source: e.target.value }))} placeholder="Jakmall" />
+              </div>
+              <div className="space-y-2">
+                <Label>External ID (SKU)</Label>
+                <Input value={form.external_id} onChange={(e) => setForm((f: any) => ({ ...f, external_id: e.target.value }))} placeholder="7RRSKBBK" />
+              </div>
+              <div className="space-y-2">
+                <Label>Weight (gram)</Label>
+                <Input type="number" value={form.weight} onChange={(e) => setForm((f: any) => ({ ...f, weight: e.target.value }))} placeholder="1500" />
+              </div>
+              <div className="space-y-2">
+                <Label>Dimensions</Label>
+                <Input value={form.dimensions} onChange={(e) => setForm((f: any) => ({ ...f, dimensions: e.target.value }))} placeholder="30 x 30 x 30 cm" />
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label>Tokopedia URL</Label>
+                <Input value={form.tokopedia_url} onChange={(e) => setForm((f: any) => ({ ...f, tokopedia_url: e.target.value }))} placeholder="https://tokopedia.com/..." />
               </div>
             </div>
           </CardContent>
