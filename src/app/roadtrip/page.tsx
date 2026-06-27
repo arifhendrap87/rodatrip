@@ -11,16 +11,30 @@ export default function RoadtripListPage() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [provinceList, setProvinceList] = useState<string[]>([])
+  const [cityMap, setCityMap] = useState<Record<string, string[]>>({})
   const [selectedProvince, setSelectedProvince] = useState("all")
   const [selectedCity, setSelectedCity] = useState("all")
 
-  const citiesForProvince = selectedProvince !== "all"
-    ? [...new Set(itineraries.filter((i: any) => i.province === selectedProvince && i.city).map((i: any) => i.city))].sort()
-    : []
+  const citiesForProvince = selectedProvince !== "all" ? cityMap[selectedProvince] || [] : []
+
+  useEffect(() => {
+    fetchFilters()
+  }, [])
 
   useEffect(() => {
     fetchItineraries()
   }, [selectedProvince, selectedCity])
+
+  async function fetchFilters() {
+    try {
+      const res = await fetch("/api/itineraries/available-filters")
+      const json = await res.json()
+      if (res.ok) {
+        setProvinceList(json.data.provinces || [])
+        setCityMap(json.data.cities || {})
+      }
+    } catch {}
+  }
 
   async function fetchItineraries() {
     setLoading(true)
@@ -28,12 +42,9 @@ export default function RoadtripListPage() {
       const params = new URLSearchParams()
       if (selectedProvince !== "all") params.set("province", selectedProvince)
       if (selectedCity !== "all") params.set("city", selectedCity)
-      const res = await fetch(`/api/admin/itineraries?${params}`)
+      const res = await fetch(`/api/itineraries?${params}`)
       const json = await res.json()
-      const list = (json.data || []) as Itinerary[]
-      const published = list.filter((i) => i.isPublished)
-      setItineraries(published)
-      setProvinceList([...new Set(published.map((i: any) => i.province).filter(Boolean))].sort() as string[])
+      setItineraries(json.data || [])
     } catch {}
     setLoading(false)
   }

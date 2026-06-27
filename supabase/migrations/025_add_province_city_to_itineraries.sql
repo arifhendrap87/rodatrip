@@ -1,2 +1,2 @@
-ALTER TABLE itineraries ADD COLUMN IF NOT EXISTS province text;
-ALTER TABLE itineraries ADD COLUMN IF NOT EXISTS city text;
+ALTER TABLE itineraries DROP COLUMN IF EXISTS province;
+ALTER TABLE itineraries DROP COLUMN IF EXISTS city;

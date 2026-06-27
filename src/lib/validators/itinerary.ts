@@ -7,8 +7,6 @@ export const itineraryStopSchema = z.object({
 
 export const createItinerarySchema = z.object({
   title: z.string().min(1),
-  province: z.string().optional(),
-  city: z.string().optional(),
   itineraryDuration: z.string().optional(),
   totalDistance: z.string().optional(),
   roadCondition: z.string().optional(),

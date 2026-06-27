@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { api } from "@/lib/api/client"
 import { Button } from "@/components/ui/button"
@@ -37,30 +37,8 @@ function createEmptyStop(stopNumber: number): StopForm {
 export default function NewRoadtripPage() {
   const router = useRouter()
   const [saving, setSaving] = useState(false)
-  const [provinceList, setProvinceList] = useState<{ code: string; name: string }[]>([])
-  const [cityList, setCityList] = useState<{ code: string; name: string }[]>([])
-  const [provCode, setProvCode] = useState("")
-  const [loadingProv, setLoadingProv] = useState(true)
-  const [loadingCity, setLoadingCity] = useState(false)
-
-  useEffect(() => {
-    fetch("/api/regions/provinces")
-      .then((r) => r.json())
-      .then((json) => { setProvinceList(json.data || []); setLoadingProv(false) })
-      .catch(() => setLoadingProv(false))
-  }, [])
-
-  useEffect(() => {
-    if (!provCode) return
-    setLoadingCity(true)
-    fetch(`/api/regions/regencies/${provCode}`)
-      .then((r) => r.json())
-      .then((json) => { setCityList(json.data || []); setLoadingCity(false) })
-      .catch(() => { setCityList([]); setLoadingCity(false) })
-  }, [provCode])
-
   const [form, setForm] = useState({
-    title: "", province: "", city: "", itineraryDuration: "", totalDistance: "", roadCondition: "",
+    title: "", itineraryDuration: "", totalDistance: "", roadCondition: "",
     estimatedCost: "", bestDrivingTime: "", routeFacilities: "", mapsEmbedUrl: "",
     drivingSafetyTips: "", culinaryNotes: "", coverImage: "", isPublished: false,
   })
@@ -77,8 +55,7 @@ export default function NewRoadtripPage() {
     e.preventDefault()
     setSaving(true)
     const data = {
-      title: form.title, province: form.province || undefined, city: form.city || undefined,
-      itineraryDuration: form.itineraryDuration || undefined,
+      title: form.title, itineraryDuration: form.itineraryDuration || undefined,
       totalDistance: form.totalDistance || undefined, roadCondition: form.roadCondition || undefined,
       estimatedCost: form.estimatedCost || undefined, bestDrivingTime: form.bestDrivingTime || undefined,
       routeFacilities: form.routeFacilities ? form.routeFacilities.split(",").map((f) => f.trim()).filter(Boolean) : undefined,
@@ -105,58 +82,6 @@ export default function NewRoadtripPage() {
           <CardHeader><CardTitle>Informasi Roadtrip</CardTitle><CardDescription>Data makro perjalanan</CardDescription></CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2"><Label>Judul *</Label><Input value={form.title} onChange={(e) => updateField("title", e.target.value)} required /></div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label>Provinsi</Label>
-                <Select
-                  value={form.province}
-                  onValueChange={(v) => {
-                    if (!v) return
-                    updateField("province", v)
-                    updateField("city", "")
-                    const prov = provinceList.find((p) => p.name === v)
-                    if (prov) setProvCode(prov.code)
-                  }}
-                  disabled={loadingProv}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={loadingProv ? "Memuat..." : "Pilih provinsi"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {loadingProv ? (
-                      <SelectItem value="loading" disabled>Memuat...</SelectItem>
-                    ) : (
-                      provinceList.map((p) => (
-                        <SelectItem key={p.code} value={p.name}>{p.name}</SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Kota</Label>
-                <Select
-                  value={form.city}
-                  onValueChange={(v) => v && updateField("city", v)}
-                  disabled={loadingCity || cityList.length === 0}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={loadingCity ? "Memuat..." : cityList.length === 0 ? "Pilih provinsi dulu" : "Pilih kota"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {loadingCity ? (
-                      <SelectItem value="loading" disabled>Memuat...</SelectItem>
-                    ) : cityList.length === 0 ? (
-                      <SelectItem value="" disabled>Pilih provinsi dulu</SelectItem>
-                    ) : (
-                      cityList.map((c) => (
-                        <SelectItem key={c.code} value={c.name}>{c.name}</SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-2"><Label>Durasi</Label><Input value={form.itineraryDuration} onChange={(e) => updateField("itineraryDuration", e.target.value)} /></div>
               <div className="space-y-2"><Label>Jarak</Label><Input value={form.totalDistance} onChange={(e) => updateField("totalDistance", e.target.value)} /></div>

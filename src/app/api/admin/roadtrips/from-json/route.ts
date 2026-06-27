@@ -138,14 +138,11 @@ export async function POST(request: Request) {
     })
   }
 
-  const firstStop = stops[0]
   const { data: itinerary, error: itError } = await db
     .from("itineraries")
     .insert({
       slug: itinerarySlug,
       title: itineraryFields.title,
-      province: itineraryFields.province || firstStop?.province || null,
-      city: itineraryFields.city || firstStop?.city || null,
       itinerary_duration: itineraryFields.itinerary_duration || null,
       total_distance: itineraryFields.total_distance || null,
       road_condition: itineraryFields.road_condition || null,
