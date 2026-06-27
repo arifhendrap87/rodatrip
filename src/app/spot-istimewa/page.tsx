@@ -33,6 +33,7 @@ interface SpotData {
   name: string
   category: SpotCategory
   province: string
+  city?: string
   region: string
   description: string
   rating: number
@@ -44,17 +45,23 @@ export default function SpotIstimewaPage() {
   const [selectedCategory, setSelectedCategory] = useState<SpotCategory | "all">("all")
   const [selectedRegion, setSelectedRegion] = useState("all")
   const [selectedProvince, setSelectedProvince] = useState<string>("all")
+  const [selectedCity, setSelectedCity] = useState<string>("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [spots, setSpots] = useState<SpotData[]>([])
   const [loading, setLoading] = useState(true)
 
   const PROVINSI = [...new Set(spots.map((s) => s.province))].sort()
 
+  const citiesForProvince = selectedProvince !== "all"
+    ? [...new Set(spots.filter((s) => s.province === selectedProvince && s.city).map((s) => s.city as string))].sort()
+    : []
+
   useEffect(() => {
     const params: Record<string, string> = {}
     if (selectedCategory !== "all") params.category = selectedCategory
     if (selectedRegion !== "all") params.region = selectedRegion
     if (selectedProvince !== "all") params.province = selectedProvince
+    if (selectedCity !== "all") params.city = selectedCity
     if (searchQuery) params.search = searchQuery
     params.limit = "100"
 
@@ -62,7 +69,7 @@ export default function SpotIstimewaPage() {
       .then((res: any) => setSpots(res?.data || []))
       .catch(() => setSpots([]))
       .finally(() => setLoading(false))
-  }, [selectedCategory, selectedRegion, selectedProvince])
+  }, [selectedCategory, selectedRegion, selectedProvince, selectedCity])
 
   const filtered = spots.filter((spot) => {
     if (searchQuery) {
@@ -134,13 +141,21 @@ export default function SpotIstimewaPage() {
                 <span>{cat.icon}</span><span>{cat.label}</span>
               </button>
             ))}
-            <div className="ml-auto hidden sm:block">
-              <select value={selectedProvince} onChange={(e) => setSelectedProvince(e.target.value)}
+            <div className="ml-auto hidden sm:flex items-center gap-2">
+              <select value={selectedProvince} onChange={(e) => { setSelectedProvince(e.target.value); setSelectedCity("all") }}
                 className="h-9 rounded-xl border border-border bg-white px-3 text-sm text-muted-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
               >
                 <option value="all">Semua Provinsi</option>
                 {PROVINSI.map((p) => (<option key={p} value={p}>{p}</option>))}
               </select>
+              {selectedProvince !== "all" && citiesForProvince.length > 0 && (
+                <select value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)}
+                  className="h-9 rounded-xl border border-border bg-white px-3 text-sm text-muted-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                >
+                  <option value="all">Semua Kota</option>
+                  {citiesForProvince.map((c) => (<option key={c} value={c}>{c}</option>))}
+                </select>
+              )}
             </div>
           </div>
         </div>
@@ -169,7 +184,7 @@ export default function SpotIstimewaPage() {
               <span className="text-4xl">🔍</span>
               <p className="mt-4 text-lg font-medium text-foreground">Tidak ada spot yang cocok</p>
               <p className="mt-1 text-sm text-muted-foreground">Coba ubah filter atau kata kunci pencarian</p>
-              <button onClick={() => { setSelectedCategory("all"); setSelectedRegion("all"); setSelectedProvince("all"); setSearchQuery("") }}
+                <button onClick={() => { setSelectedCategory("all"); setSelectedRegion("all"); setSelectedProvince("all"); setSelectedCity("all"); setSearchQuery("") }}
                 className="mt-4 text-sm text-primary hover:underline underline-offset-2">Reset Filter</button>
             </div>
           )}

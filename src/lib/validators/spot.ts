@@ -25,6 +25,7 @@ export const createSpotSchema = z.object({
   name: z.string().min(1).max(255),
   category: z.enum(SPOT_CATEGORIES),
   province: z.string().min(1),
+  city: z.string().optional(),
   region: z.enum(REGIONS),
   location: geoPointSchema,
   description: z.string().optional(),

@@ -19,6 +19,7 @@ const geminiStopSchema = z.object({
   name: z.string().min(1),
   category: z.enum(["alam", "kuliner", "budaya", "foto", "petualangan", "sejarah"]),
   province: z.string().min(1),
+  city: z.string().optional(),
   description: z.string().optional(),
   ticket_price: z.string().optional(),
   parking_fee: z.string().optional(),
@@ -39,6 +40,8 @@ const geminiStopSchema = z.object({
 
 export const geminiRoadtripSchema = z.object({
   title: z.string().min(1),
+  province: z.string().optional(),
+  city: z.string().optional(),
   itinerary_duration: z.string().optional(),
   total_distance: z.string().optional(),
   road_condition: z.string().optional(),

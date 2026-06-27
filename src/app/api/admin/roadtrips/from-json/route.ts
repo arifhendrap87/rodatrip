@@ -61,6 +61,7 @@ function transformStopForDb(stop: Record<string, unknown>, province: string) {
     why_special: description,
     location: `POINT(${coords.lng} ${coords.lat})`,
     region: getRegion(province),
+    city: (fields.city as string) || null,
     nearby_hotels_jsonb: nearby_hotels || [],
     nearby_restaurants_jsonb: nearby_restaurants || [],
   }
@@ -137,11 +138,14 @@ export async function POST(request: Request) {
     })
   }
 
+  const firstStop = stops[0]
   const { data: itinerary, error: itError } = await db
     .from("itineraries")
     .insert({
       slug: itinerarySlug,
       title: itineraryFields.title,
+      province: itineraryFields.province || firstStop?.province || null,
+      city: itineraryFields.city || firstStop?.city || null,
       itinerary_duration: itineraryFields.itinerary_duration || null,
       total_distance: itineraryFields.total_distance || null,
       road_condition: itineraryFields.road_condition || null,

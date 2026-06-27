@@ -31,21 +31,41 @@ const CATEGORIES = [
   { value: "sejarah", label: "Sejarah" },
 ]
 
-const PROVINCES = [
-  "Jawa Barat", "Jawa Tengah", "DIY", "Jawa Timur",
-  "Bali", "Sumatera Utara", "Sumatera Barat",
-  "Sulawesi Utara", "Sulawesi Selatan",
-  "Kalimantan Timur", "Nusa Tenggara Barat",
-  "Nusa Tenggara Timur",
-]
-
 export default function EditSpotPage() {
   const params = useParams()
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [provinceList, setProvinceList] = useState<{ code: string; name: string }[]>([])
+  const [cityList, setCityList] = useState<{ code: string; name: string }[]>([])
+  const [provCode, setProvCode] = useState("")
+  const [loadingProv, setLoadingProv] = useState(true)
+  const [loadingCity, setLoadingCity] = useState(false)
+
+  useEffect(() => {
+    fetch("/api/regions/provinces")
+      .then((r) => r.json())
+      .then((json) => {
+        setProvinceList(json.data || [])
+        setLoadingProv(false)
+      })
+      .catch(() => setLoadingProv(false))
+  }, [])
+
+  useEffect(() => {
+    if (!provCode) return
+    setLoadingCity(true)
+    fetch(`/api/regions/regencies/${provCode}`)
+      .then((r) => r.json())
+      .then((json) => {
+        setCityList(json.data || [])
+        setLoadingCity(false)
+      })
+      .catch(() => { setCityList([]); setLoadingCity(false) })
+  }, [provCode])
+
   const [form, setForm] = useState<any>({
-    name: "", category: "", province: "", region: "",
+    name: "", category: "", province: "", city: "", region: "",
     description: "", why_special: "", tips: "",
     rating: "", best_time: "", opening_hours: "",
     estimated_time: "", ticket_price: "", road_access: "",
@@ -61,10 +81,15 @@ export default function EditSpotPage() {
       .then((res) => {
         const data = res.data
         if (data) {
+          const prov = data.province || ""
+          const provItem = provinceList.find((p) => p.name === prov)
+          if (provItem) setProvCode(provItem.code)
+
           setForm({
             name: data.name || "",
             category: data.category || "",
-            province: data.province || "",
+            province: prov,
+            city: data.city || "",
             region: data.region || "",
             description: data.description || "",
             why_special: data.why_special || "",
@@ -105,6 +130,7 @@ export default function EditSpotPage() {
       name: form.name,
       category: form.category,
       province: form.province,
+      city: form.city || undefined,
       region: form.region,
       description: form.description,
       whySpecial: form.why_special,
@@ -188,14 +214,50 @@ export default function EditSpotPage() {
               </div>
               <div className="space-y-2">
                 <Label>Province</Label>
-                <Select value={form.province} onValueChange={(v) => v && setForm((f: any) => ({ ...f, province: v }))}>
+                <Select
+                  value={form.province}
+                  onValueChange={(v) => {
+                    if (!v) return
+                    setForm((f: any) => ({ ...f, province: v, city: "" }))
+                    const prov = provinceList.find((p) => p.name === v)
+                    if (prov) setProvCode(prov.code)
+                  }}
+                  disabled={loadingProv}
+                >
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder={loadingProv ? "Memuat..." : "Pilih provinsi"} />
                   </SelectTrigger>
                   <SelectContent>
-                    {PROVINCES.map((p) => (
-                      <SelectItem key={p} value={p}>{p}</SelectItem>
-                    ))}
+                    {loadingProv ? (
+                      <SelectItem value="loading" disabled>Memuat...</SelectItem>
+                    ) : (
+                      provinceList.map((p) => (
+                        <SelectItem key={p.code} value={p.name}>{p.name}</SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>City / Regency</Label>
+                <Select
+                  value={form.city}
+                  onValueChange={(v) => v && setForm((f: any) => ({ ...f, city: v }))}
+                  disabled={loadingCity || cityList.length === 0}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={loadingCity ? "Memuat..." : cityList.length === 0 ? "Pilih provinsi dulu" : "Pilih kota"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {loadingCity ? (
+                      <SelectItem value="loading" disabled>Memuat...</SelectItem>
+                    ) : cityList.length === 0 ? (
+                      <SelectItem value="" disabled>Pilih provinsi dulu</SelectItem>
+                    ) : (
+                      cityList.map((c) => (
+                        <SelectItem key={c.code} value={c.name}>{c.name}</SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
               </div>

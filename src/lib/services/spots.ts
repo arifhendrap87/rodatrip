@@ -41,6 +41,7 @@ export async function getSpots(options?: {
   category?: string
   region?: string
   province?: string
+  city?: string
   search?: string
   featured?: boolean
   limit?: number
@@ -52,6 +53,7 @@ export async function getSpots(options?: {
     if (options?.category) query = query.eq("category", options.category)
     if (options?.region) query = query.eq("region", options.region)
     if (options?.province) query = query.eq("province", options.province)
+    if (options?.city) query = query.eq("city", options.city)
     if (options?.search) query = query.ilike("name", `%${options.search}%`)
     if (options?.featured) query = query.eq("is_featured", true)
 

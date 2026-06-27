@@ -3,12 +3,16 @@ import { getServerAdmin } from "@/lib/api/auth"
 import { getItineraries, createItinerary } from "@/lib/services/itineraries"
 import { createItinerarySchema } from "@/lib/validators/itinerary"
 
-export async function GET() {
+export async function GET(request: Request) {
   const admin = await getServerAdmin()
   if (!admin) return unauthorized()
 
+  const { searchParams } = new URL(request.url)
+  const province = searchParams.get("province") || undefined
+  const city = searchParams.get("city") || undefined
+
   try {
-    const itineraries = await getItineraries()
+    const itineraries = await getItineraries({ province, city })
     return success(itineraries)
   } catch {
     return success([])

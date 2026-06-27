@@ -14,12 +14,13 @@ export async function GET(request: Request) {
   const category = searchParams.get("category") || undefined
   const region = searchParams.get("region") || undefined
   const province = searchParams.get("province") || undefined
+  const city = searchParams.get("city") || undefined
   const search = searchParams.get("search") || undefined
   const limit = Math.min(Number(searchParams.get("limit")) || 20, 100)
   const offset = Number(searchParams.get("offset")) || 0
 
   try {
-    const { data, total } = await getSpots({ category, region, province, search, limit, offset })
+    const { data, total } = await getSpots({ category, region, province, city, search, limit, offset })
     return paginated(data, total, limit, offset)
   } catch {
     return paginated([], 0, limit, offset)

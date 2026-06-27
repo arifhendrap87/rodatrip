@@ -82,6 +82,8 @@ export interface Itinerary {
   id: string
   slug: string
   title: string
+  province?: string
+  city?: string
   itineraryDuration?: string
   totalDistance?: string
   roadCondition?: string

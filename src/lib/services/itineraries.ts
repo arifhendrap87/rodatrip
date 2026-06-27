@@ -5,6 +5,8 @@ export interface ItineraryRow {
   id: string
   slug: string
   title: string
+  province: string | null
+  city: string | null
   itinerary_duration: string | null
   total_distance: string | null
   road_condition: string | null
@@ -61,6 +63,8 @@ function rowToItinerary(row: ItineraryRow, stops: ItineraryStopRow[]): Itinerary
     id: row.id,
     slug: row.slug,
     title: row.title,
+    province: row.province || undefined,
+    city: row.city || undefined,
     itineraryDuration: row.itinerary_duration || undefined,
     totalDistance: row.total_distance || undefined,
     roadCondition: row.road_condition || undefined,
@@ -150,12 +154,20 @@ async function getStopsForItinerary(itineraryId: string): Promise<ItineraryStopR
 
 export async function getItineraries(options?: {
   published?: boolean
+  province?: string
+  city?: string
 }): Promise<Itinerary[]> {
   try {
     let query = db.from("itineraries").select("*")
 
     if (options?.published) {
       query = query.eq("is_published", true)
+    }
+    if (options?.province) {
+      query = query.eq("province", options.province)
+    }
+    if (options?.city) {
+      query = query.eq("city", options.city)
     }
 
     const { data, error } = await query.order("created_at", { ascending: false })
@@ -195,6 +207,8 @@ export async function getItineraryBySlug(slug: string): Promise<Itinerary | null
 export async function createItinerary(data: {
   slug: string
   title: string
+  province?: string
+  city?: string
   itineraryDuration?: string
   totalDistance?: string
   roadCondition?: string
@@ -214,6 +228,8 @@ export async function createItinerary(data: {
       .insert({
         slug: data.slug,
         title: data.title,
+        province: data.province || null,
+        city: data.city || null,
         itinerary_duration: data.itineraryDuration || null,
         total_distance: data.totalDistance || null,
         road_condition: data.roadCondition || null,
@@ -255,6 +271,8 @@ export async function updateItinerary(
   slug: string,
   data: {
     title?: string
+    province?: string
+    city?: string
     itineraryDuration?: string
     totalDistance?: string
     roadCondition?: string
@@ -272,6 +290,8 @@ export async function updateItinerary(
   try {
     const updateData: Record<string, unknown> = {}
     if (data.title !== undefined) updateData.title = data.title
+    if (data.province !== undefined) updateData.province = data.province
+    if (data.city !== undefined) updateData.city = data.city
     if (data.itineraryDuration !== undefined) updateData.itinerary_duration = data.itineraryDuration
     if (data.totalDistance !== undefined) updateData.total_distance = data.totalDistance
     if (data.roadCondition !== undefined) updateData.road_condition = data.roadCondition

@@ -66,6 +66,7 @@ Roadtrip di ${kota}, ${provinsi}
       "name": "Nama Destinasi 1",
       "category": "alam",
       "province": "${provinsi}",
+      "city": "${kota}",
       "description": "Deskripsi singkat destinasi",
       "ticket_price": "Rp XX.XXX / orang",
       "parking_fee": "Motor: Rp X.XXX | Mobil: Rp XX.XXX",
