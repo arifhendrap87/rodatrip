@@ -42,7 +42,7 @@ export default function PromptGeneratorPage() {
   // Fetch provinces on mount
   useEffect(() => {
     setLoadingProv(true)
-    fetch("/api/wilayah/provinces")
+    fetch("/api/regions/provinces")
       .then((r) => r.json())
       .then((json) => {
         const list = (json.data || []) as WilayahItem[]
@@ -63,7 +63,7 @@ export default function PromptGeneratorPage() {
     if (!provCode) return
     setLoadingKota(true)
     setKota("")
-    fetch(`/api/wilayah/regencies/${provCode}`)
+    fetch(`/api/regions/regencies/${provCode}`)
       .then((r) => r.json())
       .then((json) => {
         const list = (json.data || []) as WilayahItem[]
