@@ -17,7 +17,7 @@ export function Hero() {
   const [origin, setOrigin] = useState("")
   const [destination, setDestination] = useState("")
   const [vehicle, setVehicle] = useState("mobil")
-  const [stats] = useState({ roadtrips: "3", products: "5", poi: "50+" })
+  const [stats] = useState({ roadtrips: "3", poi: "50+" })
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -50,7 +50,7 @@ export function Hero() {
             <motion.div variants={heroItem}>
               <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm text-primary shadow-sm">
                 <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-                Roadtrip · Aksesoris Mobil · Marketplace
+                🏎️ Panduan Roadtrip · POI · Tips Perjalanan
               </div>
             </motion.div>
 
@@ -61,35 +61,26 @@ export function Hero() {
               Rencanakan
               <br />
               <GradientText as="span" className="text-5xl sm:text-6xl lg:text-7xl font-bold">
-                Roadtrip
+                Roadtrip Impianmu
               </GradientText>
-              <br />
-              Lengkap dengan Aksesorisnya
             </motion.h1>
 
             <motion.p
               variants={heroItem}
               className="mt-6 text-lg text-muted-foreground max-w-lg"
             >
-              Temukan itinerary roadtrip, beli perlengkapan mobil, dan cari kendaraan impian — semua dalam satu platform.
+              Temukan itinerary roadtrip kurasi lengkap dengan timeline, estimasi biaya, dan tips perjalanan.
             </motion.p>
 
             <motion.div variants={heroItem} className="mt-8 space-y-4">
-              <div className="flex flex-wrap gap-3">
-                <Link href="/roadtrip">
-                  <Button size="lg" className="h-12 px-6 bg-gradient-to-r from-primary via-[hsl(340_85%_55%)] to-accent text-primary-foreground font-semibold shadow-lg shadow-primary/30 transition-all duration-300 hover:shadow-primary/50 hover:-translate-y-0.5 rounded-xl">
-                    🏎️ Jelajahi Roadtrip
-                  </Button>
-                </Link>
-                <Link href="/products">
-                  <Button size="lg" variant="outline" className="h-12 px-6 bg-white/80 border-border shadow-sm hover:bg-white/90 rounded-xl">
-                    🛍️ Belanja Aksesoris
-                  </Button>
-                </Link>
-              </div>
+              <Link href="/roadtrip">
+                <Button size="lg" className="h-12 px-8 bg-gradient-to-r from-primary via-[hsl(340_85%_55%)] to-accent text-primary-foreground font-semibold shadow-lg shadow-primary/30 transition-all duration-300 hover:shadow-primary/50 hover:-translate-y-0.5 rounded-xl">
+                  🏎️ Jelajahi Roadtrip
+                </Button>
+              </Link>
 
               <details className="group">
-                <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground transition-colors list-none flex items-center gap-1">
+                <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground transition-colors list-none flex items-center gap-1 mt-4">
                   <span className="text-xs">🗺️</span> Cari Rute POI + Estimasi Biaya
                   <svg className="w-3 h-3 ml-1 transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m6 9 6 6 6-6"/></svg>
                 </summary>
@@ -154,23 +145,15 @@ export function Hero() {
                   </div>
                 </div>
               </Link>
-              <div className="grid grid-cols-2 gap-4">
-                <Link href="/products" className="block group">
-                  <div className="overflow-hidden rounded-2xl bg-white shadow-lg border border-border/30 p-5 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                    <span className="text-3xl">🛍️</span>
-                    <p className="mt-2 font-semibold font-heading">Aksesoris Mobil</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">Perlengkapan roadtrip berkualitas</p>
+              <div className="rounded-2xl bg-white shadow-lg border border-border/30 p-5">
+                <div className="flex items-center gap-4">
+                  <span className="text-3xl">🗺️</span>
+                  <div>
+                    <p className="font-semibold font-heading">POI Interaktif</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">SPBU, kuliner, bengkel, spot foto sepanjang rute</p>
                   </div>
-                </Link>
-                <div className="overflow-hidden rounded-2xl bg-white shadow-lg border border-border/30 p-5">
-                  <span className="text-3xl">🚗</span>
-                  <p className="mt-2 font-semibold font-heading">Marketplace Mobil</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Segera hadir</p>
                 </div>
               </div>
-            </div>
-            <div className="absolute -bottom-4 -right-4 flex items-center gap-2 rounded-2xl bg-white px-4 py-2 shadow-lg border border-border/30">
-              <span className="text-sm font-medium text-foreground">✨ 3 Pilar — 1 Platform</span>
             </div>
           </motion.div>
         </motion.div>
@@ -186,10 +169,6 @@ export function Hero() {
             <div className="text-center">
               <span className="text-3xl font-bold font-heading text-primary">{stats.roadtrips}</span>
               <p className="text-sm text-muted-foreground">Roadtrip Itinerary</p>
-            </div>
-            <div className="text-center">
-              <span className="text-3xl font-bold font-heading text-secondary">{stats.products}</span>
-              <p className="text-sm text-muted-foreground">Produk Aksesoris</p>
             </div>
             <div className="text-center">
               <span className="text-3xl font-bold font-heading text-accent">{stats.poi}</span>
