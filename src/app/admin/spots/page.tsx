@@ -26,6 +26,12 @@ const CATEGORIES = [
   { value: "sejarah", label: "Sejarah", color: "amber" },
 ]
 
+const PLATFORM_BADGES: Record<string, { label: string; className: string }> = {
+  facebook: { label: "f", className: "bg-[#1877F2] text-white min-w-[18px]" },
+  instagram: { label: "IG", className: "bg-gradient-to-br from-[#833AB4] via-[#FD1D1D] to-[#FCAF45] text-white min-w-[22px]" },
+  tiktok: { label: "TT", className: "bg-black text-white min-w-[22px]" },
+}
+
 export default function SpotsPage() {
   const [spots, setSpots] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -35,6 +41,7 @@ export default function SpotsPage() {
   const [provinceFilter, setProvinceFilter] = useState("all")
   const [provinceList, setProvinceList] = useState<{ code: string; name: string }[]>([])
   const [loadingProv, setLoadingProv] = useState(true)
+  const [contentStatus, setContentStatus] = useState<Record<string, Record<string, { tone: string; updatedAt: string }>>>({})
   const initialFetchDone = useRef(false)
 
   useEffect(() => {
@@ -64,10 +71,23 @@ export default function SpotsPage() {
     setLoading(false)
   }
 
+  useEffect(() => {
+    fetchContentStatus()
+  }, [])
+
+  async function fetchContentStatus() {
+    try {
+      const res = await fetch("/api/admin/content-generator/status?content_type=spot")
+      const json = await res.json()
+      if (res.ok) setContentStatus(json.data.status || {})
+    } catch {}
+  }
+
   async function handleDelete(slug: string, name: string) {
     if (!confirm(`Hapus "${name}"?`)) return
     await api.spots.delete(slug)
     fetchSpots()
+    fetchContentStatus()
   }
 
   return (
@@ -179,6 +199,24 @@ Tambah Spot
                             Featured
                           </Badge>
                         )}
+                        <div className="flex items-center gap-0.5 shrink-0">
+                          {["facebook", "instagram", "tiktok"].map((p) => {
+                            const hasContent = !!contentStatus[spot.slug]?.[p]
+                            const badge = PLATFORM_BADGES[p]
+                            return (
+                              <span
+                                key={p}
+                                className={`inline-flex items-center gap-0.5 rounded px-1 py-0.5 text-[10px] font-bold leading-none ${
+                                  hasContent ? badge.className : "bg-muted text-muted-foreground/40"
+                                }`}
+                                title={`${p}: ${hasContent ? "Sudah ada" : "Kosong"}`}
+                              >
+                                {badge.label}
+                                {hasContent && <span>●</span>}
+                              </span>
+                            )
+                          })}
+                        </div>
                       </div>
                       <div className="flex items-center gap-2 mt-1">
                         {cat && (

@@ -20,6 +20,7 @@ import {
   LogOut,
   Menu,
   Sparkles,
+  Share2,
 } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useState } from "react"
@@ -31,6 +32,7 @@ const navItems = [
   { href: "/admin/roadtrips", label: "Roadtrips", icon: Map },
   { href: "/admin/media", label: "Media", icon: Image },
   { href: "/admin/regions", label: "Regions", icon: Globe },
+  { href: "/admin/content-generator", label: "Konten Sosmed", icon: Share2 },
   { href: "/admin/prompt-generator", label: "Prompt GPT", icon: Sparkles },
   { href: "/admin/waitlist", label: "Waitlist", icon: Mail },
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
