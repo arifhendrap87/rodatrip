@@ -1,6 +1,7 @@
 import type { NavLink } from "@/types"
 
 export const SITE_NAME = "RodaTrip"
+export const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://gaskuy-roadtrip.vercel.app"
 export const SITE_TAGLINE = "Gas — Plan · Prepare · Go"
 export const SITE_DESCRIPTION = "Platform POI, info jalan, dan perlengkapan roadtrip untuk roadtripper Indonesia."
 

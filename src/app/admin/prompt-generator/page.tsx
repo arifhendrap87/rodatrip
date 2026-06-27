@@ -1,13 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Copy, Sparkles, Check, FileDown } from "lucide-react"
-import { PROVINSI_DATA, PROVINSI_KEYS, generatePrompt, type KotaItem } from "./data"
+import { Copy, Sparkles, Check, FileDown, Loader2 } from "lucide-react"
+import { generatePrompt } from "./data"
 
 function getStopRange(days: number): string {
   if (days <= 1) return "3"
@@ -16,20 +15,67 @@ function getStopRange(days: number): string {
   return "9"
 }
 
+interface WilayahItem {
+  code: string
+  name: string
+}
+
 export default function PromptGeneratorPage() {
+  const [provinsiList, setProvinsiList] = useState<WilayahItem[]>([])
+  const [kotaList, setKotaList] = useState<WilayahItem[]>([])
+  const [loadingProv, setLoadingProv] = useState(true)
+  const [loadingKota, setLoadingKota] = useState(false)
+
+  const [provCode, setProvCode] = useState("32")
   const [provinsi, setProvinsi] = useState("Jawa Barat")
   const [kota, setKota] = useState("Bandung")
   const [days, setDays] = useState(2)
   const [copied, setCopied] = useState(false)
 
-  const prov = PROVINSI_DATA[provinsi]
-  const kotaList: KotaItem[] = prov?.kota || []
+  // Fetch provinces on mount
+  useEffect(() => {
+    setLoadingProv(true)
+    fetch("/api/wilayah/provinces")
+      .then((r) => r.json())
+      .then((json) => {
+        const list = (json.data || []) as WilayahItem[]
+        setProvinsiList(list)
+        // Set default if available
+        const jabar = list.find((p: WilayahItem) => p.code === "32")
+        if (jabar) {
+          setProvCode(jabar.code)
+          setProvinsi(jabar.name)
+        }
+        setLoadingProv(false)
+      })
+      .catch(() => setLoadingProv(false))
+  }, [])
 
-  function handleProvinsiChange(value: string) {
-    setProvinsi(value)
-    const newProv = PROVINSI_DATA[value]
-    if (newProv?.kota?.length > 0) {
-      setKota(newProv.kota[0].value)
+  // Fetch cities when province changes
+  useEffect(() => {
+    if (!provCode) return
+    setLoadingKota(true)
+    setKota("")
+    fetch(`/api/wilayah/regencies/${provCode}`)
+      .then((r) => r.json())
+      .then((json) => {
+        const list = (json.data || []) as WilayahItem[]
+        setKotaList(list)
+        if (list.length > 0) setKota(list[0].name)
+        setLoadingKota(false)
+      })
+      .catch(() => {
+        setKotaList([])
+        setLoadingKota(false)
+      })
+  }, [provCode])
+
+  function handleProvinsiChange(code: string) {
+    const prov = provinsiList.find((p) => p.code === code)
+    if (prov) {
+      setProvCode(code)
+      setProvinsi(prov.name)
+      setKota("")
     }
   }
 
@@ -66,13 +112,18 @@ export default function PromptGeneratorPage() {
               <div className="space-y-2">
                 <Label>Provinsi</Label>
                 <select
-                  value={provinsi}
+                  value={provCode}
                   onChange={(e) => handleProvinsiChange(e.target.value)}
                   className="h-10 w-full rounded-xl border border-border/50 bg-background px-3 text-sm"
+                  disabled={loadingProv}
                 >
-                  {PROVINSI_KEYS.map((key) => (
-                    <option key={key} value={key}>{PROVINSI_DATA[key].label}</option>
-                  ))}
+                  {loadingProv ? (
+                    <option>Memuat provinsi...</option>
+                  ) : (
+                    provinsiList.map((p) => (
+                      <option key={p.code} value={p.code}>{p.name}</option>
+                    ))
+                  )}
                 </select>
               </div>
 
@@ -82,10 +133,17 @@ export default function PromptGeneratorPage() {
                   value={kota}
                   onChange={(e) => setKota(e.target.value)}
                   className="h-10 w-full rounded-xl border border-border/50 bg-background px-3 text-sm"
+                  disabled={loadingKota || !provCode}
                 >
-                  {kotaList.map((k) => (
-                    <option key={k.value} value={k.value}>{k.label}</option>
-                  ))}
+                  {loadingKota ? (
+                    <option>Memuat kota...</option>
+                  ) : kotaList.length === 0 ? (
+                    <option value="">Pilih provinsi dulu</option>
+                  ) : (
+                    kotaList.map((k) => (
+                      <option key={k.code} value={k.name}>{k.name}</option>
+                    ))
+                  )}
                 </select>
               </div>
 

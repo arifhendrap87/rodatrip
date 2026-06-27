@@ -6,6 +6,7 @@ import { useAuth, signOut } from "@/hooks/useAuth"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Toaster } from "@/components/ui/sonner"
+import { ErrorBoundary } from "@/components/ErrorBoundary"
 import {
   LayoutDashboard,
   MapPin,
@@ -120,7 +121,9 @@ export default function AdminLayout({
       {/* Main content */}
       <main className="flex-1 overflow-auto">
         <div className="mx-auto max-w-7xl p-4 pt-14 md:p-8 md:pt-8">
-          {children}
+            <ErrorBoundary>
+              {children}
+            </ErrorBoundary>
         </div>
       </main>
       <Toaster position="top-right" />

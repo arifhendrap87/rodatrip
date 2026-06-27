@@ -37,6 +37,51 @@ async function scrapeImage(link: string): Promise<string> {
   }
 }
 
+async function scrapeDetail(link: string): Promise<{ image_url: string; description: string }> {
+  const result = { image_url: "", description: "" }
+  if (!link) return result
+  try {
+    const res = await fetch(link, { signal: AbortSignal.timeout(8000) })
+    const html = await res.text()
+
+    // Extract image
+    const imgMatch = html.match(/https:\/\/static\.jakmall\.id\/[^"']*images\/products\/[^"']+(?:\.jpg|\.png|\.jpeg|\.webp)/i)
+    result.image_url = imgMatch ? imgMatch[0] : ""
+
+    // Extract meta description (safe, no Vue.js template)
+    const metaMatch = html.match(/<meta\s+name="description"\s+content="([^"]+)"/i)
+    if (metaMatch) {
+      result.description = metaMatch[1]
+        .replace(/&[^;]+;/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+    }
+
+    // Clean any Vue.js template variables left in raw HTML
+    result.description = result.description.replace(/\{\{[^}]+\}\}/g, "").replace(/\s+/g, " ").trim()
+
+    // Fallback: coba pattern class lain
+    if (!result.description || result.description.length < 40) {
+      const descDiv = html.match(/<div[^>]*(?:product-description|deskripsi-produk|product-detail|desc-product)[^>]*>([\s\S]*?)<\/div>/i)
+      if (descDiv) {
+        result.description = descDiv[1]
+          .replace(/<[^>]+>/g, " ")
+          .replace(/&[^;]+;/g, " ")
+          .replace(/\s+/g, " ")
+          .trim()
+      }
+    }
+
+    if (result.description.length > 1000) {
+      result.description = result.description.slice(0, 1000)
+    }
+
+    return result
+  } catch {
+    return result
+  }
+}
+
 export async function POST(request: Request) {
   const admin = await getServerAdmin()
   if (!admin) return unauthorized()
@@ -76,7 +121,7 @@ export async function POST(request: Request) {
       return badRequest("File harus memiliki kolom: Nama Produk, Kode SKU, Harga")
     }
 
-    const parsed: { name: string; sku: string; price: number; weight?: number; dimensions?: string; link?: string; stock: number; image_url?: string }[] = []
+    const parsed: { name: string; sku: string; price: number; weight?: number; dimensions?: string; link?: string; stock: number; image_url?: string; description?: string }[] = []
 
     for (const row of dataRows) {
       const cells = row as unknown[]
@@ -93,10 +138,12 @@ export async function POST(request: Request) {
       parsed.push({ name, sku, price, weight, dimensions, link, stock: parseStatus(status) })
     }
 
-    // Scrape gambar dari setiap link produk
+    // Scrape gambar + deskripsi dari setiap link produk
     await Promise.all(parsed.map(async (item) => {
       if (item.link) {
-        item.image_url = await scrapeImage(item.link)
+        const detail = await scrapeDetail(item.link)
+        item.image_url = detail.image_url
+        item.description = detail.description || undefined
       }
     }))
 
@@ -138,6 +185,7 @@ export async function POST(request: Request) {
             source: "Jakmall",
             external_id: item.sku,
             price: item.price,
+            description: item.description || null,
             weight: item.weight || null,
             dimensions: item.dimensions || null,
             stock_quantity: item.stock,

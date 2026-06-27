@@ -6,7 +6,7 @@ import { api } from "@/lib/api/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
-import { Plus, Edit, Trash2, ExternalLink, Search, FileSpreadsheet, Package, Globe } from "lucide-react"
+import { Plus, Edit, Trash2, ExternalLink, Search, FileSpreadsheet, FileJson, Package, Globe, Sparkles } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -83,10 +83,28 @@ export default function ProductsPage() {
           <p className="text-muted-foreground">Manage e-commerce products ({products.length} total)</p>
         </div>
         <div className="flex items-center gap-2">
+          {products.filter(p => p.source === "Jakmall" && (!p.description || p.description.length < 100)).length > 0 && (
+            <Button variant="outline" size="sm" onClick={() => {
+              const urls = products
+                .filter(p => p.source === "Jakmall" && (!p.description || p.description.length < 100))
+                .map(p => p.name + ': ' + p.jakmall_url)
+                .join('\n')
+              alert('Produk yang perlu di-enrich:\n\n' + urls + '\n\nBeritahu AI untuk enrich produk ini.')
+            }}>
+              <Sparkles className="mr-2 h-4 w-4" />
+              Enrich All ({products.filter(p => p.source === "Jakmall" && (!p.description || p.description.length < 100)).length})
+            </Button>
+          )}
           <Link href="/admin/products/import">
             <Button variant="outline">
               <FileSpreadsheet className="mr-2 h-4 w-4" />
               Import XLSX
+            </Button>
+          </Link>
+          <Link href="/admin/products/import-json">
+            <Button variant="outline">
+              <FileJson className="mr-2 h-4 w-4" />
+              Import JSON
             </Button>
           </Link>
           <Link href="/admin/products/new">
@@ -161,13 +179,16 @@ export default function ProductsPage() {
                       <Package className="h-5 w-5 text-muted-foreground" />
                     )}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-medium truncate">{product.name}</h3>
-                      {product.source === "Jakmall" && (
-                        <span className="shrink-0 rounded bg-emerald-100 text-emerald-700 text-[10px] px-1.5 py-0.5 font-medium">Jakmall</span>
-                      )}
-                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-medium truncate">{product.name}</h3>
+                        {product.source === "Jakmall" && (
+                          <span className="shrink-0 rounded bg-emerald-100 text-emerald-700 text-[10px] px-1.5 py-0.5 font-medium">Jakmall</span>
+                        )}
+                        {product.source === "Jakmall" && product.description && product.description.length > 100 && (
+                          <span className="shrink-0 rounded bg-blue-100 text-blue-700 text-[10px] px-1.5 py-0.5 font-medium">Enriched</span>
+                        )}
+                      </div>
                     <p className="text-sm text-muted-foreground">
                       {product.category} — Rp {product.price.toLocaleString()}
                       {product.external_id && <span className="text-xs text-muted-foreground/60 ml-2">SKU: {product.external_id}</span>}
@@ -179,6 +200,13 @@ export default function ProductsPage() {
                         className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-emerald-100 text-emerald-600" title="Lihat di Jakmall">
                         <Globe className="h-4 w-4" />
                       </a>
+                    )}
+                    {product.source === "Jakmall" && (!product.description || product.description.length < 100) && (
+                      <button
+                        onClick={() => window.open(product.jakmall_url || '', '_blank')}
+                        className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-amber-100 text-amber-600" title="Enrich from Jakmall (buka manual, nanti saya scrap)">
+                        <Sparkles className="h-4 w-4" />
+                      </button>
                     )}
                     <Link href={`/products`} target="_blank" className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted">
                       <ExternalLink className="h-4 w-4" />

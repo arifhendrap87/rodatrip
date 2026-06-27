@@ -8,11 +8,12 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { ArrowLeft, Save, Loader2, Plus, Trash2, ExternalLink } from "lucide-react"
+import { ArrowLeft, Save, Loader2, Plus, Trash2, ExternalLink, Copy, Check } from "lucide-react"
 import Link from "next/link"
 import { SpotSelect } from "@/components/admin/SpotSelect"
 import { ImageUpload } from "@/components/ui/image-upload"
 import { toast } from "sonner"
+import { SITE_URL } from "@/lib/constants"
 
 interface StopForm { key: string; stopNumber: number; name: string; spotSlug: string }
 let stopKeyCounter = 0
@@ -25,14 +26,17 @@ export default function EditRoadtripPage() {
   const slug = params.slug as string
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [copied, setCopied] = useState(false)
   const [form, setForm] = useState({ title: "", itineraryDuration: "", totalDistance: "", roadCondition: "", estimatedCost: "", bestDrivingTime: "", routeFacilities: "", mapsEmbedUrl: "", drivingSafetyTips: "", culinaryNotes: "", coverImage: "", isPublished: false })
   const [stops, setStops] = useState<StopForm[]>([])
+  const [fullData, setFullData] = useState<any>(null)
 
   useEffect(() => {
     async function load() {
       try {
         const res = await api.admin.itineraries.get(slug)
         const d = res.data as any
+        setFullData(d)
         setForm({
           title: d.title || "", itineraryDuration: d.itineraryDuration || d.itinerary_duration || "", totalDistance: d.totalDistance || d.total_distance || "",
           roadCondition: d.roadCondition || d.road_condition || "", estimatedCost: d.estimatedCost || d.estimated_cost || "",
@@ -67,6 +71,120 @@ export default function EditRoadtripPage() {
     try { await api.admin.itineraries.update(slug, data as unknown as Record<string, unknown>); router.push("/admin/roadtrips") }
     catch (err) { toast.error("Error: " + (err as Error).message) }
     setSaving(false)
+  }
+
+  function generateFacebookText(): string {
+    const d = fullData || form
+    const lines: string[] = []
+
+    lines.push(`🚗 ROAD TRIP: ${d.title}`)
+    lines.push(`⏱️ ${d.itineraryDuration || d.itineraryDuration}${d.totalDistance ? ` · 📏 ${d.totalDistance}` : ""}${d.estimatedCost ? ` · 💸 ${d.estimatedCost}` : ""}`)
+    lines.push("")
+
+    if (d.coverImage) {
+      lines.push(`📸 COVER:`)
+      lines.push(`🖼️ ${d.coverImage}`)
+      lines.push("")
+    }
+
+    if (d.roadCondition) {
+      lines.push(`🛣️ KONDISI JALAN:`)
+      lines.push(`   ${d.roadCondition}`)
+      lines.push("")
+    }
+
+    if (d.bestDrivingTime) {
+      lines.push(`🌅 WAKTU TERBAIK:`)
+      lines.push(`   ${d.bestDrivingTime}`)
+      lines.push("")
+    }
+
+    if (d.routeFacilities && Array.isArray(d.routeFacilities) && d.routeFacilities.length > 0) {
+      lines.push(`⛽ FASILITAS JALUR:`)
+      lines.push(`   ${d.routeFacilities.join(", ")}`)
+      lines.push("")
+    }
+
+    const stopsData = fullData?.stops || []
+    if (stopsData.length > 0) {
+      lines.push(`📍 DESTINASI (${stopsData.length} stop):`)
+      lines.push("")
+      stopsData.forEach((stop: any, i: number) => {
+        const catEmojis: Record<string, string> = { alam: "🏔️", kuliner: "🍜", budaya: "🏛️", sejarah: "🏛️", petualangan: "🏞️", foto: "📸" }
+        const emoji = catEmojis[stop.category] || "📍"
+        lines.push(`${i + 1}. ${emoji} ${stop.name}${stop.category ? ` (${stop.category})` : ""}`)
+
+        const infoParts: string[] = []
+        if (stop.ticketPrice) infoParts.push(`🎟️ ${stop.ticketPrice}`)
+        if (stop.parkingFee) infoParts.push(`🅿️ ${stop.parkingFee}`)
+        if (stop.visitDuration) infoParts.push(`⏱️ ${stop.visitDuration}`)
+        if (stop.bestVisitHour) infoParts.push(`🕐 ${stop.bestVisitHour}`)
+        if (stop.physicalEffort) infoParts.push(`🏃 ${stop.physicalEffort}`)
+        if (stop.rating) infoParts.push(`⭐ ${stop.rating}/5`)
+        if (infoParts.length > 0) lines.push(`   ${infoParts.join(" | ")}`)
+
+        if (stop.description) {
+          const cleanDesc = stop.description.replace(/<[^>]+>/g, "").trim().slice(0, 250)
+          lines.push(`   ${cleanDesc}`)
+        }
+
+        if (stop.spotImportantNote) {
+          lines.push(`   ⚠️ ${stop.spotImportantNote.replace(/<[^>]+>/g, "").trim().slice(0, 150)}`)
+        }
+
+        if (stop.imageUrl) lines.push(`   🖼️ ${stop.imageUrl}`)
+
+        // Handle images array (bisa berisi object {url} atau string)
+        if (stop.images && stop.images.length > 0) {
+          const imgUrls = stop.images.slice(0, 5).map((img: any) => typeof img === "string" ? img : (img.url || "")).filter(Boolean)
+          if (imgUrls.length > 0) lines.push(`   📷 ${imgUrls.join(", ")}`)
+        }
+
+        // Nearby hotels with nested restaurants
+        if (stop.nearbyHotels && stop.nearbyHotels.length > 0) {
+          lines.push(`   🏨 Hotel Terdekat:`)
+          stop.nearbyHotels.slice(0, 3).forEach((h: any) => {
+            const hotelLine = `   • ${h.name}${h.distance ? ` (${h.distance})` : ""}${h.price ? ` — ${h.price}` : ""}`
+            lines.push(hotelLine)
+            if (h.nearby_restaurants && h.nearby_restaurants.length > 0) {
+              h.nearby_restaurants.slice(0, 2).forEach((r: any) => {
+                lines.push(`     🍜 ${r.name}${r.distance ? ` (${r.distance})` : ""}${r.price ? ` — ${r.price}` : ""}`)
+              })
+            }
+          })
+        }
+
+        lines.push("")
+      })
+    }
+
+    if (d.drivingSafetyTips) {
+      lines.push(`⚠️ TIPS KESELAMATAN:`)
+      lines.push(`   ${d.drivingSafetyTips}`)
+      lines.push("")
+    }
+
+    if (d.culinaryNotes) {
+      lines.push(`🍜 CATATAN KULINER:`)
+      lines.push(`   ${d.culinaryNotes.replace(/\\n/g, "\n   ")}`)
+      lines.push("")
+    }
+
+    lines.push(`🔗 Detail: ${SITE_URL}/roadtrip/${slug}`)
+
+    return lines.join("\n")
+  }
+
+  async function handleCopy() {
+    const text = generateFacebookText()
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+      toast.success("Teks disalin! Tinggal paste ke Facebook")
+      setTimeout(() => setCopied(false), 3000)
+    } catch {
+      toast.error("Gagal menyalin ke clipboard")
+    }
   }
 
   if (loading) return <div className="py-12 text-center text-muted-foreground">Loading...</div>
@@ -131,8 +249,12 @@ export default function EditRoadtripPage() {
           <Button type="submit" disabled={saving}>{saving ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</> : <><Save className="mr-2 h-4 w-4" /> Update</>}</Button>
           <Link href="/admin/roadtrips"><Button variant="outline">Cancel</Button></Link>
           <div className="flex-1" />
+          <Button type="button" variant="outline" onClick={handleCopy}>
+            {copied ? <Check className="mr-2 h-4 w-4 text-green-500" /> : <Copy className="mr-2 h-4 w-4" />}
+            {copied ? "Tersalin!" : "Copy untuk Facebook"}
+          </Button>
           <Button type="button" variant="outline" onClick={() => window.open(
-            `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://gaskuy-roadtrip.vercel.app/roadtrip/${slug}`)}`,
+            `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`${SITE_URL}/roadtrip/${slug}`)}`,
             "_blank", "width=600,height=400"
           )}>
             <ExternalLink className="mr-2 h-4 w-4" />
