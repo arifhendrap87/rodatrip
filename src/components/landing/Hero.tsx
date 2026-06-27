@@ -34,7 +34,7 @@ export function Hero() {
         className="object-cover"
         priority
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-white/70 via-white/50 to-white/20" />
+      <div className="absolute inset-0 bg-gradient-to-r from-white/85 via-white/75 to-white/60" />
       <div className="absolute inset-0 bg-gradient-to-t from-primary/[0.08] via-transparent to-transparent" />
       <BlobBackground position="top-right" className="opacity-70" />
       <BlobBackground position="bottom-left" className="opacity-50" />
@@ -132,30 +132,6 @@ export function Hero() {
             </motion.div>
           </div>
 
-          <motion.div variants={heroItem} className="relative hidden lg:block">
-            <div className="space-y-4">
-              <Link href="/roadtrip" className="block group">
-                <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg border border-border/30 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <div className="aspect-[16/9] bg-gradient-to-br from-primary/10 via-accent/5 to-background flex items-center justify-center">
-                    <div className="text-center p-6">
-                      <span className="text-5xl">🏎️</span>
-                      <h3 className="mt-3 text-xl font-bold font-heading">Jelajahi Roadtrip Kurasi</h3>
-                      <p className="mt-1 text-sm text-muted-foreground">Panduan itinerary lengkap dengan timeline, estimasi biaya, dan tips perjalanan</p>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-              <div className="rounded-2xl bg-white shadow-lg border border-border/30 p-5">
-                <div className="flex items-center gap-4">
-                  <span className="text-3xl">🗺️</span>
-                  <div>
-                    <p className="font-semibold font-heading">POI Interaktif</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">SPBU, kuliner, bengkel, spot foto sepanjang rute</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
         </motion.div>
 
         <motion.div
