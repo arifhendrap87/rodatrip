@@ -6,6 +6,7 @@ interface ContentSource {
   whySpecial?: string
   category?: string
   province?: string
+  city?: string
   region?: string
   price?: string
   parkingFee?: string
@@ -41,407 +42,454 @@ function stars(rating?: number): string {
   return "⭐".repeat(Math.round(rating))
 }
 
-const platformSpecs: Record<string, { maxChars: string; style: string; structure: string }> = {
-  facebook: { maxChars: "1.000-2.000", style: "Storytelling, personal, emoji tiap segmen", structure: "Hook → Detail → Tips → CTA" },
-  instagram: { maxChars: "150-300 (tanpa hashtag)", style: "Estetik, ringan, emoji", structure: "Hook visual → Deskripsi → CTA → 10-15 Hashtag" },
-  tiktok: { maxChars: "15-60 detik", style: "Cepat, engaging, text overlay", structure: "Hook → Info → Tips → CTA → Outro" },
+const CATEGORY_EMOJI: Record<string, string> = {
+  alam: "🏔️", kuliner: "🍜", budaya: "🏛️", foto: "📸", petualangan: "🏞️", sejarah: "🏛️",
 }
 
-function specHeader(platform: string, tone: string): string {
-  const spec = platformSpecs[platform]
-  return `╔══════════════════════════════════════╗
-║ ${platform.toUpperCase()} — ${tone} 
-║ ══════════════════════════════════
-║ 📊 Karakter: ${spec.maxChars}
-║ 🎨 Gaya: ${spec.style}
-║ 📋 Struktur: ${spec.structure}
-╚══════════════════════════════════════`
+const ENGAGEMENT_HOOKS: Record<string, string[]> = {
+  facebook: [
+    "👇 Komen destinasi roadtrip favorit kamu!",
+    "🔖 Simpan buat referensi perjalanan berikutnya!",
+    "Tag temen yang suka jalan-jalan 👇",
+    "Udah pernah ke sini? Cerita dong di komentar!",
+    "Share ke group roadtrip biar pada tau!",
+  ],
+  instagram: [
+    "👇 Udah pernah ke sini? Cerita!",
+    "🔖 Simpan buat wishlist roadtrip!",
+    "Tag temen yang wajib diajak! 👇",
+    "Komen angka 1-10 buat rating tempat ini!",
+  ],
+  tiktok: [
+    "Follow @rodatrip.id buat rekomendasi roadtrip!",
+    "Share ke temen yang suka jalan-jalan!",
+    'Komen "MAU" kalo pengen ke sini!',
+  ],
 }
 
-function specFooter(platform: string): string {
-  if (platform === "facebook") return "\n\n───\n💡 Tips publikasi: Post pukul 07.00-09.00 atau 19.00-21.00 WIB untuk engagement maksimal. Sertakan foto cover roadtrip sebagai thumbnail."
-  if (platform === "instagram") return "\n\n───\n💡 Tips publikasi: Post pukul 11.00-13.00 atau 19.00-21.00 WIB. Gunakan foto landscape atau portrait 4:5. Simpan hashtag di komentar pertama."
-  return "\n\n───\n💡 Tips publikasi: Post pukul 07.00-09.00 atau 19.00-23.00 WIB. Gunakan musik trending. Durasi optimal 21-34 detik."
+function randomHook(platform: string): string {
+  const hooks = ENGAGEMENT_HOOKS[platform] || ENGAGEMENT_HOOKS.facebook
+  return hooks[Math.floor(Math.random() * hooks.length)]
 }
 
-function fbParagraf1Hook(source: ContentSource): string {
-  if (source.type === "spot") {
-    return `${source.description?.slice(0, 120) || `Bosan sama destinasi yang itu-itu aja? Yuk, explore ${source.title}!`}`
+function getCategoryEmoji(source: ContentSource): string {
+  return CATEGORY_EMOJI[source.category || ""] || "📍"
+}
+
+function fullDetail(source: ContentSource): string {
+  const lines: string[] = []
+  if (source.province) lines.push(`📍 ${source.province}${source.city ? `, ${source.city}` : ""}`)
+  if (source.price) lines.push(`🎟️ ${source.price}`)
+  if (source.parkingFee) lines.push(`🅿️ ${source.parkingFee}`)
+  if (source.openingHours) lines.push(`🕐 ${source.openingHours}`)
+  if (source.bestTime) lines.push(`⏰ ${source.bestTime}`)
+  if (source.visitDuration) lines.push(`⏱️ ${source.visitDuration}`)
+  if (source.physicalEffort) lines.push(`🏃 ${source.physicalEffort}`)
+  if (source.roadAccess) lines.push(`🛣️ ${source.roadAccess}`)
+  if (source.distanceFromCity) lines.push(`📏 ${source.distanceFromCity}`)
+  if (source.rating) lines.push(`${stars(source.rating)} ${source.rating}/5`)
+  if (source.additionalCost) lines.push(`💸 ${source.additionalCost}`)
+  if (source.spotImportantNote) lines.push(`⚠️ ${source.spotImportantNote}`)
+  if (source.facilities && source.facilities.length > 0) lines.push(`🔧 ${source.facilities.slice(0, 5).join(" · ")}`)
+  if (source.nearbyHotels) {
+    try {
+      const hotels = JSON.parse(source.nearbyHotels) as { name: string; distance?: string }[]
+      if (hotels.length > 0) lines.push(`🏨 Terdekat: ${hotels.slice(0, 2).map(h => `${h.name}${h.distance ? ` (${h.distance})` : ""}`).join(", ")}`)
+    } catch {}
   }
-  return `${source.description?.slice(0, 120) || `Roadtrip seru ke ${source.title} — siap-siap bikin liburanmu makin berkesan!`}`
+  return lines.join("\n")
 }
 
-function fbParagraf2Detail(source: ContentSource): string {
-  if (source.type === "spot") {
-    let detail = `📍 ${source.title}`
-    if (source.province) detail += `\n📍 ${source.province}`
-    if (source.price) detail += `\n🎟️ ${source.price}`
-    if (source.bestTime) detail += `\n⏰ ${source.bestTime}`
-    if (source.rating) detail += `\n${stars(source.rating)} ${source.rating}/5`
-    return detail
+function detailCompact(source: ContentSource): string {
+  const parts: string[] = []
+  if (source.price) parts.push(`🎟️ ${source.price}`)
+  if (source.bestTime) parts.push(`⏰ ${source.bestTime}`)
+  if (source.visitDuration) parts.push(`⏱️ ${source.visitDuration}`)
+  if (source.rating) parts.push(`${stars(source.rating)}`)
+  return parts.join(" | ")
+}
+
+function engagementLine(platform: string): string {
+  return `\n\n${randomHook(platform)}`
+}
+
+function ctaLine(): string {
+  return `\n👉 RodaTrip — rencanakan roadtrip impianmu!\nhttps://rodatrip.id`
+}
+
+// ─── PER-KATEGORI HOOK ───
+
+function categoryHook(source: ContentSource): string {
+  const cat = source.category || ""
+  const title = source.title
+  const desc = source.description?.slice(0, 120) || ""
+  const special = source.whySpecial?.slice(0, 100) || ""
+  const emoji = getCategoryEmoji(source)
+
+  const hooks: Record<string, string> = {
+    alam: `${emoji} ${title} — alamnya masih perawan banget! ${desc ? `\n${desc}` : ""}`,
+    kuliner: `${emoji} ${title} — surga kuliner yang wajib kamu cobain! ${desc ? `\n${desc.slice(0, 100)}` : ""}`,
+    budaya: `${emoji} ${title} — kaya akan budaya dan sejarah! ${desc ? `\n${desc}` : ""}`,
+    foto: `${emoji} ${title} — spot foto paling estetik! ${desc ? `\n${desc}` : ""}`,
+    petualangan: `${emoji} ${title} — tantangan seru buat jiwa petualang! ${desc || ""}`,
+    sejarah: `${emoji} ${title} — menyimpan cerita dari masa lalu. ${desc ? `\n${desc.slice(0, 100)}` : ""}`,
   }
-  let detail = `📍 ${source.title}`
-  if (source.province) detail += `\n📍 ${source.province}`
-  if (source.duration) detail += `\n📅 ${source.duration}`
-  if (source.totalDistance) detail += `\n📏 ${source.totalDistance}`
-  if (source.estimatedCost) detail += `\n💰 ${source.estimatedCost}`
-  if (source.stops && source.stops.length > 0) {
-    detail += `\n🗺️ Rute:\n${source.stops.map((s, i) => `  ${i + 1}. ${s.name}`).join("\n")}`
-  }
-  return detail
+  return hooks[cat] || `${emoji} ${title} — ${desc || "wajib dikunjungi!"}`
 }
 
-function fbParagraf3Tips(source: ContentSource): string {
-  const tip = source.tips || "Pastikan kendaraan dalam kondisi prima sebelum berangkat. Cek perlengkapan roadtrip di RodaTrip Shop!"
-  return `💡 ${tip}`
-}
+// ─── FACEBOOK ───
 
-function fbParagraf4CTA(): string {
-  return `👇 Yuk, rencanakan roadtrip impianmu!
-Kunjungi RodaTrip untuk itinerary lengkap dan perlengkapan roadtrip
-👉 https://rodatrip.id`
-}
+function facebookPromo(source: ContentSource): string {
+  const isSpot = source.type === "spot"
+  const emoji = getCategoryEmoji(source)
+  const hook = categoryHook(source)
+  const detail = fullDetail(source)
+  const tip = source.tips || ""
+  const engage = engagementLine("facebook")
 
-export function generateFacebookPromo(source: ContentSource): string {
-  return `╔══════════════════════════════════════╗
-║ FACEBOOK — PROMO
-║ ══════════════════════════════════
-║ 📊 1.000-2.000 karakter | 🎨 Informatif + CTA
-║ 📋 Hook → Detail → Harga/Tips → CTA
-╚══════════════════════════════════════
+  return isSpot
+    ? `${emoji} SPOT ISTIMEWA: ${source.title}
 
-━━━ PARAGRAF 1 — HOOK ━━━
-🚗 ${source.type === "spot" ? "SPOT SPOTLIGHT" : "ROAD TRIP"}: ${source.title}
+${hook}
 
-${fbParagraf1Hook(source)}
+━━━ LENGKAP ―――
+${detail}
+${tip ? `\n💡 ${tip}` : ""}
+${engage}
+${ctaLine()}`
+    : `🚗 ROAD TRIP: ${source.title}
 
-━━━ PARAGRAF 2 — DETAIL ━━━
-${fbParagraf2Detail(source)}
+${hook}
 
-━━━ PARAGRAF 3 — TIPS ━━━
-${fbParagraf3Tips(source)}
-
-━━━ PARAGRAF 4 — CTA ━━━
-${fbParagraf4CTA()}
-
-───
-#RoadtripIndonesia #RodaTrip${source.title ? ` #${source.title.replace(/\s+/g, "")}` : ""} #JalanJalan${specFooter("facebook")}`
-}
-
-export function generateFacebookEdukasi(source: ContentSource): string {
-  return `╔══════════════════════════════════════╗
-║ FACEBOOK — EDUKASI
-║ ══════════════════════════════════
-║ 📊 800-1.500 karakter | 🎨 Informatif, memberikan wawasan
-║ 📋 Fakta → Informasi detail → Tips praktis → CTA
-╚══════════════════════════════════════
-
-━━━ PARAGRAF 1 — FAKTA ━━━
-🧐 TAHUKAH KAMU?
-
-${source.description?.slice(0, 150) || source.title}
-
-━━━ PARAGRAF 2 — INFORMASI ━━━
-${source.type === "spot" ? `📍 ${source.title} ${source.province ? `— ${source.province}` : ""}
-${source.price ? `🎟️ ${source.price}` : ""}
-${source.bestTime ? `⏰ ${source.bestTime}` : ""}` : `📍 ${source.title}
+━━━ RUTE ―――
 ${source.duration ? `📅 ${source.duration}` : ""}
-${source.estimatedCost ? `💰 ${source.estimatedCost}` : ""}`}
+${source.totalDistance ? `📏 ${source.totalDistance}` : ""}
+${source.estimatedCost ? `💰 ${source.estimatedCost}` : ""}
+${source.stops?.map((s, i) => `📍 Stop ${i + 1}: ${s.name}`).join("\n") || ""}
 
-━━━ PARAGRAF 3 — TIPS PRAKTIS ━━━
-💡 ${source.tips || "Persiapkan diri sebelum berangkat! Pastikan kendaraan dalam kondisi prima dan bawa perlengkapan darurat."}
-
-━━━ PARAGRAF 4 — CTA ━━━
-Jadi, udah siap roadtrip? 🚗💨
-Rencanakan perjalananmu di 👉 https://rodatrip.id
-
-───
-#TipsRoadtrip #TravelTips #RodaTrip #JalanJalanIndonesia${specFooter("facebook")}`
+${tip ? `💡 ${tip}` : ""}
+${engage}
+${ctaLine()}`
 }
 
-export function generateFacebookInspirasi(source: ContentSource): string {
-  const stopsList = source.stops?.map((s, i) => `  ${i + 1}. ${s.name}${s.category ? ` (${s.category})` : ""}`).join("\n") || ""
+function facebookEdukasi(source: ContentSource): string {
+  const isSpot = source.type === "spot"
+  const emoji = getCategoryEmoji(source)
+  const special = source.whySpecial
+  const detail = fullDetail(source)
 
-  return `╔══════════════════════════════════════╗
-║ FACEBOOK — INSPIRASI
-║ ══════════════════════════════════
-║ 📊 800-1.500 karakter | 🎨 Storytelling, menggugah
-║ 📋 Hook emosional → Deskripsi → Ajakan interaksi
-╚══════════════════════════════════════
+  return `${emoji} ${source.title} — Fakta Menarik!
 
-━━━ PARAGRAF 1 — HOOK EMOSIONAL ━━━
-🌅 ADA YANG BERBEDA HARI INI...
+${special || source.description?.slice(0, 150) || `Tahukah kamu tentang ${source.title}?`}
 
-${source.description || `Kadang, jalan-jalan terbaik adalah yang tidak direncanakan. Tapi kali ini, ${source.title} berhasil bikin kami terpana!`}
+━━━ DETAIL ―――
+${detail}
 
-━━━ PARAGRAF 2 — CERITA ━━━
-${stopsList ? `🗺️ ${source.stops?.length || 0} destinasi seru menanti:\n${stopsList}` : `📍 ${source.title} ${source.province ? `— ${source.province}` : ""}`}
-
-${source.tips ? `\n📝 ${source.tips}` : ""}
-
-━━━ PARAGRAF 3 — AJAKAN ━━━
-Kapan terakhir kali kamu roadtrip? Cerita di kolom komentar! 👇
-
-Buat roadtrip impianmu jadi kenyataan bersama RodaTrip 🚗💨
-👉 https://rodatrip.id
-
-───
-#InspirasiJalanJalan #Roadtrip #${source.title?.replace(/\s+/g, "") || "Liburan"} #RodaTrip${specFooter("facebook")}`
+${source.tips ? `\n💡 ${source.tips}` : ""}
+${engagementLine("facebook")}
+${ctaLine()}`
 }
 
-export function generateFacebookStorytelling(source: ContentSource): string {
-  return `╔══════════════════════════════════════╗
-║ FACEBOOK — STORYTELLING
-║ ══════════════════════════════════
-║ 📊 1.500-2.500 karakter | 🎨 Naratif personal
-║ 📋 Pembukaan → Perjalanan → Momen puncak → Penutup
-╚══════════════════════════════════════
+function facebookInspirasi(source: ContentSource): string {
+  const desc = source.description?.slice(0, 200) || ""
+  const stopsList = source.stops?.map((s, i) => `  ${i + 1}. ${s.name}`).join("\n") || ""
+  const hotelInfo = source.nearbyHotels ? (() => {
+    try {
+      const hotels = JSON.parse(source.nearbyHotels) as { name: string; distance?: string }[]
+      return hotels.slice(0, 2).map(h => `🏨 ${h.name}${h.distance ? ` (${h.distance})` : ""}`).join("\n")
+    } catch { return "" }
+  })() : ""
 
-━━━ PEMBUKAAN ━━━
-✨ PERJALANAN YANG TAK TERLUPAKAN
+  return `🌅 ${source.title}
 
-${source.description?.slice(0, 200) || `Roadtrip ke ${source.title} adalah salah satu pengalaman yang gak akan pernah kami lupakan.`}
+${desc || `${source.title} adalah salah satu destinasi yang bikin kita pengen balik lagi dan lagi.`}
 
-━━━ PERJALANAN ━━━
-${source.stops && source.stops.length > 0 ? `🗺️ Rute perjalanan hari itu:\n${source.stops.map((s, i) => `  Stop ${i + 1}: ${s.name}`).join("\n")}` : `📍 ${source.title}`}
+${stopsList ? `🗺️ ${source.stops?.length || 0} destinasi:\n${stopsList}` : ""}
+${hotelInfo ? `\n${hotelInfo}` : ""}
 
-${source.duration ? `\n📅 Perjalanan ${source.duration}` : ""}
-
-━━━ MOMEN PUNCAK ━━━
-${source.tips || "Yang paling berkesan? Bukan destinasi utamanya, tapi perjalanan dan momen-momen kecil di sepanjang jalan."}
-
-━━━ PENUTUP ━━━
-💬 ${source.tips || "Roadtrip itu bukan cuma soal tujuan, tapi juga perjalanan dan cerita yang kamu bawa pulang."}
-
-Buat roadtrip impianmu jadi kenyataan bersama RodaTrip! 🚗💨
-👉 https://rodatrip.id
-
-───
-#CeritaPerjalanan #RoadtripIndonesia #RodaTrip #TravelStory${specFooter("facebook")}`
+${source.tips ? `💡 ${source.tips}` : ""}
+${engagementLine("facebook")}
+${ctaLine()}`
 }
 
-export function generateInstagramPromo(source: ContentSource): string {
-  const caption = source.type === "spot"
-    ? `✨ ${source.title} — hidden gem wajib dikunjungi!`
-    : `🚗 ROAD TRIP: ${source.title}`
+function facebookStorytelling(source: ContentSource): string {
+  const desc = source.description?.slice(0, 250) || ""
+  const special = source.whySpecial?.slice(0, 150) || ""
+  const tip = source.tips || ""
 
-  const detail = source.type === "spot"
-    ? `📍 ${source.province || "Indonesia"}${source.price ? `\n🎟️ ${source.price}` : ""}`
-    : `${source.duration ? `📅 ${source.duration} ` : ""}${source.totalDistance ? `| ${source.totalDistance}` : ""}${source.estimatedCost ? `\n💰 ${source.estimatedCost}` : ""}`
+  const paragraphs: string[] = []
 
-  return `╔══════════════════════════════════════╗
-║ INSTAGRAM — PROMO
-║ ══════════════════════════════════
-║ 📊 150-300 karakter | 🎨 Estetik, ajakan
-║ 📋 Hook visual → Detail singkat → CTA → 12-15 hashtag
-╚══════════════════════════════════════
+  // Opening
+  paragraphs.push(`✨ ${source.title} — Perjalanan yang Tak Terlupakan
 
-━━━ CAPTION ━━━
-${caption}
+${desc || `Perjalanan ke ${source.title} adalah salah satu yang paling berkesan. Bukan cuma karena pemandangannya, tapi karena momen-momen kecil yang terjadi di sepanjang jalan.`}`)
 
+  // Middle
+  const middleParts: string[] = []
+  if (special) middleParts.push(`Yang bikin tempat ini spesial: ${special}.`)
+  if (source.rating) middleParts.push(`Rating ${source.rating}/5 dari pengunjung — dan setuju banget!`)
+  if (source.physicalEffort || source.bestTime) middleParts.push(`${source.physicalEffort ? `Tingkat kesulitan: ${source.physicalEffort}. ` : ""}${source.bestTime ? `Waktu terbaik: ${source.bestTime}.` : ""}`)
+
+  if (middleParts.length > 0) {
+    paragraphs.push(`━━━ PENGALAMAN ―――
+
+${middleParts.join("\n")}`)
+  }
+
+  // Closing
+  paragraphs.push(`━━━ PESAN ―――
+
+${tip || `Roadtrip itu bukan cuma soal tujuan, tapi juga perjalanan dan cerita yang kamu bawa pulang. ${source.title} adalah salah satu cerita yang gak akan pernah terlupakan.`}
+
+${engagementLine("facebook")}
+${ctaLine()}`)
+
+  return paragraphs.join("\n\n")
+}
+
+// ─── INSTAGRAM ───
+
+function instagramPromo(source: ContentSource): string {
+  const emoji = getCategoryEmoji(source)
+  const hook = categoryHook(source)
+  const compact = detailCompact(source)
+  const detail = fullDetail(source)
+  const h = randomHook("instagram")
+
+  return `${emoji} ${source.title}
+
+${hook}
+
+${compact}
+
+━━━ INFO ―――
+${detail}
+
+${h}`
+}
+
+function instagramEdukasi(source: ContentSource): string {
+  const special = source.whySpecial || ""
+  const detail = fullDetail(source)
+
+  return `🧐 TAHUKAH KAMU?
+
+${special || source.description?.slice(0, 120) || ""}
+
+━━━ INFO ―――
 ${detail}
 
 ${source.tips ? `💡 ${source.tips}` : ""}
-${stars(source.rating)}
 
-👇 Udah pernah ke sini?
-
-━━━ HASHTAG (simpan di komentar pertama) ━━━
-#${source.title?.replace(/\s+/g, "") || "Explore"} #RoadtripIndonesia #RodaTrip
-#JalanJalan #HiddenGem #ExploreIndonesia #TravelIndonesia
-#LiburanSeru #JalanJalanYuk #${source.province?.replace(/\s+/g, "") || "Wisata"} #TripSeru${specFooter("instagram")}`
+${randomHook("instagram")}`
 }
 
-export function generateInstagramEdukasi(source: ContentSource): string {
-  return `╔══════════════════════════════════════╗
-║ INSTAGRAM — EDUKASI
-║ ══════════════════════════════════
-║ 📊 150-250 karakter | 🎨 Informatif, estetik
-║ 📋 Fakta singkat → Detail → Tips → 10-12 hashtag
-╚══════════════════════════════════════
+function instagramInspirasi(source: ContentSource): string {
+  const emoji = getCategoryEmoji(source)
 
-━━━ CAPTION ━━━
-🧐 TAHUKAH KAMU?
-
-${source.description?.slice(0, 120) || ""}${(source.description?.length || 0) > 120 ? "..." : ""}
-
-📍 ${source.title}
-${source.tips ? `💡 ${source.tips}` : ""}
-${stars(source.rating)}
-
-━━━ HASHTAG ━━━
-#TipsRoadtrip #TravelTips #RodaTrip
-#${source.title?.replace(/\s+/g, "") || "Explore"} #JalanJalanIndonesia
-#${source.province?.replace(/\s+/g, "") || "Wisata"} #TripSeru${specFooter("instagram")}`
-}
-
-export function generateInstagramInspirasi(source: ContentSource): string {
-  return `╔══════════════════════════════════════╗
-║ INSTAGRAM — INSPIRASI
-║ ══════════════════════════════════
-║ 📊 100-200 karakter | 🎨 Estetik, menggugah
-║ 📋 Hook visual → Deskripsi → Ajakan interaksi → hashtag
-╚══════════════════════════════════════
-
-━━━ CAPTION ━━━
-🌅 ${source.title}
+  return `${emoji} ${source.title}
 
 ${source.description?.slice(0, 100) || ""}${(source.description?.length || 0) > 100 ? "..." : ""}
 
+${source.whySpecial ? `✨ ${source.whySpecial.slice(0, 80)}` : ""}
 ${stars(source.rating)}
 
-👇 Udah pernah ke sini? Cerita dong!
-
-━━━ HASHTAG ━━━
-#InspirasiJalanJalan #${source.title?.replace(/\s+/g, "") || "Liburan"}
-#RodaTrip #ExploreIndonesia #${source.province?.replace(/\s+/g, "") || "Wisata"}${specFooter("instagram")}`
+${randomHook("instagram")}`
 }
 
-export function generateInstagramStorytelling(source: ContentSource): string {
-  return `╔══════════════════════════════════════╗
-║ INSTAGRAM — STORYTELLING
-║ ══════════════════════════════════
-║ 📊 150-250 karakter | 🎨 Naratif personal
-║ 📋 Cerita singkat → Lokasi → Ajakan → hashtag
-╚══════════════════════════════════════
+function instagramStorytelling(source: ContentSource): string {
+  return `✨ ${source.description?.slice(0, 120) || `Pernah ke ${source.title}?}`}${(source.description?.length || 0) > 120 ? "..." : ""}
 
-━━━ CAPTION ━━━
-✨ ${source.description?.slice(0, 100) || `Roadtrip ke ${source.title}, siapa mau?`}${(source.description?.length || 0) > 100 ? "..." : ""}
+${source.whySpecial ? `💬 "${source.whySpecial.slice(0, 100)}"` : ""}
 
-📍 ${source.title}
-${source.province ? `📍 ${source.province}` : ""}
+📍 ${source.title}${source.province ? `, ${source.province}` : ""}
+
+${source.tips ? `💡 ${source.tips.slice(0, 80)}` : ""}
 
 Kapan nih roadtrip bareng RodaTrip? 🚗💨
 
-━━━ HASHTAG ━━━
-#CeritaPerjalanan #RoadtripIndonesia #RodaTrip
-#TravelStory #${source.province?.replace(/\s+/g, "") || "JalanJalan"}${specFooter("instagram")}`
+━━━ INFO ―――
+${fullDetail(source)}
+
+${randomHook("instagram")}`
 }
 
-export function generateTikTokScript(source: ContentSource, tone: string): string {
-  const isSpot = source.type === "spot"
-  const baseTitle = source.title
-  const description = source.description?.slice(0, 100) || ""
-  const tips = source.tips || "Jangan lupa siapkan kendaraan sebelum roadtrip!"
-  const priceInfo = isSpot ? `Tiket cuma ${formatCurrency(source.price || "")}` : `Estimasi ${source.estimatedCost || "—"}`
+// ─── TIKTOK ───
+
+function tiktokPromo(source: ContentSource): string {
+  const emoji = getCategoryEmoji(source)
+  const title = source.title
   const location = source.province || "Indonesia"
-  const stopsList = source.stops?.slice(0, 3).map(s => s.name).join(", ") || baseTitle
+  const desc = source.description?.slice(0, 80) || ""
+  const tips = source.tips || ""
+  const priceInfo = source.type === "spot" ? `Tiket ${source.price || "—"}` : `Estimasi ${source.estimatedCost || "—"}`
 
-  const scripts: Record<string, string> = {
-    promo: `╔══════════════════════════════════════╗
-║ TIKTOK — PROMO
-║ ══════════════════════════════════
-║ ⏱️ 45-60 detik | 🎵 Musik upbeat/trending
-║ 📋 Hook → Info → Tips → CTA → Outro
-╚══════════════════════════════════════
+  return `⏱️ DURASI: 45-60 dtk | 🎵 MUSIK: Upbeat/trending
+🎬 TRANSISI: Cepat (0.5s), zoom in/out
 
-━━━ SEGMEN 1: HOOK (0:00-0:07) ━━━
-🎬 Visual: B-Roll ${baseTitle} + transisi cepat + text overlay besar
-🔊 VO: "Kamu harus tau tempat ini! ${baseTitle} di ${location}!"
-📝 Text: "${baseTitle} 🔥"
+━━━ SEGMEN 1: HOOK (0:00-0:06) ━━━
+🎬 Visual: ${emoji} ${title} dari angle terbaik + text overlay "🔥 ${title}"
+Transisi: Cut cepat + zoom in (0.5s)
+🔊 VO: "Kamu WAJIB tau tempat ini!"
+📝 Caption editor: "[TITLE] 🔥 #rodatrip"
 
-━━━ SEGMEN 2: INFO (0:07-0:20) ━━━
-🎬 Visual: ${isSpot ? "Suasana lokasi dari berbagai angle" : "Klip perjalanan + pemandangan"}
-🔊 VO: "${description} ${priceInfo} loh!"
-📝 Text: "${priceInfo}"
+━━━ SEGMEN 2: INFO (0:06-0:18) ━━━
+🎬 Visual: ${desc.slice(0, 60)}
+Transisi: Swipe left
+🔊 VO: "${priceInfo} loh! ${desc}"
+📝 Caption editor: "Lokasi: ${location}"
 
-━━━ SEGMEN 3: TIPS (0:20-0:35) ━━━
-🎬 Visual: ${isSpot ? "Detail spot + orang menikmati" : "Setiap stop secara singkat"}
-🔊 VO: "${tips}"
-📝 Text: "💡 ${tips.slice(0, 60)}..."
+━━━ SEGMEN 3: TIPS (0:18-0:32) ━━━
+🎬 Visual: ${source.type === "spot" ? "Orang nikmatin spot" : "Klip perjalanan"}
+Transisi: Zoom out
+🔊 VO: "${tips || "Jangan lupa siapkan kendaraan sebelum roadtrip!"}"
+📝 Caption editor: "💡 Tips di caption"
 
-━━━ SEGMEN 4: CTA (0:35-0:50) ━━━
-🎬 Visual: Text overlay informatif + logo RodaTrip
-🔊 VO: "Info lengkapnya di RodaTrip — link di bio!"
-📝 Text: "Info lengkap di RodaTrip! 👆"
+━━━ SEGMEN 4: CTA (0:32-0:45) ━━━
+🎬 Visual: Logo RodaTrip fade in
+Transisi: Fade
+🔊 VO: "Follow @rodatrip.id buat rekomendasi roadtrip seru!"
+📝 Caption editor: "@rodatrip.id 🔔"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━`
+}
 
-━━━ SEGMEN 5: OUTRO (0:50-0:60) ━━━
-🎬 Visual: Logo RodaTrip + fade out
-🔊 VO: "Follow @rodatrip.id buat rekomendasi roadtrip seru lainnya!"
-📝 Text: "@rodatrip.id"${specFooter("tiktok")}`,
+function tiktokEdukasi(source: ContentSource): string {
+  const title = source.title
+  const location = source.province || "Indonesia"
+  const special = source.whySpecial?.slice(0, 60) || ""
+  const tips = source.tips || ""
+  const detail = fullDetail(source)
 
-    edukasi: `╔══════════════════════════════════════╗
-║ TIKTOK — EDUKASI
-║ ══════════════════════════════════
-║ ⏱️ 45-60 detik | 🎵 Musik lo-fi/nature sounds
-║ 📋 Intro → Fakta → Tips detail → Outro
-╚══════════════════════════════════════
+  return `⏱️ DURASI: 45-60 dtk | 🎵 MUSIK: Lo-fi / nature sounds
+🎬 TRANSISI: Pelan (1s), cross dissolve
 
 ━━━ SEGMEN 1: INTRO (0:00-0:08) ━━━
-🎬 Visual: ${baseTitle} dari kejauhan, slow zoom in
-📝 Text: "${baseTitle} | ${location}"
+🎬 Visual: ${title} slow zoom in + text overlay
+Transisi: Cross dissolve (1s)
+📝 Caption editor: "${title} | ${location}"
 
 ━━━ SEGMEN 2: FAKTA (0:08-0:25) ━━━
-🎬 Visual: ${isSpot ? "Detail spot + informasi sekitar" : "Klip perjalanan + suasana jalan"}
-🔊 VO: "Hari ini kita bahas ${baseTitle} di ${location}"
-📝 Text: "${description.slice(0, 80)}"
+🎬 Visual: Detail spot + informasi
+🔊 VO: "${special || `${title} di ${location}, tau gak sih...`}"
+📝 Caption editor: "${special.slice(0, 50)}"
 
-━━━ SEGMEN 3: TIPS DETAIL (0:25-0:45) ━━━
-🎬 Visual: ${isSpot ? "Orang menikmati spot + tips visual" : "Setiap stop + tips perjalanan"}
-🔊 VO: "${tips}"
-📝 Text: "💡 ${tips.slice(0, 60)}..."
+━━━ SEGMEN 3: INFO LENGKAP (0:25-0:45) ━━━
+🎬 Visual: ${detail.slice(0, 100)}
+🔊 VO: "${tips || "Ini yang perlu kamu tau sebelum ke sini!"}"
+📝 Caption editor: "👇 Info lengkap di caption"
 
 ━━━ SEGMEN 4: OUTRO (0:45-0:60) ━━━
 🎬 Visual: Logo RodaTrip
+Transisi: Fade
 🔊 VO: "Follow @rodatrip.id biar makin jago roadtrip!"
-📝 Text: "Follow @rodatrip.id 🔔"${specFooter("tiktok")}`,
-
-    inspirasi: `╔══════════════════════════════════════╗
-║ TIKTOK — INSPIRASI
-║ ══════════════════════════════════
-║ ⏱️ 30-45 detik | 🎵 Musik calming/lo-fi
-║ 📋 Visual aesthetic → Text inspiratif → CTA
-╚══════════════════════════════════════
-
-━━━ SEGMEN 1: VISUAL (0:00-0:10) ━━━
-🎬 Visual: Slow-mo ${baseTitle} + golden hour + musik calming
-📝 Text: "${description || "Tambahin ke wishlist roadtrip kamu!"}"
-
-━━━ SEGMEN 2: DESTINASI (0:10-0:25) ━━━
-🎬 Visual: ${isSpot ? "B-Roll lokasi dari berbagai angle" : `Klip ${stopsList}`}
-📝 Text: "${source.stops?.map(s => s.name).join(" → ") || baseTitle}"
-
-━━━ SEGMEN 3: CTA (0:25-0:45) ━━━
-🎬 Visual: Text overlay aesthetic + logo RodaTrip
-📝 Text: "Tambahin ke wishlist roadtrip kamu! 🚗"
-🔊 VO: "Share ke temen yang suka jalan-jalan! @rodatrip.id"${specFooter("tiktok")}`,
-
-    storytelling: `╔══════════════════════════════════════╗
-║ TIKTOK — STORYTELLING
-║ ══════════════════════════════════
-║ ⏱️ 45-60 detik | 🎵 Musik emotional/acoustic
-║ 📋 Pembukaan → Perjalanan → Momen → CTA
-╚══════════════════════════════════════
-
-━━━ SEGMEN 1: PEMBUKAAN (0:00-0:10) ━━━
-🎬 Visual: Aesthetic shot ${baseTitle} + transisi pelan
-📝 Text: "✨ ${description.slice(0, 60)}..."
-
-━━━ SEGMEN 2: PERJALANAN (0:10-0:30) ━━━
-🎬 Visual: ${isSpot ? "Suasana sekitar + detail spot" : "Klip perjalanan + pemandangan setiap stop"}
-🔊 VO: "${description}"
-📝 Text: "${source.stops?.map(s => s.name).join(" → ") || baseTitle}"
-
-━━━ SEGMEN 3: MOMEN (0:30-0:45) ━━━
-🎬 Visual: ${isSpot ? "Momen terbaik di lokasi" : "Momen seru selama perjalanan"}
-📝 Text: "${tips || "Moment that matters ❤️"}"
-
-━━━ SEGMEN 4: CTA (0:45-0:60) ━━━
-🎬 Visual: Logo RodaTrip + text overlay
-📝 Text: "Kapan mau roadtrip? Tag temen kamu! 👇"
-🔊 VO: "Jangan lupa follow @rodatrip.id!"${specFooter("tiktok")}`,
-  }
-
-  return scripts[tone] || scripts.promo
+📝 Caption editor: "@rodatrip.id 🔔"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━`
 }
 
+function tiktokInspirasi(source: ContentSource): string {
+  const title = source.title
+  const desc = source.description?.slice(0, 80) || ""
+  const stops = source.stops?.map(s => s.name).join(" → ") || title
+
+  return `⏱️ DURASI: 30-45 dtk | 🎵 MUSIK: Calming / lo-fi / acoustic
+🎬 TRANSISI: Slow fade (1.5s), slow motion
+
+━━━ SEGMEN 1: HOOK VISUAL (0:00-0:08) ━━━
+🎬 Visual: Slow-mo ${title} + golden hour
+Transisi: Super slow fade
+📝 Caption editor: "✨ ${desc.slice(0, 50)}..."
+
+━━━ SEGMEN 2: JOURNEY (0:08-0:25) ━━━
+🎬 Visual: ${stops}
+Transisi: Cross dissolve
+📝 Caption editor: "${stops} 🚗"
+
+━━━ SEGMEN 3: INSPIRASI (0:25-0:45) ━━━
+🎬 Visual: Text overlay + musik naik
+📝 Caption editor: "Tambahin ke wishlist roadtrip kamu! 🚗💨"
+💬 Caption: "Share ke temen yang suka jalan-jalan! @rodatrip.id"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━`
+}
+
+function tiktokStorytelling(source: ContentSource): string {
+  const title = source.title
+  const desc = source.description?.slice(0, 80) || ""
+  const tips = source.tips || ""
+
+  return `⏱️ DURASI: 45-60 dtk | 🎵 MUSIK: Emotional / acoustic
+🎬 TRANSISI: Slow fade + cross dissolve
+
+━━━ SEGMEN 1: PEMBUKAAN (0:00-0:10) ━━━
+🎬 Visual: Aesthetic shot ${title} + text "✨ A story..."
+Transisi: Fade in
+📝 Caption editor: "${desc.slice(0, 60)}..."
+
+━━━ SEGMEN 2: CERITA (0:10-0:30) ━━━
+🎬 Visual: ${source.type === "spot" ? "Detail spot + suasana" : "Klip perjalanan"}
+🔊 VO: "${desc || `Perjalanan ke ${title}`}"
+📝 Caption editor: "📍 ${title}"
+
+━━━ SEGMEN 3: MOMEN (0:30-0:45) ━━━
+🎬 Visual: ${source.type === "spot" ? "Momen terbaik" : "Momen seru"}
+📝 Caption editor: "${tips || "Moment that matters ❤️"}"
+
+━━━ SEGMEN 4: CTA (0:45-0:60) ━━━
+🎬 Visual: Logo RodaTrip
+Transisi: Fade out
+📝 Caption editor: "Kapan mau roadtrip? Tag temen kamu! 👇 @rodatrip.id"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━`
+}
+
+// ─── EXPORTED ───
+
+export function generateFacebookPromo(source: ContentSource): string { return facebookPromo(source) }
+export function generateFacebookEdukasi(source: ContentSource): string { return facebookEdukasi(source) }
+export function generateFacebookInspirasi(source: ContentSource): string { return facebookInspirasi(source) }
+export function generateFacebookStorytelling(source: ContentSource): string { return facebookStorytelling(source) }
+export function generateInstagramPromo(source: ContentSource): string { return instagramPromo(source) }
+export function generateInstagramEdukasi(source: ContentSource): string { return instagramEdukasi(source) }
+export function generateInstagramInspirasi(source: ContentSource): string { return instagramInspirasi(source) }
+export function generateInstagramStorytelling(source: ContentSource): string { return instagramStorytelling(source) }
+export function generateTikTokPromo(source: ContentSource): string { return tiktokPromo(source) }
+export function generateTikTokEdukasi(source: ContentSource): string { return tiktokEdukasi(source) }
+export function generateTikTokInspirasi(source: ContentSource): string { return tiktokInspirasi(source) }
+export function generateTikTokStorytelling(source: ContentSource): string { return tiktokStorytelling(source) }
+
 export function generateHashtags(source: ContentSource, platform: string): string {
-  const base = ["#RodaTrip", "#RoadtripIndonesia", "#JalanJalan", "#ExploreIndonesia"]
+  const base: string[] = ["#RodaTrip", "#RoadtripIndonesia"]
+
   if (source.title) base.push(`#${source.title.replace(/\s+/g, "")}`)
+  if (source.category) {
+    const catTags: Record<string, string> = {
+      alam: "#SpotAlam", kuliner: "#KulinerNusantara", budaya: "#BudayaIndonesia",
+      foto: "#SpotFoto", petualangan: "#Petualangan", sejarah: "#Sejarah",
+    }
+    if (catTags[source.category]) base.push(catTags[source.category])
+  }
   if (source.province) base.push(`#${source.province.replace(/\s+/g, "")}`)
-  if (source.category) base.push(`#${source.category}`)
-  if (platform === "instagram") base.push("#TravelIndonesia", "#LiburanSeru", "#JalanJalanYuk")
-  return base.join(" ")
+  if (source.city) base.push(`#${source.city.replace(/\s+/g, "")}`)
+  if (source.rating && source.rating >= 4.5) base.push("#HiddenGem")
+  if (source.physicalEffort === "Ringan") base.push("#CocokUntukPemula")
+
+  base.push("#ExploreIndonesia", "#JalanJalanYuk")
+
+  if (platform === "instagram") {
+    base.push("#TravelIndonesia", "#LiburanSeru", "#JalanJalan")
+  }
+
+  if (platform === "tiktok") {
+    base.push("#fyp", "#rodatrip")
+  }
+
+  const unique = [...new Set(base)]
+  const categoryOrder = ["#RodaTrip", "#RoadtripIndonesia", "#ExploreIndonesia"]
+  const rest = unique.filter(t => !categoryOrder.includes(t))
+  const highPriority = categoryOrder.filter(t => unique.includes(t))
+
+  if (platform === "instagram") {
+    return [...highPriority, ...rest].slice(0, 15).join(" ")
+  }
+  return [...highPriority, ...rest].slice(0, 8).join(" ")
 }
 
 export function generateAIPrompt(source: ContentSource, platform: string, tone: string): string {
@@ -456,12 +504,14 @@ export function generateAIPrompt(source: ContentSource, platform: string, tone: 
   const isSpot = source.type === "spot"
   const kontenLabel = isSpot ? "Spot/Destinasi Wisata" : "Roadtrip Itinerary"
   const spec = platformSpecs[platform]
+  const catEmoji = CATEGORY_EMOJI[source.category || ""] || "📍"
 
   const spotFields = [
     ["Nama", source.title],
+    ["Kategori", `${catEmoji} ${source.category}`],
     ["Provinsi", source.province],
+    ["Kota", source.city],
     ["Region", source.region],
-    ["Kategori", source.category],
     ["Deskripsi", source.description],
     ["Keunikan (why_special)", source.whySpecial],
     ["Rating", source.rating],
@@ -470,8 +520,7 @@ export function generateAIPrompt(source: ContentSource, platform: string, tone: 
     ["Biaya Tambahan", source.additionalCost],
     ["Jam Buka", source.openingHours],
     ["Durasi Kunjungan", source.visitDuration],
-    ["Waktu Terbaik Datang", source.bestTime],
-    ["Jam Terbaik", source.bestVisitHour],
+    ["Waktu Terbaik", source.bestTime],
     ["Tingkat Fisik", source.physicalEffort],
     ["Akses Jalan", source.roadAccess],
     ["Catatan Penting", source.spotImportantNote],
@@ -481,7 +530,6 @@ export function generateAIPrompt(source: ContentSource, platform: string, tone: 
     ["Rute Populer", source.popularRoutes?.map(r => `${r.from} (${r.duration})`).join(", ")],
     ["Hotel Terdekat", source.nearbyHotels],
     ["Restoran Terdekat", source.nearbyRestaurants],
-    ["Jumlah Gambar", source.images?.length],
   ].filter(([_, v]) => v && v !== "" && v !== "—" && v !== "0" && String(v) !== "undefined" && v !== "[]" && v !== "{}")
 
   const spotDataList = spotFields.map(([label, value]) => `- ${label}: ${value}`).join("\n")
@@ -492,7 +540,6 @@ Buatkan 1 konten untuk ${platformLabel} dengan tone ${toneDesc}.
 ## DATA ${kontenLabel.toUpperCase()}
 ${isSpot ? spotDataList : `- Judul: ${source.title}
 - Provinsi: ${source.province || "—"}
-- Region: ${source.region || "—"}
 - Deskripsi: ${source.description || "—"}
 - Durasi: ${source.duration || "—"}
 - Jarak: ${source.totalDistance || "—"}
@@ -506,77 +553,64 @@ ${isSpot ? spotDataList : `- Judul: ${source.title}
 - Struktur: ${spec.structure}
 
 ## FORMAT OUTPUT DETAIL
-${
-  platform === "facebook"
-    ? `Tulis caption dengan struktur:
-━━━ PARAGRAF 1 — HOOK ━━━
-[Teks hook yang engaging, 1-2 kalimat]
-
-━━━ PARAGRAF 2 — DETAIL ━━━
-[Informasi detail: lokasi, harga, durasi, rute]
-
-━━━ PARAGRAF 3 — TIPS ━━━
-[Tips bermanfaat untuk audiens]
-
-━━━ PARAGRAF 4 — CTA ━━━
-[Ajakan untuk mengunjungi RodaTrip]
-
-───
-[Hashtag minimal]`
-    : platform === "instagram"
-    ? `Tulis caption dengan struktur:
-━━━ CAPTION ━━━
-[Hook visual 1 kalimat + emoji]
+${platform === "facebook"
+  ? `Tulis caption dengan struktur alami (tanpa marker):
+[Paragraf 1: Hook engaging, dengan emoji, 2-3 kalimat]
+[Paragraf 2: Detail informasi lokasi, harga, jam buka, fasilitas]
+[Paragraf 3: Tips bermanfaat untuk audiens]
+[Paragraf 4: CTA ajakan kunjungi RodaTrip dan ajakan interaksi]
+[Akhiri dengan hashtag minimal 3-4]`
+  : platform === "instagram"
+  ? `Tulis caption pendek dengan struktur alami:
+[Hook visual 1-2 kalimat dengan emoji]
 [Detail singkat]
-[CTA interaksi]
+[CTA interaksi: ajakan komen/simpan/share]
 
-━━━ HASHTAG ━━━
-[10-15 hashtag di baris terakhir]`
-    : `Tulis skrip dengan struktur per segmen:
-━━━ SEGMEN 1: HOOK (0:00-0:07) ━━━
-🎬 Visual: [deskripsi visual]
-🔊 VO: [narasi]
-📝 Text: [text overlay]
-
-━━━ SEGMEN 2: INFO (0:07-0:20) ━━━
-...
-
-━━━ SEGMEN N: CTA (0:XX-0:60) ━━━
-...`
-}
+[Di baris terakhir: 10-15 hashtag relevan dari data di atas]`
+  : `Tulis skrip TikTok dengan struktur per segmen dan SERTAKAN:
+[Durasi per segmen]
+[Jenis transisi]
+[Genre musik rekomendasi]
+[Caption untuk editor video]`}
 
 ## ATURAN
-- Bahasa Indonesia, santai tapi informatif
+- Bahasa Indonesia natural dan engaging
 - Gunakan tone "${tone}" secara konsisten
 - Promosikan RodaTrip sebagai platform roadtrip
-${platform === "tiktok" ? "- Durasi total 15-60 detik" : "- Gunakan emoji yang relevan"}
-${platform === "facebook" ? "- Jangan gunakan hashtag berlebihan (max 3-4)" : platform === "instagram" ? "- Sertakan 10-15 hashtag relevan" : ""}
-${platform === "instagram" ? "- Tulis '━━━ HASHTAG ━━━' sebagai pemisah" : ""}
+${platform === "tiktok" ? "- Sertakan transisi dan musik recommendation" : "- Gunakan emoji yang relevan (max 3-4 per paragraf)"}
+${platform === "facebook" ? "- Jangan gunakan hashtag berlebihan (max 3-4)" : platform === "instagram" ? "- Sertakan 10-15 hashtag dari data spot" : ""}
+${platform === "instagram" ? "- Hashtag berdasarkan provinsi, kota, kategori spot" : ""}
 - Output HANYA teks konten, tanpa penjelasan lain`
 }
 
-export function renderTemplate(source: ContentSource, platform: string, tone: string): { caption: string; hashtags: string; skrip_tiktok: string } {
-  const genMap: Record<string, Record<string, (s: ContentSource) => string>> = {
-    facebook: {
-      promo: generateFacebookPromo,
-      edukasi: generateFacebookEdukasi,
-      inspirasi: generateFacebookInspirasi,
-      storytelling: generateFacebookStorytelling,
-    },
-    instagram: {
-      promo: generateInstagramPromo,
-      edukasi: generateInstagramEdukasi,
-      inspirasi: generateInstagramInspirasi,
-      storytelling: generateInstagramStorytelling,
-    },
-  }
+const platformSpecs: Record<string, { maxChars: string; style: string; structure: string }> = {
+  facebook: { maxChars: "1.000-2.000", style: "Storytelling, personal, emoji tiap segmen", structure: "Hook → Detail → Tips → CTA" },
+  instagram: { maxChars: "150-300 (tanpa hashtag)", style: "Estetik, ringan, emoji", structure: "Hook visual → Deskripsi → CTA → 10-15 Hashtag" },
+  tiktok: { maxChars: "15-60 detik", style: "Cepat, engaging, text overlay", structure: "Hook → Info → Tips → CTA → Outro" },
+}
 
+export function renderTemplate(source: ContentSource, platform: string, tone: string): { caption: string; hashtags: string; skrip_tiktok: string } {
   if (platform === "tiktok") {
-    const skrip = generateTikTokScript(source, tone)
+    const tiktokFns: Record<string, (s: ContentSource) => string> = {
+      promo: tiktokPromo, edukasi: tiktokEdukasi, inspirasi: tiktokInspirasi, storytelling: tiktokStorytelling,
+    }
+    const skrip = (tiktokFns[tone] || tiktokPromo)(source)
     return { caption: skrip, hashtags: "", skrip_tiktok: skrip }
   }
 
-  const caption = genMap[platform]?.[tone]?.(source) || generateFacebookPromo(source)
+  const fbFns: Record<string, (s: ContentSource) => string> = {
+    promo: facebookPromo, edukasi: facebookEdukasi, inspirasi: facebookInspirasi, storytelling: facebookStorytelling,
+  }
+  const igFns: Record<string, (s: ContentSource) => string> = {
+    promo: instagramPromo, edukasi: instagramEdukasi, inspirasi: instagramInspirasi, storytelling: instagramStorytelling,
+  }
+
+  const genMap: Record<string, Record<string, (s: ContentSource) => string>> = {
+    facebook: fbFns,
+    instagram: igFns,
+  }
+
+  const caption = genMap[platform]?.[tone]?.(source) || facebookPromo(source)
   const hashtags = generateHashtags(source, platform)
 
   return { caption, hashtags, skrip_tiktok: "" }

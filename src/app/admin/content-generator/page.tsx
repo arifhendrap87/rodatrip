@@ -235,11 +235,34 @@ export default function ContentGeneratorPage() {
     toast.success("Tersalin!")
   }
 
+  const [showStructure, setShowStructure] = useState(false)
+
+  function cleanCaption(text: string): string {
+    return text
+      .replace(/^━+.*$/gm, "")
+      .replace(/^───.*$/gm, "")
+      .replace(/^╔[═╗║]+$|^╠[═╣║]+$|^╚[═╝║]+$/gm, "")
+      .replace(/^║.*$/gm, "")
+      .replace(/^📊.*$|^🎨.*$|^📋.*$/gm, "")
+      .replace(/^💡 Tips publikasi:.*$/gm, "")
+      .replace(/^🎬 Transisi:.*$/gm, "")
+      .replace(/^🎵 MUSIK:.*$/gm, "")
+      .replace(/^⏱️ DURASI:.*$/gm, "")
+      .replace(/^🎬 Caption editor:.*$/gm, "")
+      .replace(/^💬 Caption:.*$/gm, "")
+      .replace(/^🎬 Visual:.*$/gm, "")
+      .replace(/^🔊 VO:.*$/gm, "")
+      .replace(/^📝 Caption editor:.*$/gm, "")
+      .replace(/^Transisi:.*$/gm, "")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim()
+  }
+
   function getResultText(platform: string, tone: string, result: GenerateResult): string {
     if (platform === "tiktok") return result.skrip_tiktok || result.caption
     let text = result.caption
     if (result.hashtags && platform === "instagram") text += "\n\n" + result.hashtags
-    return text
+    return showStructure ? text : cleanCaption(text)
   }
 
   return (
@@ -569,7 +592,7 @@ export default function ContentGeneratorPage() {
                       </CardHeader>
                       <CardContent className="space-y-4">
                         {PLATFORM_SPECS[platform] && (
-                          <div className="flex flex-wrap gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
                             <Badge variant="secondary" className="gap-1">
                               <Info className="h-3 w-3" />
                               {PLATFORM_SPECS[platform].maxChars}
@@ -580,6 +603,18 @@ export default function ContentGeneratorPage() {
                             <Badge variant="outline" className="gap-1 text-muted-foreground">
                               📋 {PLATFORM_SPECS[platform].structure}
                             </Badge>
+                            <div className="ml-auto">
+                              <button
+                                onClick={() => setShowStructure(!showStructure)}
+                                className={`text-xs font-medium px-2.5 py-1 rounded-md border transition-colors ${
+                                  showStructure
+                                    ? "bg-muted text-muted-foreground border-border"
+                                    : "bg-primary/10 text-primary border-primary/20"
+                                }`}
+                              >
+                                {showStructure ? "Tampilkan Struktur" : "Siap Posting"}
+                              </button>
+                            </div>
                           </div>
                         )}
 
