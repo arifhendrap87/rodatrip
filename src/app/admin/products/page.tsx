@@ -81,8 +81,8 @@ export default function ProductsPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold font-heading">Products</h1>
-          <p className="text-muted-foreground">Manage e-commerce products ({products.length} total)</p>
+          <h1 className="text-2xl font-bold font-heading">Produk</h1>
+          <p className="text-muted-foreground">Kelola produk e-commerce ({products.length} total)</p>
         </div>
         <div className="flex items-center gap-2">
           {products.filter(p => p.source === "Jakmall" && (!p.description || p.description.length < 100)).length > 0 && (
@@ -110,7 +110,7 @@ export default function ProductsPage() {
             </Button>
           </Link>
           <Link href="/admin/products/new">
-            <Button><Plus className="mr-2 h-4 w-4" /> Add Product</Button>
+            <Button><Plus className="mr-2 h-4 w-4" /> Tambah Produk</Button>
           </Link>
         </div>
       </div>
@@ -123,7 +123,7 @@ export default function ProductsPage() {
             <div className="relative flex-1 min-w-[200px]">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Search products..."
+                placeholder="Cari produk..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-9"
@@ -131,10 +131,10 @@ export default function ProductsPage() {
             </div>
             <Select value={categoryFilter} onValueChange={(v) => v && setCategoryFilter(v)}>
               <SelectTrigger className="w-44">
-                <SelectValue placeholder="Category" />
+                <SelectValue placeholder="Kategori" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="all">Semua Kategori</SelectItem>
                 {CATEGORIES.map((c) => (
                   <SelectItem key={c} value={c}>{c}</SelectItem>
                 ))}
@@ -145,14 +145,14 @@ export default function ProductsPage() {
       </Card>
 
       {loading ? (
-        <div className="py-12 text-center text-muted-foreground">Loading products...</div>
+        <div className="py-12 text-center text-muted-foreground">Memuat produk...</div>
       ) : products.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center gap-4 py-12">
-            <p className="text-lg font-medium">No products yet</p>
-            <p className="text-sm text-muted-foreground">Add your first product to get started</p>
+            <p className="text-lg font-medium">Belum ada produk</p>
+            <p className="text-sm text-muted-foreground">Tambah produk pertama untuk memulai</p>
             <Link href="/admin/products/new">
-              <Button variant="outline"><Plus className="mr-2 h-4 w-4" /> Add Product</Button>
+              <Button variant="outline"><Plus className="mr-2 h-4 w-4" /> Tambah Produk</Button>
             </Link>
           </CardContent>
         </Card>

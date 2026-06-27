@@ -76,14 +76,14 @@ export default function SpotsPage() {
         <div>
           <h1 className="text-2xl font-bold font-heading">Spots</h1>
           <p className="text-muted-foreground">
-            Manage destination guides ({spots.length} total)
+            Kelola panduan destinasi ({spots.length} total)
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Link href="/admin/spots/scrape">
             <Button variant="outline">
               <Sparkles className="mr-2 h-4 w-4" />
-              Scrape from Wikipedia
+              Scrape dari Wikipedia
             </Button>
           </Link>
           <Link href="/admin/spots/new">
@@ -101,7 +101,7 @@ export default function SpotsPage() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Search spots..."
+                placeholder="Cari spot..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-9"
@@ -109,10 +109,10 @@ export default function SpotsPage() {
             </div>
             <Select value={categoryFilter} onValueChange={(v) => v && setCategoryFilter(v)}>
               <SelectTrigger className="w-40">
-                <SelectValue placeholder="Category" />
+                <SelectValue placeholder="Kategori" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="all">Semua Kategori</SelectItem>
                 {CATEGORIES.map((c) => (
                   <SelectItem key={c.value} value={c.value}>
                     {c.label}
@@ -122,10 +122,10 @@ export default function SpotsPage() {
             </Select>
             <Select value={provinceFilter} onValueChange={(v) => v && setProvinceFilter(v)}>
               <SelectTrigger className="w-40">
-                <SelectValue placeholder="Province" />
+                <SelectValue placeholder="Provinsi" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Provinces</SelectItem>
+                <SelectItem value="all">Semua Provinsi</SelectItem>
                 {loadingProv ? (
                   <SelectItem value="loading" disabled>Loading...</SelectItem>
                 ) : (
@@ -141,21 +141,21 @@ export default function SpotsPage() {
 
       {loading ? (
         <div className="py-12 text-center text-muted-foreground">
-          Loading spots...
+          Memuat spot...
         </div>
       ) : spots.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center gap-4 py-12">
-            <p className="text-lg font-medium">No spots found</p>
+            <p className="text-lg font-medium">Tidak ada spot</p>
             <p className="text-sm text-muted-foreground">
               {search || categoryFilter !== "all"
                 ? "Try adjusting your filters"
-                : "Add your first spot to get started"}
+                : "Buat spot pertama untuk memulai"}
             </p>
             <Link href="/admin/spots/new">
               <Button variant="outline">
                 <Plus className="mr-2 h-4 w-4" />
-                Add Spot
+Tambah Spot
               </Button>
             </Link>
           </CardContent>

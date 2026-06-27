@@ -60,19 +60,19 @@ export default function NewProductPage() {
     <div>
       <div className="mb-6 flex items-center gap-4">
         <Link href="/admin/products"><Button variant="ghost" size="icon"><ArrowLeft className="h-4 w-4" /></Button></Link>
-        <div><h1 className="text-2xl font-bold font-heading">New Product</h1></div>
+        <div><h1 className="text-2xl font-bold font-heading">Produk Baru</h1></div>
       </div>
       <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
         <Card>
-          <CardHeader><CardTitle>Product Details</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Detail Produk</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label>Name *</Label>
+                <Label>Nama *</Label>
                 <Input required value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value, slug: generateSlug(e.target.value) }))} />
               </div>
               <div className="space-y-2">
-                <Label>Category *</Label>
+                <Label>Kategori *</Label>
                 <Select value={form.category} onValueChange={(v) => v && setForm((f) => ({ ...f, category: v }))}>
                   <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                   <SelectContent>
@@ -116,7 +116,7 @@ export default function NewProductPage() {
           </CardContent>
         </Card>
         <Button type="submit" disabled={saving}>
-          {saving ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</> : <><Save className="mr-2 h-4 w-4" /> Save Product</>}
+          {saving ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Menyimpan...</> : <><Save className="mr-2 h-4 w-4" /> Simpan</>}
         </Button>
       </form>
     </div>

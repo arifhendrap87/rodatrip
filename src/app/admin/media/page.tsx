@@ -106,7 +106,7 @@ export default function MediaPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold font-heading">Media Library</h1>
+          <h1 className="text-2xl font-bold font-heading">Media</h1>
           <p className="text-muted-foreground">{total} file</p>
         </div>
         <div>

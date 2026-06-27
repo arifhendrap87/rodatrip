@@ -56,25 +56,25 @@ export default function SettingsPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold font-heading">Settings</h1>
-        <p className="text-muted-foreground">Manage your site settings</p>
+        <h1 className="text-2xl font-bold font-heading">Pengaturan</h1>
+        <p className="text-muted-foreground">Kelola pengaturan situs</p>
       </div>
 
       <div className="space-y-6 max-w-2xl">
         <Card>
           <CardHeader>
-            <CardTitle>Site Information</CardTitle>
+            <CardTitle>Informasi Situs</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label>Site Name</Label>
+              <Label>Nama Situs</Label>
               <Input value={siteName} onChange={(e) => setSiteName(e.target.value)} />
               <p className="text-xs text-muted-foreground">
                 Nama ini muncul di navbar, footer, title halaman, dan metadata SEO
               </p>
             </div>
             <Button onClick={handleSave} disabled={saving}>
-              {saving ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</> : <><Save className="mr-2 h-4 w-4" /> Save Settings</>}
+              {saving ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Menyimpan...</> : <><Save className="mr-2 h-4 w-4" /> Simpan</>}
             </Button>
           </CardContent>
         </Card>

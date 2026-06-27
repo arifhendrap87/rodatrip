@@ -61,9 +61,9 @@ export default function RoadtripsPage() {
           </Link>
           <Link href="/admin/roadtrips/new">
             <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Roadtrip
-            </Button>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Tambah Roadtrip
+                </Button>
           </Link>
         </div>
       </div>
@@ -74,7 +74,7 @@ export default function RoadtripsPage() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Search roadtrips..."
+                placeholder="Cari roadtrip..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-9"
@@ -85,13 +85,13 @@ export default function RoadtripsPage() {
       </Card>
 
       {loading ? (
-        <div className="py-12 text-center text-muted-foreground">Loading roadtrips...</div>
+        <div className="py-12 text-center text-muted-foreground">Memuat roadtrip...</div>
       ) : filtered.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center gap-4 py-12">
-            <p className="text-lg font-medium">No roadtrips found</p>
+            <p className="text-lg font-medium">Belum ada roadtrip</p>
             <p className="text-sm text-muted-foreground">
-              {search ? "Try adjusting your search" : "Add your first road trip itinerary to get started"}
+              {search ? "Coba ubah kata kunci" : "Buat roadtrip pertama untuk memulai"}
             </p>
             <Link href="/admin/roadtrips/new">
               <Button variant="outline">
