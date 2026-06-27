@@ -50,8 +50,8 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
-          <Link href="/#waitlist">
-            <Button size="sm" className="bg-gradient-to-r from-primary via-[hsl(340_85%_55%)] to-accent text-primary-foreground shadow-lg shadow-primary/30 rounded-xl">Daftar Sekarang</Button>
+          <Link href="/roadtrip">
+            <Button size="sm" className="bg-gradient-to-r from-primary via-[hsl(340_85%_55%)] to-accent text-primary-foreground shadow-lg shadow-primary/30 rounded-xl">🚗 Mulai Jelajahi</Button>
           </Link>
         </nav>
 
@@ -76,8 +76,8 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
-              <Link href="/#waitlist" onClick={() => setOpen(false)}>
-                <Button className="mt-4 w-full bg-gradient-to-r from-primary via-[hsl(340_85%_55%)] to-accent text-primary-foreground shadow-lg shadow-primary/30 rounded-xl">Daftar Sekarang</Button>
+              <Link href="/roadtrip" onClick={() => setOpen(false)}>
+                <Button className="mt-4 w-full bg-gradient-to-r from-primary via-[hsl(340_85%_55%)] to-accent text-primary-foreground shadow-lg shadow-primary/30 rounded-xl">🚗 Mulai Jelajahi</Button>
               </Link>
             </div>
           </SheetContent>
