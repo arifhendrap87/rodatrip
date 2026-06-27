@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: "/api/",
     },
-    sitemap: "https://gaskuy.id/sitemap.xml",
+    sitemap: `${process.env.NEXT_PUBLIC_APP_URL || "https://gaskuy-roadtrip.vercel.app"}/sitemap.xml`,
   }
 }

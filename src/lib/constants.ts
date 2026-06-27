@@ -2,8 +2,8 @@ import type { NavLink } from "@/types"
 
 export const SITE_NAME = "RodaTrip"
 export const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://gaskuy-roadtrip.vercel.app"
-export const SITE_TAGLINE = "Gas — Plan · Prepare · Go"
-export const SITE_DESCRIPTION = "Platform POI, info jalan, dan perlengkapan roadtrip untuk roadtripper Indonesia."
+export const SITE_TAGLINE = "Roadtrip. Aksesoris. Mobil."
+export const SITE_DESCRIPTION = "Platform roadtrip, aksesoris mobil, dan marketplace kendaraan untuk roadtripper Indonesia."
 
 export const NAV_LINKS: NavLink[] = [
   { href: "/", label: "Beranda" },
@@ -31,9 +31,9 @@ export const FOOTER_LINKS_SPOTS: NavLink[] = [
 ]
 
 export const SOCIAL_LINKS = {
-  instagram: "https://instagram.com/gaskuy.id",
-  tiktok: "https://tiktok.com/@gaskuy.id",
-  twitter: "https://twitter.com/gaskuy_id",
+  instagram: "https://instagram.com/rodatrip.id",
+  tiktok: "https://tiktok.com/@rodatrip.id",
+  twitter: "https://twitter.com/rodatrip_id",
 }
 
 export const POI_CATEGORIES = [

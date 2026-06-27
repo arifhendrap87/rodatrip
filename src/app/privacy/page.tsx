@@ -72,7 +72,7 @@ export default function PrivacyPage() {
 
           <h2 className="text-xl font-bold font-heading mt-8">7. Kontak</h2>
           <p className="text-muted-foreground leading-relaxed">
-            Jika ada pertanyaan tentang kebijakan privasi ini, hubungi kami melalui email di hello@gaskuy.id.
+            Jika ada pertanyaan tentang kebijakan privasi ini, hubungi kami melalui email di hello@rodatrip.id.
           </p>
         </div>
       </section>

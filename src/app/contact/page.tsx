@@ -89,9 +89,9 @@ export default function ContactPage() {
 
               <div className="space-y-6">
                 {[
-                  { icon: "📧", title: "Email", value: "hello@gaskuy.id" },
-                  { icon: "📱", title: "Instagram", value: "@gaskuy.id" },
-                  { icon: "🎵", title: "TikTok", value: "@gaskuy.id" },
+                  { icon: "📧", title: "Email", value: "hello@rodatrip.id" },
+                  { icon: "📱", title: "Instagram", value: "@rodatrip.id" },
+                  { icon: "🎵", title: "TikTok", value: "@rodatrip.id" },
                 ].map((item) => (
                   <div key={item.title} className="flex items-center gap-4">
                     <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-xl">

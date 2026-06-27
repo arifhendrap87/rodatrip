@@ -10,7 +10,7 @@ export default function AboutPage() {
             Tentang Kami
           </span>
           <h1 className="mt-6 text-4xl sm:text-5xl lg:text-6xl font-bold font-heading leading-tight">
-            Gas — Plan · Prepare ·{" "}
+            RodaTrip — Roadtrip. Aksesoris. Mobil.{" "}
             <span className="bg-gradient-to-r from-primary via-[hsl(340_85%_55%)] to-accent bg-clip-text text-transparent">
               Go
             </span>
@@ -81,7 +81,7 @@ export default function AboutPage() {
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 text-center">
           <h2 className="text-3xl font-bold font-heading">Siap Mulai Petualangan?</h2>
-          <p className="mt-2 text-muted-foreground">Gas — Plan · Prepare · Go!</p>
+          <p className="mt-2 text-muted-foreground">RodaTrip — Roadtrip. Aksesoris. Mobil.</p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/spot-istimewa">
               <Button size="lg" className="rounded-xl bg-gradient-to-r from-primary via-[hsl(340_85%_55%)] to-accent text-primary-foreground shadow-lg shadow-primary/30">

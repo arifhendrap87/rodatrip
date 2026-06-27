@@ -3,7 +3,7 @@ import { getSpots } from "@/lib/services/spots"
 import { getRoutes } from "@/lib/services/routes"
 import { getPosts } from "@/lib/services/blog"
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://gaskuy.id"
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://gaskuy-roadtrip.vercel.app"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [spotsRes, routes, blog] = await Promise.all([

@@ -71,7 +71,7 @@ export default function TermsPage() {
 
           <h2 className="text-xl font-bold font-heading mt-8">9. Kontak</h2>
           <p className="text-muted-foreground leading-relaxed">
-            Untuk pertanyaan tentang syarat dan ketentuan ini, hubungi kami di hello@gaskuy.id.
+            Untuk pertanyaan tentang syarat dan ketentuan ini, hubungi kami di hello@rodatrip.id.
           </p>
         </div>
       </section>
