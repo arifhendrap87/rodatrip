@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" fill="none">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e0f0ff"/>
+      <stop offset="40%" stop-color="#f5e6d3"/>
+      <stop offset="100%" stop-color="#d4d9c8"/>
+    </linearGradient>
+    <linearGradient id="mnt1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7a9e6b"/>
+      <stop offset="100%" stop-color="#5a7d4a"/>
+    </linearGradient>
+    <linearGradient id="mnt2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6b8e5c"/>
+      <stop offset="100%" stop-color="#4d6e3e"/>
+    </linearGradient>
+    <linearGradient id="mnt3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8fb07a"/>
+      <stop offset="100%" stop-color="#6b8e5c"/>
+    </linearGradient>
+    <linearGradient id="road" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#555"/>
+      <stop offset="100%" stop-color="#333"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="1440" height="900" fill="url(#sky)"/>
+
+  <!-- Sun -->
+  <circle cx="1100" cy="180" r="80" fill="#ffd700" opacity="0.15"/>
+  <circle cx="1100" cy="180" r="55" fill="#ffec8b" opacity="0.25"/>
+  <circle cx="1100" cy="180" r="35" fill="#fff5cc" opacity="0.4"/>
+
+  <!-- Clouds -->
+  <g opacity="0.4" fill="white">
+    <ellipse cx="300" cy="120" rx="80" ry="25"/>
+    <ellipse cx="350" cy="110" rx="60" ry="20"/>
+    <ellipse cx="260" cy="115" rx="45" ry="18"/>
+    <ellipse cx="900" cy="90" rx="70" ry="22"/>
+    <ellipse cx="950" cy="80" rx="55" ry="18"/>
+    <ellipse cx="860" cy="85" rx="40" ry="15"/>
+    <ellipse cx="600" cy="150" rx="50" ry="15"/>
+    <ellipse cx="640" cy="145" rx="40" ry="12"/>
+  </g>
+
+  <!-- Far mountains -->
+  <path d="M0 420 L120 280 L200 350 L320 230 L450 340 L550 260 L680 370 L780 300 L920 400 L1050 320 L1200 430 L1320 350 L1440 400 L1440 500 L0 500 Z" fill="url(#mnt3)" opacity="0.3"/>
+
+  <!-- Middle mountains -->
+  <path d="M0 480 L180 320 L300 430 L450 300 L580 410 L700 350 L850 450 L1000 360 L1150 470 L1300 390 L1440 460 L1440 550 L0 550 Z" fill="url(#mnt2)" opacity="0.5"/>
+
+  <!-- Front mountains -->
+  <path d="M0 550 L150 400 L280 510 L420 380 L550 490 L680 420 L820 520 L950 440 L1100 530 L1250 460 L1440 540 L1440 650 L0 650 Z" fill="url(#mnt1)" opacity="0.7"/>
+
+  <!-- Rolling hills foreground -->
+  <path d="M0 620 Q200 580 400 610 Q600 640 800 600 Q1000 560 1200 610 Q1300 630 1440 590 L1440 750 Q1200 720 1000 730 Q800 740 600 720 Q400 700 200 730 Q100 740 0 720 Z" fill="#8fb07a" opacity="0.4"/>
+
+  <!-- Road -->
+  <path d="M720 900 Q700 800 680 730 Q650 650 600 600 Q550 560 500 540 Q450 520 400 510 Q350 500 300 500 L300 520 Q350 520 400 530 Q450 540 500 560 Q550 580 600 620 Q650 660 680 740 Q700 800 720 900 Z" fill="url(#road)"/>
+
+  <!-- Road center line -->
+  <path d="M510 545 Q560 570 610 615 Q650 655 675 740 Q690 790 700 840" stroke="#ffcc00" stroke-width="2" stroke-dasharray="12 10" opacity="0.6" fill="none"/>
+
+  <!-- Car -->
+  <g transform="translate(605, 610) rotate(-40)">
+    <rect x="-22" y="-10" width="44" height="16" rx="4" fill="#e74c3c"/>
+    <rect x="-14" y="-18" width="28" height="10" rx="3" fill="#e74c3c"/>
+    <rect x="-10" y="-16" width="10" height="6" rx="1.5" fill="#87ceeb" opacity="0.7"/>
+    <rect x="4" y="-16" width="10" height="6" rx="1.5" fill="#87ceeb" opacity="0.7"/>
+    <circle cx="-14" cy="4" r="4" fill="#333"/>
+    <circle cx="14" cy="4" r="4" fill="#333"/>
+  </g>
+
+  <!-- Trees left -->
+  <g opacity="0.5">
+    <path d="M100 630 L110 560 L120 630 Z" fill="#4a7a3a"/>
+    <path d="M130 640 L138 580 L146 640 Z" fill="#5a8a4a"/>
+    <path d="M60 620 L70 550 L80 620 Z" fill="#4a7a3a"/>
+    <path d="M170 610 L178 555 L186 610 Z" fill="#5a8a4a"/>
+    <path d="M200 620 L208 565 L216 620 Z" fill="#4a7a3a"/>
+  </g>
+
+  <!-- Trees right -->
+  <g opacity="0.5">
+    <path d="M420 520 L428 465 L436 520 Z" fill="#4a7a3a"/>
+    <path d="M460 540 L468 480 L476 540 Z" fill="#5a8a4a"/>
+    <path d="M380 510 L388 455 L396 510 Z" fill="#4a7a3a"/>
+    <path d="M340 500 L348 445 L356 500 Z" fill="#5a8a4a"/>
+  </g>
+
+  <!-- Trees bottom area -->
+  <g opacity="0.35">
+    <path d="M800 640 L808 580 L816 640 Z" fill="#4a7a3a"/>
+    <path d="M840 630 L848 570 L856 630 Z" fill="#5a8a4a"/>
+    <path d="M880 640 L888 585 L896 640 Z" fill="#4a7a3a"/>
+    <path d="M920 620 L928 560 L936 620 Z" fill="#5a8a4a"/>
+    <path d="M960 630 L968 575 L976 630 Z" fill="#4a7a3a"/>
+    <path d="M1000 610 L1008 550 L1016 610 Z" fill="#5a8a4a"/>
+  </g>
+</svg>

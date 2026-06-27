@@ -28,11 +28,12 @@ export function Hero() {
   return (
     <section className="relative min-h-[90vh] flex items-center overflow-hidden">
       <Image
-        src="/images/hero-bg.jpg"
-        alt="Pemandangan jalan berkelok di pegunungan tropis — siap untuk roadtrip"
+        src="/images/hero-bg.svg"
+        alt="Ilustrasi jalan berkelok di pegunungan — roadtrip"
         fill
         className="object-cover"
         priority
+        unoptimized
       />
       <div className="absolute inset-0 bg-gradient-to-r from-white/85 via-white/75 to-white/60" />
       <div className="absolute inset-0 bg-gradient-to-t from-primary/[0.08] via-transparent to-transparent" />
