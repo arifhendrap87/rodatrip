@@ -9,16 +9,18 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Plus, Search, Edit, Trash2, ExternalLink, EyeOff, FileDown } from "lucide-react"
+import { useDebounce } from "@/hooks/useDebounce"
 
 export default function RoadtripsPage() {
   const router = useRouter()
   const [roadtrips, setRoadtrips] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
+  const debouncedSearch = useDebounce(search, 300)
 
   useEffect(() => {
     fetchRoadtrips()
-  }, [])
+  }, [debouncedSearch])
 
   async function fetchRoadtrips() {
     setLoading(true)
@@ -30,10 +32,6 @@ export default function RoadtripsPage() {
     }
     setLoading(false)
   }
-
-  useEffect(() => {
-    fetchRoadtrips()
-  }, [search])
 
   async function handleDelete(slug: string, title: string) {
     if (!confirm(`Hapus "${title}"?`)) return

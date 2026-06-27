@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { api } from "@/lib/api/client"
 import { Button } from "@/components/ui/button"
@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { useDebounce } from "@/hooks/useDebounce"
 
 const CATEGORIES = [
   { value: "alam", label: "Alam", color: "emerald" },
@@ -29,17 +30,32 @@ export default function SpotsPage() {
   const [spots, setSpots] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
+  const debouncedSearch = useDebounce(search, 300)
   const [categoryFilter, setCategoryFilter] = useState("all")
   const [provinceFilter, setProvinceFilter] = useState("all")
+  const [provinceList, setProvinceList] = useState<{ code: string; name: string }[]>([])
+  const [loadingProv, setLoadingProv] = useState(true)
+  const initialFetchDone = useRef(false)
+
+  useEffect(() => {
+    // Fetch provinces from API
+    fetch("/api/wilayah/provinces")
+      .then((r) => r.json())
+      .then((json) => {
+        setProvinceList(json.data || [])
+        setLoadingProv(false)
+      })
+      .catch(() => setLoadingProv(false))
+  }, [])
 
   useEffect(() => {
     fetchSpots()
-  }, [search, categoryFilter, provinceFilter])
+  }, [debouncedSearch, categoryFilter, provinceFilter])
 
   async function fetchSpots() {
     setLoading(true)
     const params: Record<string, string> = {}
-    if (search) params.search = search
+    if (debouncedSearch) params.search = debouncedSearch
     if (categoryFilter !== "all") params.category = categoryFilter
     if (provinceFilter !== "all") params.province = provinceFilter
 
@@ -47,10 +63,6 @@ export default function SpotsPage() {
     setSpots(res.data as any[])
     setLoading(false)
   }
-
-  useEffect(() => {
-    fetchSpots()
-  }, [search, categoryFilter, provinceFilter])
 
   async function handleDelete(slug: string, name: string) {
     if (!confirm(`Hapus "${name}"?`)) return
@@ -114,10 +126,13 @@ export default function SpotsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Provinces</SelectItem>
-                <SelectItem value="Jawa Barat">Jawa Barat</SelectItem>
-                <SelectItem value="Jawa Tengah">Jawa Tengah</SelectItem>
-                <SelectItem value="Jawa Timur">Jawa Timur</SelectItem>
-                <SelectItem value="Bali">Bali</SelectItem>
+                {loadingProv ? (
+                  <SelectItem value="loading" disabled>Loading...</SelectItem>
+                ) : (
+                  provinceList.map((p) => (
+                    <SelectItem key={p.code} value={p.name}>{p.name}</SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
           </div>

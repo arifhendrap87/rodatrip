@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { useDebounce } from "@/hooks/useDebounce"
 
 const CATEGORIES = [
   "Safety & Darurat", "Comfort", "Gadget & Mount",
@@ -24,17 +25,18 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
+  const debouncedSearch = useDebounce(search, 300)
   const [categoryFilter, setCategoryFilter] = useState("all")
   const [selected, setSelected] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     fetchProducts()
-  }, [search, categoryFilter])
+  }, [debouncedSearch, categoryFilter])
 
   async function fetchProducts() {
     setLoading(true)
     const params: Record<string, string> = {}
-    if (search) params.search = search
+    if (debouncedSearch) params.search = debouncedSearch
     if (categoryFilter !== "all") params.category = categoryFilter
 
     const res = await api.products.list(params)

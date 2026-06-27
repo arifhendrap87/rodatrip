@@ -27,26 +27,40 @@ interface MediaItem {
 export default function MediaPage() {
   const [items, setItems] = useState<MediaItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [search, setSearch] = useState("")
   const [folder, setFolder] = useState("all")
   const [total, setTotal] = useState(0)
+  const [offset, setOffset] = useState(0)
+  const LIMIT = 50
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => { fetchMedia() }, [search, folder])
+  useEffect(() => {
+    resetAndFetch()
+  }, [search, folder])
 
-  async function fetchMedia() {
-    setLoading(true)
-    const params = new URLSearchParams({ limit: "100" })
+  async function resetAndFetch() {
+    setOffset(0)
+    await fetchMedia(0, true)
+  }
+
+  async function fetchMedia(newOffset: number = offset, replace: boolean = false) {
+    if (replace) setLoading(true)
+    else setLoadingMore(true)
+
+    const params = new URLSearchParams({ limit: String(LIMIT), offset: String(newOffset) })
     if (search) params.set("search", search)
     if (folder !== "all") params.set("folder", folder)
 
     const res = await fetch(`/api/media?${params}`)
     const json = await res.json()
-    setItems(json.data || [])
+    setItems(replace ? (json.data || []) : [...items, ...(json.data || [])])
     setTotal(json.pagination?.total || 0)
+    setOffset(newOffset + (json.data || []).length)
     setLoading(false)
+    setLoadingMore(false)
   }
 
   async function handleUpload(file: File) {
@@ -63,7 +77,7 @@ export default function MediaPage() {
 
     try {
       await fetch("/api/media", { method: "POST", body: formData })
-      fetchMedia()
+      resetAndFetch()
     } catch (err) {
       toast.error("Gagal upload: " + (err as Error).message)
     }
@@ -73,7 +87,7 @@ export default function MediaPage() {
   async function handleDelete(id: string, filename: string) {
     if (!confirm(`Hapus "${filename}"?`)) return
     await fetch(`/api/media/${id}`, { method: "DELETE" })
-    fetchMedia()
+    resetAndFetch()
   }
 
   function handleCopy(url: string, id: string) {
@@ -178,6 +192,13 @@ export default function MediaPage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+      {!loading && items.length > 0 && items.length < total && (
+        <div className="mt-6 text-center">
+          <Button onClick={() => fetchMedia(offset)} disabled={loadingMore} variant="outline">
+            {loadingMore ? <span><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Memuat...</span> : `Tampilkan lebih banyak (${items.length}/${total})`}
+          </Button>
         </div>
       )}
     </div>

@@ -7,6 +7,13 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Copy, Sparkles, Check, FileDown, Loader2 } from "lucide-react"
 import { generatePrompt } from "./data"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 function getStopRange(days: number): string {
   if (days <= 1) return "3"
@@ -111,40 +118,40 @@ export default function PromptGeneratorPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label>Provinsi</Label>
-                <select
-                  value={provCode}
-                  onChange={(e) => handleProvinsiChange(e.target.value)}
-                  className="h-10 w-full rounded-xl border border-border/50 bg-background px-3 text-sm"
-                  disabled={loadingProv}
-                >
-                  {loadingProv ? (
-                    <option>Memuat provinsi...</option>
-                  ) : (
-                    provinsiList.map((p) => (
-                      <option key={p.code} value={p.code}>{p.name}</option>
-                    ))
-                  )}
-                </select>
+                <Select value={provCode} onValueChange={(v) => v && handleProvinsiChange(v)} disabled={loadingProv}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder={loadingProv ? "Memuat..." : "Pilih provinsi"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {loadingProv ? (
+                      <SelectItem value="loading" disabled>Memuat...</SelectItem>
+                    ) : (
+                      provinsiList.map((p) => (
+                        <SelectItem key={p.code} value={p.code}>{p.name}</SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
                 <Label>Kota / Daerah</Label>
-                <select
-                  value={kota}
-                  onChange={(e) => setKota(e.target.value)}
-                  className="h-10 w-full rounded-xl border border-border/50 bg-background px-3 text-sm"
-                  disabled={loadingKota || !provCode}
-                >
-                  {loadingKota ? (
-                    <option>Memuat kota...</option>
-                  ) : kotaList.length === 0 ? (
-                    <option value="">Pilih provinsi dulu</option>
-                  ) : (
-                    kotaList.map((k) => (
-                      <option key={k.code} value={k.name}>{k.name}</option>
-                    ))
-                  )}
-                </select>
+                <Select value={kota} onValueChange={(v) => v && setKota(v)} disabled={loadingKota || !provCode}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder={loadingKota ? "Memuat..." : kota || "Pilih dulu"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {loadingKota ? (
+                      <SelectItem value="loading" disabled>Memuat...</SelectItem>
+                    ) : kotaList.length === 0 ? (
+                      <SelectItem value="" disabled>Pilih provinsi dulu</SelectItem>
+                    ) : (
+                      kotaList.map((k) => (
+                        <SelectItem key={k.code} value={k.name}>{k.name}</SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
