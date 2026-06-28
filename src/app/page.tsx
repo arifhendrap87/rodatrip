@@ -4,32 +4,29 @@ import { Features } from "@/components/landing/Features"
 import { Testimonials } from "@/components/landing/Testimonials"
 import { HowItWorks } from "@/components/landing/HowItWorks"
 import { FeaturedSpots } from "@/components/landing/FeaturedSpots"
-import { WavyDivider } from "@/components/shared/WavyDivider"
 
 export default function LandingPage() {
   return (
     <>
-      <div className="section-dark">
-        <Hero />
-      </div>
+      <Hero />
 
-      <div className="section-light-alt">
+      <div className="bg-[#FDFBF7]">
         <ValueProps />
       </div>
 
-      <div className="section-dark-alt">
+      <div className="bg-[#F0EDE8]">
         <Features />
       </div>
 
-      <div className="bg-background">
+      <div className="bg-[#FDFBF7]">
         <Testimonials />
       </div>
 
-      <div className="section-light-alt">
+      <div className="bg-[#F0EDE8]">
         <FeaturedSpots />
       </div>
 
-      <div className="section-dark-alt">
+      <div className="bg-[#FDFBF7]">
         <HowItWorks />
       </div>
     </>

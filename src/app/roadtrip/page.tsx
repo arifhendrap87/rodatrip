@@ -57,41 +57,35 @@ export default function RoadtripListPage() {
 
   return (
     <div className="min-h-screen">
-      <section className="relative overflow-hidden hero-gradient py-20 sm:py-28">
-        <div className="absolute inset-0 dot-pattern pointer-events-none" />
-        <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-primary/20 blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full bg-accent/15 blur-3xl" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20" />
+      <section className="relative overflow-hidden bg-[#FDFBF7] py-20 sm:py-28">
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
           <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur-md px-4 py-1.5 text-sm text-white/90 shadow-lg">
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#2C4A3E]/20 bg-[#2C4A3E]/5 px-4 py-1.5 text-sm text-[#2C4A3E]">
               🏎️ Roadtrip Kurasi
             </span>
-            <h1 className="mt-6 text-5xl sm:text-6xl lg:text-7xl font-bold font-heading tracking-tight leading-tight glow-text" style={{ color: "white" }}>
+            <h1 className="mt-6 text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-tight" style={{ fontFamily: "Montserrat, sans-serif", color: "#1E232A" }}>
               Panduan{" "}
-              <span className="bg-gradient-to-r from-primary via-[hsl(340_85%_55%)] to-accent bg-clip-text text-transparent">
-                Roadtrip
-              </span>
+              <span className="text-[#D95D39]">Roadtrip</span>
             </h1>
-            <p className="mt-4 text-lg text-white/70 max-w-xl">
+            <p className="mt-4 text-lg text-[#6B7280] max-w-xl">
               Kumpulan rute roadtrip kurasi lengkap dengan itinerary, estimasi biaya, dan tips perjalanan. Siap-siap gas!
             </p>
             <div className="relative max-w-md mt-6">
-              <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
               <input type="text" placeholder="Cari roadtrip..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-12 pl-11 pr-4 rounded-xl glass-dark text-white placeholder:text-white/50 text-sm shadow-xl focus:outline-none focus:ring-2 focus:ring-primary/50"
+                className="w-full h-12 pl-11 pr-4 rounded-xl border border-[#E5E0D8] bg-white text-[#1E232A] placeholder:text-[#9CA3AF] text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D95D39]/30"
               />
             </div>
           </div>
         </div>
       </section>
 
-      <section className="border-b border-border/30 glass shadow-sm sticky top-16 z-40">
+      <section className="border-b border-[#E5E0D8] bg-white/90 backdrop-blur-md shadow-sm sticky top-16 z-40">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-sm text-muted-foreground shrink-0">🌏</span>
+            <span className="text-sm text-[#6B7280] shrink-0">🌏</span>
             <select value={selectedProvince} onChange={(e) => { setSelectedProvince(e.target.value); setSelectedCity("all") }}
-              className="h-9 rounded-xl border border-border bg-white px-3 text-sm text-muted-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer"
+              className="h-9 rounded-xl border border-[#E5E0D8] bg-white px-3 text-sm text-[#6B7280] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D95D39]/30 cursor-pointer"
             >
               <option value="all">🏴 Semua Provinsi</option>
               {provinceList.map((p) => {
@@ -104,7 +98,7 @@ export default function RoadtripListPage() {
             </select>
             {selectedProvince !== "all" && citiesForProvince.length > 0 && (
               <select value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)}
-                className="h-9 rounded-xl border border-border bg-white px-3 text-sm text-muted-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer"
+                className="h-9 rounded-xl border border-[#E5E0D8] bg-white px-3 text-sm text-[#6B7280] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D95D39]/30 cursor-pointer"
               >
                 <option value="all">🏙️ Semua Kota</option>
                 {citiesForProvince.map((c) => (<option key={c} value={c}>{c}</option>))}
@@ -112,22 +106,22 @@ export default function RoadtripListPage() {
             )}
             {(selectedProvince !== "all" || selectedCity !== "all" || searchQuery) && (
               <button onClick={() => { setSelectedProvince("all"); setSelectedCity("all"); setSearchQuery("") }}
-                className="h-9 px-3 rounded-xl border border-border/50 text-xs text-muted-foreground hover:bg-muted transition-colors"
+                className="h-9 px-3 rounded-xl border border-[#E5E0D8]/50 text-xs text-[#6B7280] hover:bg-[#F0EDE8] transition-colors"
               >
                 ✕ Reset
               </button>
             )}
-            <p className="ml-auto text-sm text-muted-foreground whitespace-nowrap">
-              <span className="font-semibold text-foreground">{filtered.length}</span> roadtrip
+            <p className="ml-auto text-sm text-[#6B7280] whitespace-nowrap">
+              <span className="font-semibold text-[#1E232A]">{filtered.length}</span> roadtrip
             </p>
           </div>
         </div>
       </section>
 
-      <section className="py-12 sm:py-16 section-light-alt">
+      <section className="py-12 sm:py-16 bg-[#F0EDE8]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           {loading ? (
-            <div className="py-20 text-center text-muted-foreground">Memuat...</div>
+            <div className="py-20 text-center text-[#6B7280]">Memuat...</div>
           ) : filtered.length === 0 ? (
             <div className="text-center py-20">
               <span className="text-5xl">🏎️</span>

@@ -43,17 +43,15 @@ export default function ProductsPage() {
 
   return (
     <div className="min-h-screen">
-      <section className="relative overflow-hidden hero-gradient py-16 sm:py-20">
-        <div className="absolute inset-0 dot-pattern pointer-events-none" />
-        <div className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full bg-primary/20 blur-3xl" />
+      <section className="relative overflow-hidden bg-[#FDFBF7] py-16 sm:py-20">
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl sm:text-5xl font-bold font-heading glow-text-sm" style={{ color: "white" }}>Produk Roadtrip</h1>
-              <p className="mt-2 text-white/70">Perlengkapan roadtrip yang pas buat perjalanan kamu.</p>
+              <h1 className="text-4xl sm:text-5xl font-black" style={{ fontFamily: "Montserrat, sans-serif", color: "#1E232A" }}>Produk Roadtrip</h1>
+              <p className="mt-2 text-[#6B7280]">Perlengkapan roadtrip yang pas buat perjalanan kamu.</p>
             </div>
             <button onClick={() => setCartOpen(true)}
-              className="relative rounded-xl glass-dark px-4 py-2.5 shadow-lg transition-all hover:shadow-xl text-white"
+              className="relative rounded-xl border border-[#E5E0D8] bg-white px-4 py-2.5 shadow-sm transition-all hover:shadow-md"
             >
               <div className="flex items-center gap-2">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
@@ -71,10 +69,10 @@ export default function ProductsPage() {
 
         <div className="mt-8 flex flex-wrap gap-2">
           <button onClick={() => setActiveCategory("Semua")}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${activeCategory === "Semua" ? "bg-primary text-primary-foreground" : "bg-muted/50 text-muted-foreground hover:bg-muted"}`}>Semua</button>
+            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${activeCategory === "Semua" ? "bg-[#D95D39] text-white" : "bg-[#F0EDE8] text-[#6B7280] hover:bg-[#E5E0D8] hover:text-[#1E232A]"}`}>Semua</button>
           {PRODUCT_CATEGORIES.map((cat) => (
             <button key={cat} onClick={() => setActiveCategory(cat)}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${activeCategory === cat ? "bg-primary text-primary-foreground" : "bg-muted/50 text-muted-foreground hover:bg-muted"}`}>{cat}</button>
+              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${activeCategory === cat ? "bg-[#D95D39] text-white" : "bg-[#F0EDE8] text-[#6B7280] hover:bg-[#E5E0D8] hover:text-[#1E232A]"}`}>{cat}</button>
           ))}
         </div>
 

@@ -84,30 +84,26 @@ export default function SpotIstimewaPage() {
 
   return (
     <>
-      <section className="relative min-h-[60vh] flex items-center overflow-hidden hero-gradient">
-        <div className="absolute inset-0 dot-pattern pointer-events-none" />
-        <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-primary/20 blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full bg-accent/15 blur-3xl" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20 pointer-events-none" />
-        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 py-24 sm:py-32 w-full">
+      <section className="relative min-h-[55vh] flex items-center overflow-hidden bg-[#FDFBF7]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-20 sm:py-28 w-full">
           <motion.div variants={heroStagger} initial="initial" animate="animate" className="max-w-3xl">
             <motion.div variants={heroItem}>
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur-md px-4 py-1.5 text-sm text-white/90 shadow-lg">✨ Tempat Istimewa</span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-[#2C4A3E]/20 bg-[#2C4A3E]/5 px-4 py-1.5 text-sm text-[#2C4A3E]">✨ Tempat Istimewa</span>
             </motion.div>
             <motion.h1 variants={heroItem}
-              className="mt-6 text-5xl font-bold leading-none tracking-tight sm:text-6xl lg:text-7xl font-heading glow-text"
-              style={{ fontFamily: "var(--font-display)", color: "white" }}
+              className="mt-6 text-5xl font-black leading-none tracking-tight sm:text-6xl lg:text-7xl"
+              style={{ fontFamily: "Montserrat, sans-serif", color: "#1E232A" }}
             >
-              Spot <span className="bg-gradient-to-r from-primary via-[hsl(340_85%_55%)] to-accent bg-clip-text text-transparent">Istimewa</span>
+              Spot <span className="text-[#D95D39]">Istimewa</span>
             </motion.h1>
-            <motion.p variants={heroItem} className="mt-4 text-lg text-white/70 max-w-xl">
+            <motion.p variants={heroItem} className="mt-4 text-lg text-[#6B7280] max-w-xl">
               Kumpulan tempat-tempat epik di Indonesia yang bikin roadtrip kamu nggak terlupakan. Dikurasi khusus buat kamu.
             </motion.p>
             <motion.div variants={heroItem}>
               <div className="relative max-w-md mt-8">
-                <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                 <input type="text" placeholder="Cari spot, provinsi, atau tag..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-12 pl-11 pr-4 rounded-xl glass-dark text-white placeholder:text-white/50 text-sm shadow-xl focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  className="w-full h-12 pl-11 pr-4 rounded-xl border border-[#E5E0D8] bg-white text-[#1E232A] placeholder:text-[#9CA3AF] text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D95D39]/30"
                 />
               </div>
             </motion.div>
@@ -115,38 +111,38 @@ export default function SpotIstimewaPage() {
         </div>
       </section>
 
-      <section className="py-8 sm:py-10 section-light-alt">
+      <section className="py-8 sm:py-10 bg-[#FDFBF7]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <h2 className="text-sm font-semibold font-heading text-muted-foreground uppercase tracking-wider mb-4">Jelajah Berdasarkan Region</h2>
+          <h2 className="text-sm font-semibold font-heading text-[#6B7280] uppercase tracking-wider mb-4">Jelajah Berdasarkan Region</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {REGIONS.filter((r) => r.key !== "all").map((region) => (
               <button key={region.key} onClick={() => setSelectedRegion(selectedRegion === region.key ? "all" : region.key)}
-                className={`relative overflow-hidden rounded-2xl border p-4 text-left transition-all duration-300 card-glow ${selectedRegion === region.key ? "border-primary bg-primary/10 shadow-md shadow-primary/10" : "border-border/50 bg-white hover:border-primary/30"}`}
+                className={`relative overflow-hidden rounded-xl border p-4 text-left transition-all duration-300 card-glow ${selectedRegion === region.key ? "border-[#D95D39] bg-[#D95D39]/5 shadow-md shadow-[#D95D39]/10" : "bg-white hover:border-[#D95D39]/30"}`}
               >
                 <span className="text-2xl">{region.icon}</span>
-                <p className={`mt-2 text-sm font-semibold font-heading ${selectedRegion === region.key ? "text-primary" : "text-foreground"}`}>{region.label}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{region.desc}</p>
-                <p className="text-[10px] text-muted-foreground mt-1 font-mono">{regionCounts[region.key]} spot</p>
+                <p className={`mt-2 text-sm font-semibold font-heading ${selectedRegion === region.key ? "text-[#D95D39]" : "text-[#1E232A]"}`}>{region.label}</p>
+                <p className="text-xs text-[#6B7280] mt-0.5">{region.desc}</p>
+                <p className="text-[10px] text-[#6B7280] mt-1 font-mono">{regionCounts[region.key]} spot</p>
               </button>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="sticky top-16 z-40 border-b border-border/30 glass shadow-sm">
+      <section className="sticky top-16 z-40 border-b border-[#E5E0D8] bg-white/90 backdrop-blur-md shadow-sm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3">
           <div className="flex flex-wrap items-center gap-2">
             {ALL_CATEGORIES.map((cat) => (
               <button key={cat.key} onClick={() => setSelectedCategory(cat.key)}
-                className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ${selectedCategory === cat.key ? "bg-primary text-primary-foreground shadow-md shadow-primary/25" : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+                className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ${selectedCategory === cat.key ? "bg-[#D95D39] text-white shadow-md shadow-[#D95D39]/25" : "bg-[#F0EDE8] text-[#6B7280] hover:bg-[#E5E0D8] hover:text-[#1E232A]"}`}
               >
                 <span>{cat.icon}</span><span>{cat.label}</span>
               </button>
             ))}
             <div className="ml-auto flex items-center gap-2">
-              <span className="text-sm text-muted-foreground hidden sm:inline">🌏</span>
+              <span className="text-sm text-[#6B7280] hidden sm:inline">🌏</span>
               <select value={selectedProvince} onChange={(e) => { setSelectedProvince(e.target.value); setSelectedCity("all") }}
-                className="h-9 rounded-xl border border-border bg-white px-3 text-sm text-muted-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer"
+                className="h-9 rounded-xl border border-[#E5E0D8] bg-white px-3 text-sm text-[#6B7280] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D95D39]/30 cursor-pointer"
               >
                 <option value="all">🏴 Semua Provinsi</option>
                 {PROVINSI.map((p) => {
@@ -156,7 +152,7 @@ export default function SpotIstimewaPage() {
               </select>
               {selectedProvince !== "all" && citiesForProvince.length > 0 && (
                 <select value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)}
-                  className="h-9 rounded-xl border border-border bg-white px-3 text-sm text-muted-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer"
+                  className="h-9 rounded-xl border border-[#E5E0D8] bg-white px-3 text-sm text-[#6B7280] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D95D39]/30 cursor-pointer"
                 >
                   <option value="all">🏙️ Semua Kota</option>
                   {citiesForProvince.map((c) => {
@@ -167,7 +163,7 @@ export default function SpotIstimewaPage() {
               )}
               {(selectedProvince !== "all" || selectedCity !== "all" || selectedCategory !== "all" || selectedRegion !== "all" || searchQuery) && (
                 <button onClick={() => { setSelectedCategory("all"); setSelectedRegion("all"); setSelectedProvince("all"); setSelectedCity("all"); setSearchQuery("") }}
-                  className="h-9 px-3 rounded-xl border border-border/50 text-xs text-muted-foreground hover:bg-muted transition-colors whitespace-nowrap"
+                  className="h-9 px-3 rounded-xl border border-[#E5E0D8]/50 text-xs text-[#6B7280] hover:bg-[#F0EDE8] transition-colors whitespace-nowrap"
                 >
                   ✕ Reset
                 </button>
@@ -177,20 +173,20 @@ export default function SpotIstimewaPage() {
         </div>
       </section>
 
-      <section className="py-12 sm:py-16 section-light-alt">
+      <section className="py-12 sm:py-16 bg-[#F0EDE8]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex items-center justify-between mb-8">
-            <p className="text-sm text-muted-foreground">
-              <span className="font-semibold text-foreground">{loading ? "..." : filtered.length}</span> spot ditemukan
+            <p className="text-sm text-[#6B7280]">
+              <span className="font-semibold text-[#1E232A]">{loading ? "..." : filtered.length}</span> spot ditemukan
             </p>
           </div>
 
           {loading ? (
-            <div className="py-20 text-center text-muted-foreground">Memuat spot...</div>
+            <div className="py-20 text-center text-[#6B7280]">Memuat spot...</div>
           ) : filtered.length > 0 ? (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {filtered.map((spot, i) => (
-                <motion.div key={spot.slug} className="card-glow rounded-2xl overflow-hidden bg-white" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: (i % 6) * 0.05 }}>
+                <motion.div key={spot.slug} className="card-glow rounded-xl overflow-hidden bg-white" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: (i % 6) * 0.05 }}>
                   <SpotCard spot={spot} />
                 </motion.div>
               ))}
@@ -198,10 +194,10 @@ export default function SpotIstimewaPage() {
           ) : (
             <div className="text-center py-20">
               <span className="text-4xl">🔍</span>
-              <p className="mt-4 text-lg font-medium text-foreground">Tidak ada spot yang cocok</p>
-              <p className="mt-1 text-sm text-muted-foreground">Coba ubah filter atau kata kunci pencarian</p>
+              <p className="mt-4 text-lg font-medium text-[#1E232A]">Tidak ada spot yang cocok</p>
+              <p className="mt-1 text-sm text-[#6B7280]">Coba ubah filter atau kata kunci pencarian</p>
               <button onClick={() => { setSelectedCategory("all"); setSelectedRegion("all"); setSelectedProvince("all"); setSelectedCity("all"); setSearchQuery("") }}
-                className="mt-4 text-sm text-primary hover:underline underline-offset-2">Reset Filter</button>
+                className="mt-4 text-sm text-[#D95D39] hover:underline underline-offset-2">Reset Filter</button>
             </div>
           )}
         </div>
