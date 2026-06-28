@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
-import Image from "next/image"
 import { SpotCard } from "@/components/spot/SpotCard"
 import { SPOT_CATEGORIES } from "@/data/spots"
 import { heroStagger, heroItem } from "@/lib/animations"
@@ -85,28 +84,28 @@ export default function SpotIstimewaPage() {
 
   return (
     <>
-      <section className="relative min-h-[55vh] flex items-center overflow-hidden bg-[#FDFBF7]">
-        <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(#2C4A3E 0.5px, transparent 0.5px)", backgroundSize: "32px 32px", opacity: 0.06 }} />
-        <Image src="/images/hero-bg.svg" alt="" fill unoptimized className="object-bottom object-contain opacity-[0.08] pointer-events-none select-none" style={{ objectPosition: "bottom center" }} />
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-20 sm:py-28 w-full">
+      <section className="relative min-h-[55vh] flex items-center overflow-hidden">
+        <img src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1600&q=85" alt="" className="absolute inset-0 z-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 z-[1] bg-gradient-to-b from-black/60 via-black/30 to-black/50" />
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 py-20 sm:py-28 w-full">
           <motion.div variants={heroStagger} initial="initial" animate="animate" className="max-w-3xl">
             <motion.div variants={heroItem}>
-              <span className="inline-flex items-center gap-2 rounded-full border border-[#2C4A3E]/20 bg-[#2C4A3E]/5 px-4 py-1.5 text-sm text-[#2C4A3E]">✨ Tempat Istimewa</span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur-sm px-4 py-1.5 text-sm text-white/90">✨ Tempat Istimewa</span>
             </motion.div>
             <motion.h1 variants={heroItem}
-              className="mt-6 text-5xl font-black leading-none tracking-tight sm:text-6xl lg:text-7xl"
-              style={{ fontFamily: "Montserrat, sans-serif", color: "#1E232A" }}
+              className="mt-6 text-5xl font-black leading-none tracking-tight sm:text-6xl lg:text-7xl text-white"
+              style={{ fontFamily: "Montserrat, sans-serif" }}
             >
               Spot <span className="text-[#D95D39]">Istimewa</span>
             </motion.h1>
-            <motion.p variants={heroItem} className="mt-4 text-lg text-[#6B7280] max-w-xl">
+            <motion.p variants={heroItem} className="mt-4 text-lg text-white/70 max-w-xl">
               Kumpulan tempat-tempat epik di Indonesia yang bikin roadtrip kamu nggak terlupakan. Dikurasi khusus buat kamu.
             </motion.p>
             <motion.div variants={heroItem}>
               <div className="relative max-w-md mt-8">
-                <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                 <input type="text" placeholder="Cari spot, provinsi, atau tag..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-12 pl-11 pr-4 rounded-xl border border-[#E5E0D8] bg-white text-[#1E232A] placeholder:text-[#9CA3AF] text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D95D39]/30"
+                  className="w-full h-12 pl-11 pr-4 rounded-xl bg-black/30 backdrop-blur-sm border border-white/20 text-white placeholder:text-white/50 text-sm shadow-xl focus:outline-none focus:ring-2 focus:ring-[#D95D39]/50"
                 />
               </div>
             </motion.div>
