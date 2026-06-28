@@ -9,37 +9,27 @@ import { WavyDivider } from "@/components/shared/WavyDivider"
 export default function LandingPage() {
   return (
     <>
-      <div className="bg-background">
+      <div className="section-dark">
         <Hero />
       </div>
 
-      <WavyDivider />
-
-      <div className="bg-primary/[0.03]">
+      <div className="section-light-alt">
         <ValueProps />
       </div>
 
-      <WavyDivider />
-
-      <div className="bg-primary/[0.03]">
+      <div className="section-dark-alt">
         <Features />
       </div>
-
-      <WavyDivider />
 
       <div className="bg-background">
         <Testimonials />
       </div>
 
-      <WavyDivider />
-
-      <div className="bg-primary/[0.03]">
+      <div className="section-light-alt">
         <FeaturedSpots />
       </div>
 
-      <WavyDivider />
-
-      <div className="bg-background">
+      <div className="section-dark-alt">
         <HowItWorks />
       </div>
     </>
