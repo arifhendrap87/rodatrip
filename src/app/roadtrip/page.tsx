@@ -58,6 +58,8 @@ export default function RoadtripListPage() {
   return (
     <div className="min-h-screen">
       <section className="relative overflow-hidden bg-[#FDFBF7] py-20 sm:py-28">
+        <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(#2C4A3E 0.5px, transparent 0.5px)", backgroundSize: "32px 32px", opacity: 0.06 }} />
+        <Image src="/images/hero-bg.svg" alt="" fill unoptimized className="object-bottom object-contain opacity-[0.08] pointer-events-none select-none" style={{ objectPosition: "bottom center" }} />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
           <div className="max-w-3xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-[#2C4A3E]/20 bg-[#2C4A3E]/5 px-4 py-1.5 text-sm text-[#2C4A3E]">

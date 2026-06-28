@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
+import Image from "next/image"
 import { SpotCard } from "@/components/spot/SpotCard"
 import { SPOT_CATEGORIES } from "@/data/spots"
 import { heroStagger, heroItem } from "@/lib/animations"
@@ -85,6 +86,8 @@ export default function SpotIstimewaPage() {
   return (
     <>
       <section className="relative min-h-[55vh] flex items-center overflow-hidden bg-[#FDFBF7]">
+        <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(#2C4A3E 0.5px, transparent 0.5px)", backgroundSize: "32px 32px", opacity: 0.06 }} />
+        <Image src="/images/hero-bg.svg" alt="" fill unoptimized className="object-bottom object-contain opacity-[0.08] pointer-events-none select-none" style={{ objectPosition: "bottom center" }} />
         <div className="mx-auto max-w-7xl px-4 sm:px-6 py-20 sm:py-28 w-full">
           <motion.div variants={heroStagger} initial="initial" animate="animate" className="max-w-3xl">
             <motion.div variants={heroItem}>

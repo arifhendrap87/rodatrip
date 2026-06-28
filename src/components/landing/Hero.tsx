@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { motion } from "framer-motion"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { heroStagger, heroItem } from "@/lib/animations"
@@ -24,6 +25,8 @@ export function Hero() {
 
   return (
     <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-[#FDFBF7]">
+      <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(#2C4A3E 0.5px, transparent 0.5px)", backgroundSize: "32px 32px", opacity: 0.06 }} />
+      <Image src="/images/hero-bg.svg" alt="" fill unoptimized className="object-bottom object-contain opacity-[0.08] pointer-events-none select-none" style={{ objectPosition: "bottom center" }} />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-20 lg:py-32 w-full">
         <motion.div
           variants={heroStagger}
