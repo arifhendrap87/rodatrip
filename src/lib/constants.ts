@@ -9,7 +9,6 @@ export const NAV_LINKS: NavLink[] = [
   { href: "/", label: "Beranda" },
   { href: "/spot-istimewa", label: "Spot Istimewa" },
   { href: "/roadtrip", label: "Roadtrip" },
-  { href: "/products", label: "Produk" },
   { href: "/blog", label: "Blog" },
 ]
 
@@ -24,7 +23,6 @@ export const FOOTER_LINKS_UTILITY: NavLink[] = [
 export const FOOTER_LINKS_SPOTS: NavLink[] = [
   { href: "/spot-istimewa", label: "Spot Istimewa" },
   { href: "/roadtrip", label: "Panduan Roadtrip" },
-  { href: "/products", label: "Toko Roadtrip" },
   { href: "/blog", label: "Blog" },
 ]
 

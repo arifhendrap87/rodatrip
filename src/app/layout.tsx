@@ -1,6 +1,9 @@
 import type { Metadata } from "next"
 import { headers } from "next/headers"
+import { Montserrat } from "next/font/google"
 import "./globals.css"
+
+const montserratDisplay = Montserrat({ subsets: ["latin"], weight: ["700", "900"], variable: "--font-display" })
 import { Navbar } from "@/components/landing/Navbar"
 import { Footer } from "@/components/landing/Footer"
 import { PostHogProvider } from "@/components/PostHogProvider"
@@ -36,7 +39,7 @@ export default async function RootLayout({
 
   if (isAdmin) {
     return (
-      <html lang="id" className="h-full antialiased">
+      <html lang="id" className={`h-full antialiased ${montserratDisplay.variable}`}>
         <body className="min-h-full bg-background text-foreground">
           {children}
         </body>
@@ -45,7 +48,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="id" className="h-full antialiased">
+    <html lang="id" className={`h-full antialiased ${montserratDisplay.variable}`}>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <PostHogProvider>
           <Navbar />
