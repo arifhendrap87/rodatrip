@@ -69,7 +69,7 @@ export default function RoadtripListPage() {
               Panduan{" "}
               <span className="text-[#D95D39]">Roadtrip</span>
             </h1>
-            <p className="mt-4 text-lg text-white/70 max-w-xl">
+            <p className="mt-4 text-lg text-white/90 max-w-xl">
               Kumpulan rute roadtrip kurasi lengkap dengan itinerary, estimasi biaya, dan tips perjalanan. Siap-siap gas!
             </p>
             <div className="relative max-w-md mt-6">

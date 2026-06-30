@@ -98,7 +98,7 @@ export default function SpotIstimewaPage() {
             >
               Spot <span className="text-[#D95D39]">Istimewa</span>
             </motion.h1>
-            <motion.p variants={heroItem} className="mt-4 text-lg text-white/70 max-w-xl">
+            <motion.p variants={heroItem} className="mt-4 text-lg text-white/90 max-w-xl">
               Kumpulan tempat-tempat epik di Indonesia yang bikin roadtrip kamu nggak terlupakan. Dikurasi khusus buat kamu.
             </motion.p>
             <motion.div variants={heroItem}>

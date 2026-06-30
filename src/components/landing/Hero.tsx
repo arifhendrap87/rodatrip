@@ -53,7 +53,7 @@ export function Hero() {
 
             <motion.p
               variants={heroItem}
-              className="mt-6 text-lg text-white/70 max-w-lg mx-auto"
+              className="mt-6 text-lg text-white/90 max-w-lg mx-auto"
             >
               Temukan itinerary roadtrip kurasi lengkap dengan timeline, estimasi biaya, dan tips perjalanan.
             </motion.p>
@@ -129,11 +129,11 @@ export function Hero() {
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
             <div className="text-center">
               <span className="text-3xl font-bold font-heading text-[#D95D39]">{stats.roadtrips}</span>
-              <p className="text-sm text-white/70">Roadtrip Itinerary</p>
+              <p className="text-sm text-white/90">Roadtrip Itinerary</p>
             </div>
             <div className="text-center">
               <span className="text-3xl font-bold font-heading text-white">{stats.poi}</span>
-              <p className="text-sm text-white/70">POI Sepanjang Rute</p>
+              <p className="text-sm text-white/90">POI Sepanjang Rute</p>
             </div>
           </div>
         </motion.div>
