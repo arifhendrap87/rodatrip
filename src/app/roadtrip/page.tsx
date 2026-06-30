@@ -58,7 +58,7 @@ export default function RoadtripListPage() {
   return (
     <div className="min-h-screen">
       <section className="relative overflow-hidden py-20 sm:py-28">
-        <img src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1600&q=85" alt="" className="absolute inset-0 z-0 w-full h-full object-cover" />
+        <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1600&q=85" alt="" className="absolute inset-0 z-0 w-full h-full object-cover" />
         <div className="absolute inset-0 z-[1] bg-gradient-to-b from-black/60 via-black/30 to-black/50" />
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
           <div className="max-w-3xl">
