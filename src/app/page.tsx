@@ -4,6 +4,7 @@ import { Features } from "@/components/landing/Features"
 import { Testimonials } from "@/components/landing/Testimonials"
 import { HowItWorks } from "@/components/landing/HowItWorks"
 import { FeaturedSpots } from "@/components/landing/FeaturedSpots"
+import { BlogSection } from "@/components/landing/BlogSection"
 
 export default function LandingPage() {
   return (
@@ -27,6 +28,10 @@ export default function LandingPage() {
       </div>
 
       <div className="bg-[#FDFBF7]">
+        <BlogSection />
+      </div>
+
+      <div className="bg-[#F0EDE8]">
         <HowItWorks />
       </div>
     </>
