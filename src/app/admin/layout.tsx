@@ -21,6 +21,7 @@ import {
   Menu,
   Sparkles,
   Share2,
+  FileText,
 } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useState } from "react"
@@ -30,6 +31,7 @@ const navItems = [
   { href: "/admin/spots", label: "Spots", icon: MapPin },
   { href: "/admin/products", label: "Products", icon: ShoppingBag },
   { href: "/admin/roadtrips", label: "Roadtrips", icon: Map },
+  { href: "/admin/blog", label: "Blog", icon: FileText },
   { href: "/admin/media", label: "Media", icon: Image },
   { href: "/admin/regions", label: "Regions", icon: Globe },
   { href: "/admin/content-generator", label: "Konten Sosmed", icon: Share2 },
