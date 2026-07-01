@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
+import TiptapEditor from "@/components/ui/tiptap/tiptap-editor"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Select,
@@ -206,8 +207,8 @@ export default function EditBlogPage() {
             </div>
 
             <div className="space-y-2">
-              <Label>Konten (Markdown)</Label>
-              <Textarea value={form.content} onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))} rows={20} className="font-mono text-sm" />
+              <Label>Konten</Label>
+              <TiptapEditor content={form.content} onChange={(html) => setForm((f) => ({ ...f, content: html }))} />
             </div>
 
             <div className="grid gap-4 sm:grid-cols-3">

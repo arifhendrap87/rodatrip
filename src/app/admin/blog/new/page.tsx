@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
+import TiptapEditor from "@/components/ui/tiptap/tiptap-editor"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import {
   Select,
@@ -270,8 +271,8 @@ export default function NewBlogPage() {
             </div>
 
             <div className="space-y-2">
-              <Label>Konten (Markdown)</Label>
-              <Textarea value={form.content} onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))} rows={15} placeholder="Tulis konten artikel di sini...&#10;&#10;## Judul&#10;&#10;Isi artikel dengan **bold** dan list:" className="font-mono text-sm" />
+              <Label>Konten</Label>
+              <TiptapEditor content={form.content} onChange={(html) => setForm((f) => ({ ...f, content: html }))} />
             </div>
 
             <div className="grid gap-4 sm:grid-cols-3">
