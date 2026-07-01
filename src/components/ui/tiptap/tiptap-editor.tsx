@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from "react"
 import { useEditor, EditorContent } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import ImageExtension from "@tiptap/extension-image"
@@ -41,6 +42,12 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
       },
     },
   })
+
+  useEffect(() => {
+    if (editor && content && editor.getHTML() !== content) {
+      editor.commands.setContent(content)
+    }
+  }, [content, editor])
 
   if (!editor) return null
 
