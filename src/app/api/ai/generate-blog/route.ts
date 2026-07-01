@@ -89,6 +89,21 @@ Aturan:
 - Output HANYA HTML, tanpa tag html/body/head, tanpa teks lain`
         break
 
+      case "gambar":
+        prompt = `Buatkan 1 prompt untuk AI image generator (Midjourney/DALL-E) berdasarkan judul artikel berikut:
+
+Judul: "${existingData?.title || topic}"
+Kategori: ${existingData?.category || "Tips"}
+
+Aturan:
+- Output HANYA teks prompt, tanpa penjelasan lain
+- Gunakan Bahasa Inggris untuk prompt utama (Midjourney lebih optimal dengan English)
+- Sertakan: subjek utama, lingkungan/setting, pencahayaan, suasana, gaya visual
+- Format yang cocok untuk Midjourney (deskriptif, detail, tidak terlalu pendek)
+- Jangan gunakan --ar atau parameter teknis Midjourney
+- Prompt length: 50-100 kata`
+        break
+
       case "seo":
         prompt = `Buatkan meta data SEO untuk artikel berikut:
 Judul: "${existingData?.title || topic}"

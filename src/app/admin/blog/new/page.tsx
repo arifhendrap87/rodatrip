@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { ArrowLeft, Save, Loader2, Sparkles, Lightbulb, FileText, Check } from "lucide-react"
+import { ArrowLeft, Save, Loader2, Sparkles, Lightbulb, FileText, Check, Image as ImageIcon, Copy } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 
@@ -30,6 +30,9 @@ export default function NewBlogPage() {
   const [generatingContent, setGeneratingContent] = useState(false)
   const [generatingSeo, setGeneratingSeo] = useState(false)
   const [ideResults, setIdeResults] = useState<any[]>([])
+  const [generatingImage, setGeneratingImage] = useState(false)
+  const [imagePrompt, setImagePrompt] = useState("")
+  const [copiedPrompt, setCopiedPrompt] = useState(false)
 
   const [aiTopic, setAiTopic] = useState("Tips Roadtrip")
 
@@ -146,6 +149,29 @@ export default function NewBlogPage() {
     setGeneratingSeo(false)
   }
 
+  async function handleGenerateImage() {
+    setGeneratingImage(true)
+    setImagePrompt("")
+    try {
+      const res = await fetch("/api/ai/generate-blog", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "gambar",
+          topic: aiTopic,
+          existingData: { title: form.title, category: form.category },
+        }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json?.error?.message || "Gagal generate prompt")
+      setImagePrompt(json.data?.text || "")
+      toast.success("Prompt gambar siap!")
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Gagal generate prompt gambar")
+    }
+    setGeneratingImage(false)
+  }
+
   function selectIdea(idea: any) {
     setForm((f) => ({
       ...f,
@@ -242,9 +268,40 @@ export default function NewBlogPage() {
                 onClick={handleGenerateSeo} disabled={generatingSeo || !form.title}
                 className="gap-1.5 bg-white">
                 {generatingSeo ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                {generatingSeo ? "Generating..." : "✨ Generate SEO"}
+                {generatingSeo ? "Generating..." : "✨ SEO"}
+              </Button>
+              <Button type="button" variant="outline" size="sm"
+                onClick={handleGenerateImage} disabled={generatingImage || !form.title}
+                className="gap-1.5 bg-white">
+                {generatingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
+                {generatingImage ? "Generating..." : "🎨 Prompt Gambar"}
               </Button>
             </div>
+
+            {/* Image Prompt Result */}
+            {imagePrompt && (
+              <div className="mt-3 p-3 rounded-xl border border-border/50 bg-white">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs font-medium text-muted-foreground">🎨 Prompt untuk AI Image Generator</p>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 gap-1 text-xs"
+                    onClick={() => {
+                      navigator.clipboard.writeText(imagePrompt)
+                      setCopiedPrompt(true)
+                      setTimeout(() => setCopiedPrompt(false), 2000)
+                      toast.success("Prompt tersalin!")
+                    }}
+                  >
+                    {copiedPrompt ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
+                    {copiedPrompt ? "Tersalin!" : "Copy"}
+                  </Button>
+                </div>
+                <Textarea value={imagePrompt} readOnly rows={4} className="text-xs font-mono resize-none" />
+              </div>
+            )}
 
             {/* Ide Results */}
             {ideResults.length > 0 && (
