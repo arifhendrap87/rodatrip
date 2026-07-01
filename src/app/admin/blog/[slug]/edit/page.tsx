@@ -222,6 +222,8 @@ export default function EditBlogPage() {
                     <SelectItem value="Destinasi">Destinasi</SelectItem>
                     <SelectItem value="Tutorial">Tutorial</SelectItem>
                     <SelectItem value="Review">Review</SelectItem>
+                    <SelectItem value="Perawatan Mobil">Perawatan Mobil</SelectItem>
+                    <SelectItem value="Kendaraan">Kendaraan</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

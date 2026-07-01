@@ -31,6 +31,8 @@ export default function NewBlogPage() {
   const [generatingSeo, setGeneratingSeo] = useState(false)
   const [ideResults, setIdeResults] = useState<any[]>([])
 
+  const [aiTopic, setAiTopic] = useState("Tips Roadtrip")
+
   const [form, setForm] = useState({
     title: "",
     slug: "",
@@ -58,7 +60,7 @@ export default function NewBlogPage() {
       const res = await fetch("/api/ai/generate-blog", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "ide", topic: form.title || "roadtrip Indonesia" }),
+        body: JSON.stringify({ action: "ide", topic: aiTopic }),
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json?.error?.message || "Gagal generate ide")
@@ -206,6 +208,23 @@ export default function NewBlogPage() {
             <CardDescription>Gunakan DeepSeek untuk membantu menulis konten</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
+            <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">Topik Ide Konten</Label>
+              <Select value={aiTopic} onValueChange={(v) => v && setAiTopic(v)}>
+                <SelectTrigger className="w-full sm:w-64 h-8 text-xs bg-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Tips Roadtrip">Tips Roadtrip</SelectItem>
+                  <SelectItem value="Destinasi Wisata">Destinasi Wisata</SelectItem>
+                  <SelectItem value="Inspirasi Perjalanan">Inspirasi Perjalanan</SelectItem>
+                  <SelectItem value="Perawatan Mobil">Perawatan Mobil</SelectItem>
+                  <SelectItem value="Kendaraan">Kendaraan</SelectItem>
+                  <SelectItem value="Tutorial">Tutorial</SelectItem>
+                  <SelectItem value="Review">Review</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <div className="flex flex-wrap gap-2">
               <Button type="button" variant="outline" size="sm"
                 onClick={handleGenerateIde} disabled={generatingIde}
@@ -286,6 +305,8 @@ export default function NewBlogPage() {
                     <SelectItem value="Destinasi">Destinasi</SelectItem>
                     <SelectItem value="Tutorial">Tutorial</SelectItem>
                     <SelectItem value="Review">Review</SelectItem>
+                    <SelectItem value="Perawatan Mobil">Perawatan Mobil</SelectItem>
+                    <SelectItem value="Kendaraan">Kendaraan</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

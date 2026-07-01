@@ -44,22 +44,22 @@ export async function POST(request: Request) {
 
     switch (action) {
       case "ide":
-        prompt = `Buatkan 5 ide artikel blog menarik tentang topik: "${topic || 'roadtrip Indonesia'}".
+        prompt = `Buatkan 5 ide artikel blog menarik tentang topik: "${topic || 'Tips Roadtrip'}".
 
 Format output (HANYA JSON array, tanpa teks lain):
 [
   {
     "title": "Judul artikel yang SEO-friendly",
     "excerpt": "Deskripsi singkat 1-2 kalimat",
-    "category": "salah satu dari: Tips, Inspirasi, Destinasi, Tutorial, Review"
+    "category": "salah satu dari: Tips, Inspirasi, Destinasi, Tutorial, Review, Perawatan Mobil, Kendaraan"
   }
 ]
 
 Aturan:
 - Judul harus menarik, click-worthy, tapi tidak clickbait
 - Gunakan Bahasa Indonesia
-- Sesuaikan dengan topik yang diberikan
-- Kategori harus spesifik dan relevan`
+- Sesuaikan dengan topik "${topic}" yang diberikan
+- Kategori harus spesifik dan relevan dengan topik`
         break
 
       case "tulis":
