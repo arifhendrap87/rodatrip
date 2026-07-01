@@ -63,6 +63,16 @@ Aturan:
         break
 
       case "tulis":
+        const toneHints: Record<string, string> = {
+          "Tips": "praktis, langsung ke inti, seperti saran dari teman",
+          "Destinasi": "deskriptif, visual, membangun imajinasi tempat",
+          "Inspirasi": "storytelling, emosional, personal",
+          "Review": "opini jujur, kelebihan & kekurangan, perbandingan",
+          "Tutorial": "langkah demi langkah, instruksional, mudah diikuti",
+          "Perawatan Mobil": "teknis tapi mudah dipahami, safety first",
+          "Kendaraan": "informatif, detail teknis, rekomendasi",
+        }
+
         prompt = `Buatkan artikel blog lengkap tentang: "${existingData?.title || topic}"
 
 Data pendukung:
@@ -70,23 +80,34 @@ ${existingData?.spots ? `Spot terkait: ${existingData.spots}` : ""}
 ${existingData?.category ? `Kategori: ${existingData.category}` : ""}
 ${existingData?.excerpt ? `Ringkasan: ${existingData.excerpt}` : ""}
 
-Aturan:
-- Tulis dalam Bahasa Indonesia yang engaging
-- Gunakan format HTML standar untuk konten (bukan markdown)
-- <h2> untuk judul, <h3> untuk sub-judul, <p> untuk paragraf, <strong> untuk bold, <ul>/<li> untuk list
-- Contoh:
-  <h2>Judul Bagian</h2>
-  <p>Isi paragraf yang informatif...</p>
-  <ul>
-    <li>Poin pertama</li>
-    <li>Poin kedua</li>
-  </ul>
-- Panjang: 500-800 kata
-- Struktur: pengantar → isi (3-4 bagian) → kesimpulan
-- Sisipkan emoji yang relevan di dalam <p>
-- Gunakan tone: ${existingData?.category || 'Tips'}
-- Akhiri dengan CTA ke RodaTrip
-- Output HANYA HTML, tanpa tag html/body/head, tanpa teks lain`
+## STRUKTUR WAJIB:
+1. Paragraf pembuka (3-4 kalimat) — hook pembaca
+2. 3-4 section utama, masing-masing: <h2> → <p> (3-4 kalimat) → <h3> optional → <p> → <ul> optional
+3. 1 section tips praktis dengan <ul>
+4. Paragraf penutup + CTA natural
+
+## ATURAN FORMAT:
+- Output HANYA HTML standar, tanpa tag html/body/head, tanpa CSS, tanpa teks lain
+- <h2> untuk section utama, <h3> untuk sub-section (JANGAN pakai H1)
+- Setiap <p> minimal 3-4 kalimat — JANGAN ada paragraf 1-2 kalimat
+- <strong> untuk kata kunci penting (max 2 per paragraf)
+- Gunakan <ul>/<li> untuk list tips atau daftar
+- <blockquote> untuk kutipan atau testimoni (optional)
+- Maks 1 emoji, hanya di heading H2, jangan di paragraf
+
+## TONE:
+${toneHints[existingData?.category || ""] || "informatif dan engaging"}
+
+## SEO:
+- Sisipkan secara natural 2-3 keyword: roadtrip, ${existingData?.category?.toLowerCase() || "perjalanan"}, ${(existingData?.title || topic).toLowerCase()}
+- Pastikan heading mengandung keyword
+
+## CTA:
+- Akhiri dengan 1 paragraf CTA yang natural (bukan "Kunjungi RodaTrip" doang)
+- Contoh CTA: "Siap merencanakan roadtrip berikutnya? Yuk, cek itinerary lengkapnya di RodaTrip."
+- Jangan pake link HTML, cukup teks "RodaTrip"
+
+Panjang total: 500-800 kata`
         break
 
       case "gambar":
