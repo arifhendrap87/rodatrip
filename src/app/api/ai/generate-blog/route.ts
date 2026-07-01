@@ -5,7 +5,7 @@ const API_URL = "https://api.deepseek.com/chat/completions"
 
 const SYSTEM_PROMPT = `Kamu adalah content writer untuk RodaTrip — platform roadtrip Indonesia.
 Tuliskan dalam Bahasa Indonesia yang engaging, informatif, dan SEO-friendly.
-Gunakan format markdown sederhana (## untuk judul, ** untuk bold, - untuk list).`
+Gunakan format HTML standar untuk konten.`
 
 async function callDeepSeek(prompt: string): Promise<string> {
   if (!API_KEY) throw new Error("AI API key not configured")
@@ -72,18 +72,27 @@ ${existingData?.excerpt ? `Ringkasan: ${existingData.excerpt}` : ""}
 
 Aturan:
 - Tulis dalam Bahasa Indonesia yang engaging
-- Gunakan format markdown: ## untuk judul, ### untuk sub-judul, ** untuk bold, - untuk list
+- Gunakan format HTML standar untuk konten (bukan markdown)
+- <h2> untuk judul, <h3> untuk sub-judul, <p> untuk paragraf, <strong> untuk bold, <ul>/<li> untuk list
+- Contoh:
+  <h2>Judul Bagian</h2>
+  <p>Isi paragraf yang informatif...</p>
+  <ul>
+    <li>Poin pertama</li>
+    <li>Poin kedua</li>
+  </ul>
 - Panjang: 500-800 kata
-- Struktur: judul utama → pengantar → isi (3-4 bagian) → kesimpulan
-- Sisipkan emoji yang relevan untuk visual
+- Struktur: pengantar → isi (3-4 bagian) → kesimpulan
+- Sisipkan emoji yang relevan di dalam <p>
 - Gunakan tone: ${existingData?.category || 'Tips'}
-- Akhiri dengan CTA ke RodaTrip`
+- Akhiri dengan CTA ke RodaTrip
+- Output HANYA HTML, tanpa tag html/body/head, tanpa teks lain`
         break
 
       case "seo":
         prompt = `Buatkan meta data SEO untuk artikel berikut:
 Judul: "${existingData?.title || topic}"
-Konten: "${existingData?.excerpt || existingData?.content?.slice(0, 200) || ''}"
+Konten: "${existingData?.excerpt || existingData?.content?.replace(/<[^>]+>/g, '').slice(0, 200) || ''}"
 
 Format output (HANYA JSON, tanpa teks lain):
 {
