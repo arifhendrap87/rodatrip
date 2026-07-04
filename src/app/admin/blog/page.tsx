@@ -125,6 +125,10 @@ export default function BlogAdminPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
+                    <Link href={`/admin/blog/preview/${post.slug}`} target="_blank"
+                      className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted">
+                      <Eye className="h-4 w-4" />
+                    </Link>
                     {post.is_published && (
                       <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer"
                         className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted">

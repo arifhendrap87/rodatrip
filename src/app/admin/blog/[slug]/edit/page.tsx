@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { ArrowLeft, Save, Loader2, Sparkles, FileText, Trash2, Image as ImageIcon, Copy, Check } from "lucide-react"
+import { ArrowLeft, Save, Loader2, Sparkles, FileText, Trash2, Image as ImageIcon, Copy, Check, Eye, ExternalLink } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 
@@ -30,6 +30,7 @@ export default function EditBlogPage() {
   const [generatingImage, setGeneratingImage] = useState(false)
   const [imagePrompt, setImagePrompt] = useState("")
   const [copiedPrompt, setCopiedPrompt] = useState(false)
+  const [fbCopied, setFbCopied] = useState(false)
 
   const [form, setForm] = useState({
     title: "",
@@ -45,7 +46,7 @@ export default function EditBlogPage() {
   })
 
   useEffect(() => {
-    fetch(`/api/blog/${slug}`)
+    fetch(`/api/admin/blog/${slug}`)
       .then((r) => r.json())
       .then((json) => {
         const post = json.data
@@ -151,6 +152,37 @@ export default function EditBlogPage() {
     setGeneratingImage(false)
   }
 
+  function generateFbText(): string {
+    const lines: string[] = []
+    lines.push(`📖 BLOG: ${form.title}`)
+    lines.push("")
+
+    if (form.excerpt) {
+      const clean = form.excerpt.replace(/<[^>]+>/g, "").slice(0, 300)
+      lines.push(clean)
+      lines.push("")
+    } else if (form.content) {
+      const clean = form.content.replace(/<[^>]+>/g, "").trim().slice(0, 300)
+      lines.push(clean + "...")
+      lines.push("")
+    }
+
+    lines.push(`📂 ${form.category}  •  ✍️ ${form.author}  •  ⏱️ ${form.read_time}`)
+    lines.push("")
+    lines.push(`🔗 Baca selengkapnya: https://gaskuy-roadtrip.vercel.app/blog/${slug}`)
+    lines.push("")
+    lines.push("#RodaTrip #Blog #Roadtrip")
+
+    return lines.join("\n")
+  }
+
+  function handleFbCopy() {
+    navigator.clipboard.writeText(generateFbText())
+    setFbCopied(true)
+    setTimeout(() => setFbCopied(false), 2000)
+    toast.success("Teks Facebook tersalin!")
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSaving(true)
@@ -183,9 +215,21 @@ export default function EditBlogPage() {
         <Link href="/admin/blog">
           <Button variant="ghost" size="icon"><ArrowLeft className="h-4 w-4" /></Button>
         </Link>
-        <div>
+        <div className="flex-1">
           <h1 className="text-2xl font-bold font-heading">Edit Blog</h1>
           <p className="text-muted-foreground">{form.title}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Link href={`/admin/blog/preview/${slug}`} target="_blank">
+            <Button variant="outline" size="sm" className="gap-1.5">
+              <Eye className="h-4 w-4" />
+              Preview
+            </Button>
+          </Link>
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={handleFbCopy}>
+            {fbCopied ? <Check className="h-4 w-4 text-green-500" /> : <ExternalLink className="h-4 w-4" />}
+            {fbCopied ? "Tersalin!" : "Copy FB"}
+          </Button>
         </div>
       </div>
 
