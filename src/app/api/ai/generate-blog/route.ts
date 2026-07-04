@@ -144,6 +144,24 @@ Aturan:
 - Description informatif dan mengundang klik`
         break
 
+      case "tags":
+        prompt = `Berdasarkan judul dan konten artikel blog berikut, buatkan tags yang relevan untuk SEO:
+
+Judul: "${existingData?.title || topic}"
+Kategori: ${existingData?.category || "Tips"}
+${existingData?.excerpt ? `Excerpt: ${existingData.excerpt}` : ""}
+
+Output HANYA JSON array of strings, tanpa teks lain:
+["tag1", "tag2", "tag3", ...]
+
+Aturan:
+- Tags dalam Bahasa Indonesia, lowercase
+- Relevan dengan topik artikel
+- Campuran antara lokasi, topik, dan aktivitas
+- Minimal 5, maksimal 10 tags
+- Jangan gunakan kata umum seperti "blog", "artikel", "tips" saja`
+        break
+
       default:
         return badRequest("action tidak valid")
     }

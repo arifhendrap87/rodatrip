@@ -193,6 +193,27 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
   const Divider = () => <div className="mx-0.5 h-5 w-px bg-border" />
 
   return (
+    <>
+      <style>{`
+        .ProseMirror h2 {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: #1E232A;
+          border-bottom: 2px solid #E5E0D8;
+          padding-bottom: 0.25rem;
+          line-height: 1.3;
+          margin-top: 1.5rem !important;
+          margin-bottom: 0.75rem !important;
+        }
+        .ProseMirror h3 {
+          font-size: 1.25rem;
+          font-weight: 600;
+          color: #2C4A3E;
+          line-height: 1.35;
+          margin-top: 1.25rem !important;
+          margin-bottom: 0.5rem !important;
+        }
+      `}</style>
     <div className="rounded-xl border border-border shadow-sm">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-0.5 border-b bg-muted/30 px-2 py-1.5">
@@ -332,5 +353,6 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
         </DialogContent>
       </Dialog>
     </div>
+    </>
   )
 }
