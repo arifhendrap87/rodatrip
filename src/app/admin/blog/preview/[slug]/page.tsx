@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
-import { Loader2, ArrowLeft } from "lucide-react"
+import { Loader2, ArrowLeft, Copy, Check, ExternalLink } from "lucide-react"
+import { toast } from "sonner"
 
 interface BlogPost {
   id: string
@@ -43,6 +44,38 @@ export default function BlogPreviewPage() {
   const [post, setPost] = useState<BlogPost | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const [fbCopied, setFbCopied] = useState(false)
+
+  function generateFbText(): string {
+    if (!post) return ""
+    const lines: string[] = []
+    lines.push(`📖 BLOG: ${post.title}`)
+    lines.push("")
+
+    if (post.excerpt) {
+      lines.push(post.excerpt.replace(/<[^>]+>/g, "").slice(0, 300))
+      lines.push("")
+    } else if (post.content) {
+      const clean = post.content.replace(/<[^>]+>/g, "").trim().slice(0, 300)
+      lines.push(clean + "...")
+      lines.push("")
+    }
+
+    lines.push(`📂 ${post.category}  •  ✍️ ${post.author}  •  ⏱️ ${post.read_time}`)
+    lines.push("")
+    lines.push(`🔗 Baca selengkapnya: https://gaskuy-roadtrip.vercel.app/blog/${post.slug}`)
+    lines.push("")
+    lines.push("#RodaTrip #Blog #Roadtrip")
+
+    return lines.join("\n")
+  }
+
+  function handleFbCopy() {
+    navigator.clipboard.writeText(generateFbText())
+    setFbCopied(true)
+    setTimeout(() => setFbCopied(false), 2000)
+    toast.success("Teks Facebook tersalin!")
+  }
 
   useEffect(() => {
     fetch(`/api/admin/blog/${slug}`)
@@ -82,6 +115,10 @@ export default function BlogPreviewPage() {
             Kembali ke Admin
           </Link>
           <div className="flex items-center gap-3 text-xs">
+            <button onClick={handleFbCopy} className="flex items-center gap-1.5 text-sm text-white/80 hover:text-white">
+              {fbCopied ? <Check className="h-4 w-4 text-green-300" /> : <ExternalLink className="h-4 w-4" />}
+              {fbCopied ? "Tersalin!" : "Copy FB"}
+            </button>
             <span className={post.is_published ? "text-green-300" : "text-yellow-300"}>
               {post.is_published ? "Published" : "Draft"}
             </span>
