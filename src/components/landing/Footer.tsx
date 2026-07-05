@@ -82,6 +82,11 @@ export function Footer() {
                   TikTok
                 </a>
               </li>
+              <li>
+                <a href={SOCIAL_LINKS.twitter} target="_blank" rel="noopener noreferrer" className="text-sm text-white/60 transition-colors hover:text-white">
+                  Twitter / X
+                </a>
+              </li>
             </ul>
           </div>
         </div>
