@@ -93,7 +93,7 @@ export function FeaturedSpots() {
             {Array.from({ length: 5 }).map((_, i) => (
               <div
                 key={i}
-                className="min-w-[300px] sm:min-w-[340px] animate-pulse rounded-[2rem] border border-border/50 bg-white overflow-hidden shrink-0"
+                className="min-w-[300px] sm:min-w-[340px] animate-pulse rounded-[2rem] border border-border/50 bg-white overflow-hidden shrink-0 h-full"
               >
                 <div className="aspect-[4/3] bg-muted" />
                 <div className="p-5 space-y-3">
@@ -113,7 +113,7 @@ export function FeaturedSpots() {
             <style>{`div::-webkit-scrollbar { display: none; }`}</style>
             {spots.map((spot) => (
               <div key={spot.slug} className="min-w-[300px] sm:min-w-[340px] snap-start shrink-0">
-                <SpotCard spot={spot} />
+                <SpotCard spot={spot} fullHeight />
               </div>
             ))}
           </div>

@@ -3,16 +3,16 @@ import Image from "next/image"
 import type { Spot } from "@/types"
 import { SPOT_CATEGORIES } from "@/data/spots"
 
-export function SpotCard({ spot }: { spot: any }) {
+export function SpotCard({ spot, fullHeight }: { spot: any; fullHeight?: boolean }) {
   const cat = SPOT_CATEGORIES[spot.category as keyof typeof SPOT_CATEGORIES] || { icon: "📍", label: spot.category }
   const slug = spot.slug
   const imageUrl = spot.image_url || spot.imageUrl || "/placeholder.svg"
   const addedAt = spot.created_at || spot.addedAt
 
   return (
-    <Link href={`/spot-istimewa/${slug}`} className="group block">
-      <div className="relative overflow-hidden rounded-[2rem] bg-white shadow-md transition-all duration-500 hover:shadow-xl hover:-translate-y-1 border border-border/50">
-        <div className="relative aspect-[4/3] overflow-hidden">
+    <Link href={`/spot-istimewa/${slug}`} className={`group block ${fullHeight ? "h-full" : ""}`}>
+      <div className={`relative overflow-hidden rounded-[2rem] bg-white shadow-md transition-all duration-500 hover:shadow-xl hover:-translate-y-1 border border-border/50 ${fullHeight ? "flex flex-col h-full" : ""}`}>
+        <div className="relative aspect-[4/3] overflow-hidden shrink-0">
           <Image
             src={imageUrl}
             alt={spot.name}
@@ -37,12 +37,12 @@ export function SpotCard({ spot }: { spot: any }) {
             </div>
           )}
         </div>
-        <div className="p-5">
+        <div className={`p-5 ${fullHeight ? "flex flex-col flex-1" : ""}`}>
           <h3 className="text-lg font-bold font-heading leading-tight group-hover:text-primary transition-colors">
             {spot.name}
           </h3>
-          <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{spot.description || spot.tips}</p>
-          <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
+          <p className={`mt-2 text-sm text-muted-foreground line-clamp-2 ${fullHeight ? "flex-1" : ""}`}>{spot.description || spot.tips}</p>
+          <div className={`flex items-center justify-between text-xs text-muted-foreground ${fullHeight ? "mt-auto pt-4" : "mt-4"}`}>
             <span className="flex items-center gap-1">
               <span>📍</span>
               <span>{spot.province}</span>
