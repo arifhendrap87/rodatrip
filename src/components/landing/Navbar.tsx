@@ -22,6 +22,7 @@ export function Navbar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [siteName, setSiteName] = useState(SITE_NAME)
+  const [user, setUser] = useState<{ email: string; fullName?: string } | null>(null)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -32,8 +33,20 @@ export function Navbar() {
         if (json.data?.site_name) setSiteName(json.data.site_name)
       })
       .catch(() => {})
+    fetch("/api/auth/session")
+      .then((r) => r.json())
+      .then((json) => {
+        if (json.data?.user) setUser(json.data.user)
+      })
+      .catch(() => {})
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
+
+  async function handleLogout() {
+    await fetch("/api/auth/signout", { method: "POST" })
+    setUser(null)
+    window.location.href = "/"
+  }
 
   return (
     <header
@@ -60,6 +73,32 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
+          <div className="flex items-center gap-3 pl-3 border-l border-white/20">
+            {user ? (
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-xs font-bold text-white">
+                    {(user.fullName || user.email).charAt(0).toUpperCase()}
+                  </div>
+                  <span className="text-sm text-white/80">{user.fullName || user.email}</span>
+                </div>
+                <button onClick={handleLogout} className="text-xs text-white/50 hover:text-white transition-colors">
+                  Keluar
+                </button>
+              </div>
+            ) : (
+              <>
+                <Link href="/login" className="text-sm text-white/70 hover:text-white transition-colors">
+                  Masuk
+                </Link>
+                <Link href="/register">
+                  <Button size="sm" variant="outline" className="border-white/30 text-white hover:bg-white/10 rounded-xl text-xs">
+                    Daftar
+                  </Button>
+                </Link>
+              </>
+            )}
+          </div>
           <Link href="/roadtrip">
             <Button size="sm" className="bg-[#D95D39] text-white font-semibold shadow-lg shadow-black/20 hover:bg-[#D95D39]/90 rounded-xl">
               🚗 Mulai Jelajahi
@@ -104,12 +143,40 @@ export function Navbar() {
                 )
               })}
             </div>
-            <div className="mt-auto border-t border-white/10 px-3 pt-4">
-              <Link href="/roadtrip" onClick={() => setOpen(false)}>
-                <Button className="w-full bg-[#D95D39] text-white font-semibold shadow-lg shadow-black/20 hover:bg-[#D95D39]/90 rounded-xl text-sm h-10">
-                  🚗 Mulai Jelajahi
-                </Button>
-              </Link>
+            <div className="border-t border-white/10 px-3 pt-3 pb-4">
+              {user ? (
+                <div className="flex items-center justify-between px-3 py-2">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-xs font-bold text-white">
+                      {(user.fullName || user.email).charAt(0).toUpperCase()}
+                    </div>
+                    <span className="text-sm text-white/80">{user.fullName || user.email}</span>
+                  </div>
+                  <button onClick={() => { handleLogout(); setOpen(false) }} className="text-xs text-white/50 hover:text-white">
+                    Keluar
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2 px-3">
+                  <Link href="/login" onClick={() => setOpen(false)} className="flex-1">
+                    <Button variant="outline" className="w-full border-white/30 text-white hover:bg-white/10 rounded-xl text-sm">
+                      Masuk
+                    </Button>
+                  </Link>
+                  <Link href="/register" onClick={() => setOpen(false)} className="flex-1">
+                    <Button className="w-full bg-[#D95D39] text-white hover:bg-[#D95D39]/90 rounded-xl text-sm">
+                      Daftar
+                    </Button>
+                  </Link>
+                </div>
+              )}
+              <div className="mt-3 px-3">
+                <Link href="/roadtrip" onClick={() => setOpen(false)}>
+                  <Button className="w-full bg-white/10 text-white hover:bg-white/20 rounded-xl text-sm h-10">
+                    🚗 Mulai Jelajahi
+                  </Button>
+                </Link>
+              </div>
             </div>
           </SheetContent>
         </Sheet>
