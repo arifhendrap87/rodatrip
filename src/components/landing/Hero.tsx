@@ -1,13 +1,43 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import { motion } from "framer-motion"
+import { motion, useInView } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { heroStagger, heroItem } from "@/lib/animations"
 
+function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null)
+  const inView = useInView(ref, { once: true })
+  const [display, setDisplay] = useState(0)
+
+  useEffect(() => {
+    if (!inView) return
+    let start = 0
+    const duration = 1500
+    const step = Math.max(1, Math.floor(value / 60))
+    const interval = setInterval(() => {
+      start += step
+      if (start >= value) {
+        setDisplay(value)
+        clearInterval(interval)
+      } else {
+        setDisplay(start)
+      }
+    }, duration / (value / step))
+    return () => clearInterval(interval)
+  }, [inView, value])
+
+  return (
+    <span ref={ref} className="text-3xl font-bold font-heading">
+      {display}{suffix}
+    </span>
+  )
+}
+
 export function Hero() {
-  const [stats, setStats] = useState({ roadtrips: "3", spots: "50+" })
+  const [stats, setStats] = useState({ roadtrips: 3, spots: 50 })
+  const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
     Promise.all([
@@ -15,9 +45,10 @@ export function Hero() {
       fetch("/api/spots?limit=1").then((r) => r.json()).catch(() => ({ pagination: { total: 0 } })),
     ]).then(([itinRes, spotRes]) => {
       setStats({
-        roadtrips: String((itinRes.data || []).length),
-        spots: String(spotRes.pagination?.total || spotRes.data?.length || 0),
+        roadtrips: (itinRes.data || []).length,
+        spots: spotRes.pagination?.total || spotRes.data?.length || 0,
       })
+      setLoaded(true)
     })
   }, [])
 
@@ -76,11 +107,15 @@ export function Hero() {
           <div className="relative flex flex-wrap justify-center gap-8 sm:gap-16 pt-8">
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
             <div className="text-center">
-              <span className="text-3xl font-bold font-heading text-[#D95D39]">{stats.roadtrips}</span>
+              <span className="text-[#D95D39]">
+                <AnimatedCounter value={stats.roadtrips} />
+              </span>
               <p className="text-sm text-white/90">Roadtrip Itinerary</p>
             </div>
             <div className="text-center">
-              <span className="text-3xl font-bold font-heading text-white">{stats.spots}</span>
+              <span className="text-white">
+                <AnimatedCounter value={stats.spots} />
+              </span>
               <p className="text-sm text-white/90">POI Sepanjang Rute</p>
             </div>
           </div>
