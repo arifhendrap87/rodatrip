@@ -29,6 +29,17 @@ const CATEGORY_COLORS: Record<string, string> = {
   sejarah: "#6B7280",
 }
 
+const FALLBACK_SPOTS: Spot[] = [
+  { slug: "kawah-putih", name: "Kawah Putih Ciwidey", lat: -7.1660, lng: 107.4042, category: "alam", province: "Jawa Barat" },
+  { slug: "kebun-teh-rancabali", name: "Kebun Teh Rancabali", lat: -7.1450, lng: 107.3750, category: "alam", province: "Jawa Barat" },
+  { slug: "situ-patenggang", name: "Situ Patenggang", lat: -7.1500, lng: 107.3600, category: "alam", province: "Jawa Barat" },
+  { slug: "tangkuban-perahu", name: "Tangkuban Perahu", lat: -6.7590, lng: 107.6090, category: "alam", province: "Jawa Barat" },
+  { slug: "farmhouse-lembang", name: "Farmhouse Lembang", lat: -6.8130, lng: 107.6180, category: "petualangan", province: "Jawa Barat" },
+  { slug: "floating-market", name: "Floating Market Lembang", lat: -6.8160, lng: 107.6200, category: "kuliner", province: "Jawa Barat" },
+  { slug: "dusun-bambu", name: "Dusun Bambu", lat: -6.7900, lng: 107.5800, category: "alam", province: "Jawa Barat" },
+  { slug: "orchid-forest", name: "Orchid Forest Cikole", lat: -6.7770, lng: 107.6450, category: "alam", province: "Jawa Barat" },
+]
+
 function MapBoundsUpdater({ spots }: { spots: Spot[] }) {
   const map = useMap()
   useEffect(() => {
@@ -61,9 +72,9 @@ export default function MapSection() {
             category: s.category,
             province: s.province,
           }))
-        setSpots(valid)
+        setSpots(valid.length >= 2 ? valid : FALLBACK_SPOTS)
       })
-      .catch(() => setSpots([]))
+      .catch(() => setSpots(FALLBACK_SPOTS))
       .finally(() => setLoading(false))
   }, [])
 
