@@ -3,9 +3,11 @@ import type { SVGProps } from "react"
 export function Logo(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <rect x="2" y="2" width="36" height="36" rx="10" fill="#FF6B35" />
-      <path d="M12 12 L28 20 L12 28 L20 20 Z" fill="white" />
-      <circle cx="20" cy="20" r="2" fill="#FF6B35" />
+      <rect x="1" y="1" width="38" height="38" rx="10" fill="#2C4A3E" />
+      <circle cx="26" cy="12" r="6" fill="#D95D39" />
+      <path d="M2 34 C2 34, 12 10, 20 7 C28 10, 38 34, 38 34 Z" fill="white" />
+      <path d="M12 15 C14 11, 20 10, 22 12 C20 14, 16 16, 12 15 Z" fill="rgba(255,255,255,0.65)" />
+      <rect x="5" y="30" width="30" height="3" rx="1.5" fill="#D95D39" />
     </svg>
   )
 }
