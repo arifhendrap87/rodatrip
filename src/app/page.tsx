@@ -1,6 +1,5 @@
 import { Hero } from "@/components/landing/Hero"
 import { LandingMap } from "@/components/landing/LandingMap"
-import { ValueProps } from "@/components/landing/ValueProps"
 import { Testimonials } from "@/components/landing/Testimonials"
 import { HowItWorks } from "@/components/landing/HowItWorks"
 import { FeaturedSpots } from "@/components/landing/FeaturedSpots"
@@ -11,10 +10,6 @@ export default function LandingPage() {
     <>
       <Hero />
       <LandingMap />
-
-      <div className="bg-[#FDFBF7]">
-        <ValueProps />
-      </div>
 
       <div className="bg-[#FDFBF7]">
         <Testimonials />
