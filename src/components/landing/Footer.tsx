@@ -38,7 +38,7 @@ export function Footer() {
               <Logo className="h-6 w-6 text-white/90 transition-transform duration-300 group-hover:scale-110" />
               <span className="font-bold font-heading text-white">{siteName}</span>
             </Link>
-            <p className="mt-3 max-w-xs text-sm text-white/60 leading-relaxed">
+            <p className="mt-3 max-w-xs text-sm text-white/80 leading-relaxed">
               Platform POI, info jalan, dan perlengkapan roadtrip untuk roadtripper Indonesia.
             </p>
           </div>
@@ -98,7 +98,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 relative pt-6 text-center text-sm text-white/40">
+        <div className="mt-12 relative pt-6 text-center text-sm text-white/70">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
           &copy; {new Date().getFullYear()} {siteName}. All rights reserved.
         </div>
