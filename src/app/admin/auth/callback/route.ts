@@ -28,6 +28,6 @@ export async function GET(request: Request) {
     await supabase.auth.exchangeCodeForSession(code)
   }
 
-  const redirectTo = requestUrl.searchParams.get("redirect") || "/admin"
+  const redirectTo = requestUrl.searchParams.get("redirect") || "/"
   return NextResponse.redirect(new URL(redirectTo, requestUrl.origin))
 }
