@@ -57,7 +57,7 @@ export function BlogSection() {
             className="text-4xl sm:text-5xl font-black"
             style={{ fontFamily: "Montserrat, sans-serif", color: "#1E232A" }}
           >
-            Cerita Dari Jalanan
+            Blog Roadtrip
           </h2>
           <div className="flex gap-2">
             <button
