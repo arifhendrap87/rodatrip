@@ -101,28 +101,44 @@ export default function MapSection() {
   const [segProg, setSegProg] = useState(0)
   const [pulseStop, setPulseStop] = useState(-1)
   const moved = useRef(false)
+  const drawTimerRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined)
+  const loopRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
-  useEffect(() => {
-    if (routePoints.length < 2) return
+  function startDraw() {
     setPhase("draw")
     setDrawCount(1)
     setSegIdx(0)
     setSegProg(0)
     setPulseStop(-1)
     moved.current = false
+    clearInterval(drawTimerRef.current)
     let i = 1
-    const drawTimer = setInterval(() => {
+    drawTimerRef.current = setInterval(() => {
       i++
       setDrawCount(i)
       if (i >= routePoints.length) {
-        clearInterval(drawTimer)
-        setTimeout(() => {
-          setPhase("move")
-        }, 500)
+        clearInterval(drawTimerRef.current)
+        setTimeout(() => setPhase("move"), 500)
       }
     }, 400)
-    return () => clearInterval(drawTimer)
+  }
+
+  useEffect(() => {
+    if (routePoints.length < 2) return
+    startDraw()
+    return () => {
+      clearInterval(drawTimerRef.current)
+      clearTimeout(loopRef.current)
+    }
   }, [routePoints])
+
+  useEffect(() => {
+    if (phase !== "done" || routePoints.length < 2) return
+    loopRef.current = setTimeout(() => {
+      startDraw()
+    }, 4000)
+    return () => clearTimeout(loopRef.current)
+  }, [phase, routePoints])
 
   useEffect(() => {
     if (phase !== "move" || routePoints.length < 2) return
