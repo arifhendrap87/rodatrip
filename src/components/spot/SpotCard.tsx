@@ -6,21 +6,28 @@ import { SPOT_CATEGORIES } from "@/data/spots"
 export function SpotCard({ spot }: { spot: any }) {
   const cat = SPOT_CATEGORIES[spot.category as keyof typeof SPOT_CATEGORIES] || { icon: "📍", label: spot.category }
   const slug = spot.slug
-  const imageUrl = spot.image_url || spot.imageUrl || "/placeholder.svg"
+  const imageUrl = spot.image_url || spot.imageUrl
   const addedAt = spot.created_at || spot.addedAt
+  const hasImage = Boolean(imageUrl)
 
   return (
     <Link href={`/spot-istimewa/${slug}`} className="group block">
       <div className="relative overflow-hidden rounded-[2rem] bg-white shadow-md transition-all duration-500 hover:shadow-xl hover:-translate-y-1 border border-border/50">
-        <div className="relative aspect-[4/3] overflow-hidden shrink-0">
-          <Image
-            src={imageUrl}
-            alt={spot.name}
-            fill
-            className="object-cover transition-all duration-700 group-hover:scale-110"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+        <div className="relative aspect-[4/3] overflow-hidden shrink-0 bg-gradient-to-br from-primary/10 to-accent/10">
+          {hasImage ? (
+            <Image
+              src={imageUrl}
+              alt={spot.name}
+              fill
+              className="object-cover transition-all duration-700 group-hover:scale-110"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <span className="text-5xl opacity-40">{cat.icon}</span>
+            </div>
+          )}
+          {hasImage && <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />}
           <div className="absolute top-3 left-3 flex items-center gap-2">
             <span className="inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-foreground shadow-sm backdrop-blur-sm">
               <span>{cat.icon}</span>

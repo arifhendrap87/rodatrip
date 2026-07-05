@@ -37,15 +37,10 @@ export function RoadtripCard({ itinerary }: RoadtripCardProps) {
           </div>
         </div>
       ) : (
-        <div className="relative aspect-[16/9] overflow-hidden bg-muted">
-          <Image
-            src="/images/roadtrip-default.svg"
-            alt=""
-            fill
-            unoptimized
-            className="object-cover opacity-60"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        <div className="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10">
+          <div className="flex h-full w-full items-center justify-center">
+            <span className="text-5xl opacity-40">🏎️</span>
+          </div>
           <div className="absolute bottom-3 left-3 flex items-center gap-2">
             <span className="rounded-full bg-white/90 backdrop-blur-sm px-3 py-1 text-xs font-medium shadow-sm">
               {itinerary.itineraryDuration || "Roadtrip"}
