@@ -26,7 +26,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ slug
 
   const { slug } = await params
   const body = await request.json()
-  const { title, excerpt, content, image_url, category, author, tags, read_time, is_published } = body
+  const { title, excerpt, content, image_url, category, author, tags, read_time, is_published, seo_title, meta_description, prompt_gambar } = body
 
   const updates: Record<string, unknown> = {}
   if (title !== undefined) updates.title = title
@@ -37,6 +37,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ slug
   if (author !== undefined) updates.author = author
   if (read_time !== undefined) updates.read_time = read_time
   if (tags !== undefined) updates.tags = tags
+  if (seo_title !== undefined) updates.seo_title = seo_title
+  if (meta_description !== undefined) updates.meta_description = meta_description
+  if (prompt_gambar !== undefined) updates.prompt_gambar = prompt_gambar
   if (is_published !== undefined) {
     updates.is_published = is_published
     if (is_published) updates.published_at = new Date().toISOString()

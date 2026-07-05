@@ -40,10 +40,12 @@ export default function BlogAdminPage() {
       if (debouncedSearch) params.set("search", debouncedSearch)
 
       const res = await fetch(`/api/admin/blog?${params}`)
+      if (!res.ok) throw new Error(res.statusText)
       const json = await res.json()
       setPosts(json.data?.posts || [])
     } catch {
       toast.error("Gagal memuat blog")
+      setPosts([])
     }
     setLoading(false)
   }
@@ -55,6 +57,8 @@ export default function BlogAdminPage() {
       if (res.ok) {
         setPosts((prev) => prev.filter((p) => p.slug !== slug))
         toast.success("Blog dihapus")
+      } else {
+        throw new Error(res.statusText)
       }
     } catch {
       toast.error("Gagal menghapus blog")

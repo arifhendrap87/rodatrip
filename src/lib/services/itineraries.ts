@@ -150,6 +150,9 @@ async function getStopsForItinerary(itineraryId: string): Promise<ItineraryStopR
 
 export async function getItineraries(options?: {
   published?: boolean
+  ids?: string[]
+  limit?: number
+  offset?: number
 }): Promise<Itinerary[]> {
   try {
     let query = db.from("itineraries").select("*")
@@ -158,7 +161,18 @@ export async function getItineraries(options?: {
       query = query.eq("is_published", true)
     }
 
-    const { data, error } = await query.order("created_at", { ascending: false })
+    if (options?.ids && options.ids.length > 0) {
+      query = query.in("id", options.ids)
+    }
+
+    query = query.order("created_at", { ascending: false })
+
+    if (options?.limit) {
+      const from = options?.offset || 0
+      query = query.range(from, from + options.limit - 1) as any
+    }
+
+    const { data, error } = await query
     if (error) return []
 
     const rows = data as ItineraryRow[]

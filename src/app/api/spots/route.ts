@@ -1,4 +1,4 @@
-import { success, paginated, badRequest, unauthorized } from "@/lib/api/response"
+import { success, paginated, badRequest, unauthorized, conflict } from "@/lib/api/response"
 import { publicLimiter, adminLimiter } from "@/lib/api/rate-limit"
 import { createSpotSchema } from "@/lib/validators/spot"
 import { getServerAdmin } from "@/lib/api/auth"
@@ -40,6 +40,14 @@ export async function POST(request: Request) {
   if (!parsed.success) return badRequest(parsed.error.issues.map(e => e.message).join(", "))
 
   const slug = parsed.data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+
+  const { data: existingSpot } = await db
+    .from("spots")
+    .select("slug")
+    .eq("slug", slug)
+    .maybeSingle()
+
+  if (existingSpot) return conflict(`Spot dengan slug "${slug}" sudah ada`)
 
   // Map camelCase from validator to snake_case for DB
   const { location, ...rest } = parsed.data

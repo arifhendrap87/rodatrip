@@ -315,9 +315,73 @@ export default function EditSpotPage() {
                   onChange={(e) => setForm((f: any) => ({ ...f, ticket_price: e.target.value }))} />
               </div>
               <div className="space-y-2">
+                <Label>Parking Fee</Label>
+                <Input value={form.parking_fee || ""}
+                  onChange={(e) => setForm((f: any) => ({ ...f, parking_fee: e.target.value }))} />
+              </div>
+              <div className="space-y-2">
                 <Label>Distance</Label>
                 <Input value={form.distance_from_city || ""}
                   onChange={(e) => setForm((f: any) => ({ ...f, distance_from_city: e.target.value }))} />
+              </div>
+              <div className="space-y-2">
+                <Label>Road Access</Label>
+                <Input value={form.road_access || ""}
+                  onChange={(e) => setForm((f: any) => ({ ...f, road_access: e.target.value }))} />
+              </div>
+              <div className="space-y-2">
+                <Label>Physical Effort</Label>
+                <Input value={form.physical_effort || ""}
+                  onChange={(e) => setForm((f: any) => ({ ...f, physical_effort: e.target.value }))} />
+              </div>
+              <div className="space-y-2">
+                <Label>Visit Duration</Label>
+                <Input value={form.visit_duration || ""}
+                  onChange={(e) => setForm((f: any) => ({ ...f, visit_duration: e.target.value }))} />
+              </div>
+              <div className="space-y-2">
+                <Label>Best Visit Hour</Label>
+                <Input value={form.best_visit_hour || ""}
+                  onChange={(e) => setForm((f: any) => ({ ...f, best_visit_hour: e.target.value }))} />
+              </div>
+              <div className="space-y-2">
+                <Label>Additional Cost</Label>
+                <Input value={form.additional_cost || ""}
+                  onChange={(e) => setForm((f: any) => ({ ...f, additional_cost: e.target.value }))} />
+              </div>
+              <div className="space-y-2">
+                <Label>Duration Estimate</Label>
+                <Input value={form.estimated_time || ""}
+                  onChange={(e) => setForm((f: any) => ({ ...f, estimated_time: e.target.value }))} />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Spot Important Note</Label>
+              <Input value={form.spot_important_note || ""}
+                onChange={(e) => setForm((f: any) => ({ ...f, spot_important_note: e.target.value }))} />
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Latitude</Label>
+                <Input type="number" step="any" value={form.lat}
+                  onChange={(e) => setForm((f: any) => ({ ...f, lat: e.target.value }))} />
+              </div>
+              <div className="space-y-2">
+                <Label>Longitude</Label>
+                <Input type="number" step="any" value={form.lng}
+                  onChange={(e) => setForm((f: any) => ({ ...f, lng: e.target.value }))} />
+              </div>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Facilities (comma separated)</Label>
+                <Input value={form.facilities || ""}
+                  onChange={(e) => setForm((f: any) => ({ ...f, facilities: e.target.value }))} />
+              </div>
+              <div className="space-y-2">
+                <Label>Tags (comma separated)</Label>
+                <Input value={form.tags || ""}
+                  onChange={(e) => setForm((f: any) => ({ ...f, tags: e.target.value }))} />
               </div>
             </div>
             <ImageUpload value={form.image_url} onChange={(v) => setForm((f: any) => ({ ...f, image_url: v }))} label="🖼️ Image" folder="spots" />

@@ -9,11 +9,13 @@ import { staggerContainer, fadeInUp } from "@/lib/animations"
 
 export function FeaturedSpots() {
   const [spots, setSpots] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     api.spots.list({ limit: "6" })
       .then((res) => setSpots(res.data || []))
       .catch(() => setSpots([]))
+      .finally(() => setLoading(false))
   }, [])
 
   return (
@@ -29,11 +31,25 @@ export function FeaturedSpots() {
         </motion.div>
 
         <motion.div variants={staggerContainer} initial="initial" whileInView="whileInView" className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {spots.map((spot, i) => (
-            <motion.div key={spot.slug} variants={fadeInUp}>
-              <SpotCard spot={spot} />
-            </motion.div>
-          ))}
+          {loading ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="animate-pulse rounded-2xl border border-border/50 bg-white overflow-hidden">
+                <div className="aspect-[16/9] bg-muted" />
+                <div className="p-4 space-y-3">
+                  <div className="h-3 w-16 rounded-full bg-muted" />
+                  <div className="h-5 w-3/4 rounded bg-muted" />
+                  <div className="h-3 w-full rounded bg-muted" />
+                  <div className="h-3 w-1/2 rounded bg-muted" />
+                </div>
+              </div>
+            ))
+          ) : (
+            spots.map((spot, i) => (
+              <motion.div key={spot.slug} variants={fadeInUp}>
+                <SpotCard spot={spot} />
+              </motion.div>
+            ))
+          )}
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mt-12 text-center">

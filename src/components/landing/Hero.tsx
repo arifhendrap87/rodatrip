@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { motion } from "framer-motion"
@@ -14,7 +14,19 @@ export function Hero() {
   const [origin, setOrigin] = useState("")
   const [destination, setDestination] = useState("")
   const [vehicle, setVehicle] = useState("mobil")
-  const [stats] = useState({ roadtrips: "3", poi: "50+" })
+  const [stats, setStats] = useState({ roadtrips: "3", spots: "50+" })
+
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/itineraries").then((r) => r.json()).catch(() => ({ data: [] })),
+      fetch("/api/spots?limit=1").then((r) => r.json()).catch(() => ({ pagination: { total: 0 } })),
+    ]).then(([itinRes, spotRes]) => {
+      setStats({
+        roadtrips: String((itinRes.data || []).length),
+        spots: String(spotRes.pagination?.total || spotRes.data?.length || 0),
+      })
+    })
+  }, [])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -132,7 +144,7 @@ export function Hero() {
               <p className="text-sm text-white/90">Roadtrip Itinerary</p>
             </div>
             <div className="text-center">
-              <span className="text-3xl font-bold font-heading text-white">{stats.poi}</span>
+              <span className="text-3xl font-bold font-heading text-white">{stats.spots}</span>
               <p className="text-sm text-white/90">POI Sepanjang Rute</p>
             </div>
           </div>

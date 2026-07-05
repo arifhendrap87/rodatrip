@@ -22,6 +22,7 @@ import {
   Sparkles,
   Share2,
   FileText,
+  Receipt,
 } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useState } from "react"
@@ -38,6 +39,7 @@ const navItems = [
   { href: "/admin/prompt-generator", label: "Prompt GPT", icon: Sparkles },
   { href: "/admin/waitlist", label: "Waitlist", icon: Mail },
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
+  { href: "/admin/invoice", label: "Invoice", icon: Receipt },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ]
 

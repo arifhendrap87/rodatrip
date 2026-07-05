@@ -4,6 +4,10 @@ import type { Metadata } from "next"
 import { SITE_NAME } from "@/lib/constants"
 import { getPosts, getPostBySlug } from "@/lib/services/blog"
 
+function isHtmlContent(str: string): boolean {
+  return /<[a-z][\s\S]*>/i.test(str)
+}
+
 export async function generateStaticParams() {
   const posts = await getPosts()
   return posts.map((post) => ({ slug: post.slug }))
@@ -13,10 +17,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const post = await getPostBySlug(slug)
   if (!post) return {}
+  const seoTitle = (post as any).seo_title || post.title
+  const metaDesc = (post as any).meta_description || post.excerpt
   return {
-    title: `${post.title} — Blog — ${SITE_NAME}`,
-    description: post.excerpt,
-    openGraph: { title: post.title, description: post.excerpt, type: "article", publishedTime: post.published_at, authors: [post.author] },
+    title: `${seoTitle} — Blog — ${SITE_NAME}`,
+    description: metaDesc,
+    openGraph: { title: seoTitle, description: metaDesc, type: "article", publishedTime: post.published_at, authors: [post.author] },
   }
 }
 
@@ -47,22 +53,32 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           <span>{new Date(post.published_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}</span>
         </div>
 
-        <div className="mt-8 aspect-[16/9] rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
-          <span className="text-6xl opacity-30">🚗</span>
+        <div className="mt-8 aspect-[16/9] rounded-2xl overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10">
+          {post.image_url ? (
+            <img src={post.image_url} alt={post.title} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <span className="text-6xl opacity-30">🚗</span>
+            </div>
+          )}
         </div>
 
         <div className="mt-10 prose prose-gray max-w-none">
-          {post.content.split("\n").map((line, i) => {
-            if (line.startsWith("## ")) return <h2 key={i} className="text-xl font-bold font-heading mt-8 mb-3">{line.replace("## ", "")}</h2>
-            if (line.startsWith("- **")) {
-              const match = line.match(/- \*\*(.+?)\*\*[：:] (.+)/)
-              if (match) return <div key={i} className="mb-4"><h3 className="text-lg font-bold font-heading">{match[1]}</h3><p className="text-muted-foreground">{match[2]}</p></div>
-            }
-            if (line.startsWith("- ")) return <li key={i} className="text-muted-foreground ml-4 list-disc">{line.replace("- ", "")}</li>
-            if (line.startsWith("**") && line.endsWith("**")) return <p key={i} className="font-semibold mt-4">{line.replace(/\*\*/g, "")}</p>
-            if (line.trim() === "") return null
-            return <p key={i} className="text-muted-foreground leading-relaxed mb-3">{line}</p>
-          })}
+          {isHtmlContent(post.content) ? (
+            <div dangerouslySetInnerHTML={{ __html: post.content }} />
+          ) : (
+            post.content.split("\n").map((line, i) => {
+              if (line.startsWith("## ")) return <h2 key={i} className="text-xl font-bold font-heading mt-8 mb-3">{line.replace("## ", "")}</h2>
+              if (line.startsWith("- **")) {
+                const match = line.match(/- \*\*(.+?)\*\*[：:] (.+)/)
+                if (match) return <div key={i} className="mb-4"><h3 className="text-lg font-bold font-heading">{match[1]}</h3><p className="text-muted-foreground">{match[2]}</p></div>
+              }
+              if (line.startsWith("- ")) return <li key={i} className="text-muted-foreground ml-4 list-disc">{line.replace("- ", "")}</li>
+              if (line.startsWith("**") && line.endsWith("**")) return <p key={i} className="font-semibold mt-4">{line.replace(/\*\*/g, "")}</p>
+              if (line.trim() === "") return null
+              return <p key={i} className="text-muted-foreground leading-relaxed mb-3">{line}</p>
+            })
+          )}
         </div>
 
         <div className="mt-10 flex flex-wrap gap-2">

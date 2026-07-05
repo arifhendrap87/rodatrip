@@ -14,6 +14,9 @@ export default function RoadtripListPage() {
   const [cityMap, setCityMap] = useState<Record<string, string[]>>({})
   const [selectedProvince, setSelectedProvince] = useState("all")
   const [selectedCity, setSelectedCity] = useState("all")
+  const [offset, setOffset] = useState(0)
+  const [hasMore, setHasMore] = useState(true)
+  const PAGE_SIZE = 12
 
   const citiesForProvince = selectedProvince !== "all" ? cityMap[selectedProvince] || [] : []
 
@@ -22,7 +25,10 @@ export default function RoadtripListPage() {
   }, [])
 
   useEffect(() => {
-    fetchItineraries()
+    setOffset(0)
+    setItineraries([])
+    setHasMore(true)
+    fetchItineraries(0)
   }, [selectedProvince, selectedCity])
 
   async function fetchFilters() {
@@ -36,17 +42,26 @@ export default function RoadtripListPage() {
     } catch {}
   }
 
-  async function fetchItineraries() {
+  async function fetchItineraries(pageOffset = offset) {
     setLoading(true)
     try {
       const params = new URLSearchParams()
       if (selectedProvince !== "all") params.set("province", selectedProvince)
       if (selectedCity !== "all") params.set("city", selectedCity)
+      params.set("limit", String(PAGE_SIZE))
+      params.set("offset", String(pageOffset))
       const res = await fetch(`/api/itineraries?${params}`)
       const json = await res.json()
-      setItineraries(json.data || [])
+      const data = json.data || []
+      setItineraries((prev) => pageOffset === 0 ? data : [...prev, ...data])
+      setHasMore(data.length === PAGE_SIZE)
+      setOffset(pageOffset)
     } catch {}
     setLoading(false)
+  }
+
+  function handleLoadMore() {
+    fetchItineraries(offset + PAGE_SIZE)
   }
 
   const filtered = itineraries.filter((i) => {
@@ -169,6 +184,16 @@ export default function RoadtripListPage() {
                   </div>
                 </Link>
               ))}
+            </div>
+          )}
+          {!loading && hasMore && filtered.length >= PAGE_SIZE && (
+            <div className="mt-10 text-center">
+              <button
+                onClick={handleLoadMore}
+                className="inline-flex items-center gap-2 rounded-xl border border-border bg-white px-6 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors shadow-sm"
+              >
+                Muat Lebih Banyak
+              </button>
             </div>
           )}
         </div>

@@ -10,21 +10,20 @@ const adminClient = createClient(
 export async function POST(_request: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
 
-  const { data, error: dbError } = await adminClient.rpc("increment_view_count", { slug_param: slug })
-  if (dbError) {
-    const { error: updateError } = await adminClient
-      .from("spots")
-      .update({ view_count: adminClient.rpc("increment", { x: 1 }) as unknown as number })
-      .eq("slug", slug)
-
-    if (updateError) return internalError(updateError.message)
-  }
-
   const { data: spot } = await adminClient
     .from("spots")
     .select("view_count")
     .eq("slug", slug)
     .single()
 
-  return success({ viewCount: spot?.view_count || 0 })
+  const currentCount = (spot?.view_count as number) || 0
+
+  const { error: updateError } = await adminClient
+    .from("spots")
+    .update({ view_count: currentCount + 1 })
+    .eq("slug", slug)
+
+  if (updateError) return internalError(updateError.message)
+
+  return success({ viewCount: currentCount + 1 })
 }

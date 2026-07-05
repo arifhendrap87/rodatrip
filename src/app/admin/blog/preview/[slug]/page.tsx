@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
-import { Loader2, ArrowLeft, Copy, Check, ExternalLink } from "lucide-react"
+import { Loader2, ArrowLeft, ExternalLink, Check } from "lucide-react"
 import { toast } from "sonner"
 
 interface BlogPost {
@@ -19,23 +19,6 @@ interface BlogPost {
   tags: string[]
   is_published: boolean
   published_at: string
-}
-
-function renderContent(html: string): string {
-  if (!html) return ""
-  return html
-    .replace(/<\/?[^>]+(>|$)/g, (match) => {
-      if (match.startsWith("</")) return "\n"
-      if (match.startsWith("<h2") || match.startsWith("<h3")) return "\n\n"
-      if (match.startsWith("<li>")) return "• "
-      if (match.startsWith("<p>")) return ""
-      if (match.startsWith("<strong>")) return ""
-      if (match.startsWith("</strong>")) return ""
-      if (match.startsWith("<ul>") || match.startsWith("</ul>")) return "\n"
-      return ""
-    })
-    .replace(/\n{3,}/g, "\n\n")
-    .trim()
 }
 
 export default function BlogPreviewPage() {
@@ -63,7 +46,7 @@ export default function BlogPreviewPage() {
 
     lines.push(`📂 ${post.category}  •  ✍️ ${post.author}  •  ⏱️ ${post.read_time}`)
     lines.push("")
-    lines.push(`🔗 Baca selengkapnya: https://gaskuy-roadtrip.vercel.app/blog/${post.slug}`)
+    lines.push(`🔗 Baca selengkapnya: ${window.location.origin}/blog/${post.slug}`)
     lines.push("")
     lines.push("#RodaTrip #Blog #Roadtrip")
 
@@ -152,18 +135,7 @@ export default function BlogPreviewPage() {
         )}
 
         {/* Content */}
-        <div className="prose prose-lg max-w-none text-[#1E232A]">
-          {renderContent(post.content).split("\n").map((line, i) => {
-            if (line.startsWith("• ")) {
-              return <li key={i} className="text-[#1E232A] ml-4">{line.slice(2)}</li>
-            }
-            if (line.startsWith("## ")) {
-              return <h2 key={i} className="text-2xl font-bold mt-8 mb-4 text-[#1E232A]">{line.slice(3)}</h2>
-            }
-            if (line.trim() === "") return null
-            return <p key={i} className="mb-4 leading-relaxed">{line}</p>
-          })}
-        </div>
+        <div className="prose prose-lg max-w-none text-[#1E232A]" dangerouslySetInnerHTML={{ __html: post.content }} />
 
         {/* Tags */}
         {post.tags && post.tags.length > 0 && (

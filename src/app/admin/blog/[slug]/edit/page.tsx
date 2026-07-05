@@ -170,7 +170,7 @@ export default function EditBlogPage() {
 
     lines.push(`📂 ${form.category}  •  ✍️ ${form.author}  •  ⏱️ ${form.read_time}`)
     lines.push("")
-    lines.push(`🔗 Baca selengkapnya: https://gaskuy-roadtrip.vercel.app/blog/${slug}`)
+    lines.push(`🔗 Baca selengkapnya: ${window.location.origin}/blog/${slug}`)
     lines.push("")
     lines.push("#RodaTrip #Blog #Roadtrip")
 

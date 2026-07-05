@@ -1,4 +1,4 @@
-import { success, badRequest, unauthorized, internalError } from "@/lib/api/response"
+import { success, badRequest, unauthorized, conflict, internalError } from "@/lib/api/response"
 import { getServerAdmin } from "@/lib/api/auth"
 import { db } from "@/lib/services/db"
 
@@ -38,10 +38,18 @@ export async function POST(request: Request) {
   if (!admin) return unauthorized()
 
   const body = await request.json()
-  const { title, slug, excerpt, content, image_url, category, author, tags, read_time, is_published } = body
+  const { title, slug, excerpt, content, image_url, category, author, tags, read_time, is_published, seo_title, meta_description, prompt_gambar } = body
 
   if (!title) return badRequest("title wajib diisi")
   if (!slug) return badRequest("slug wajib diisi")
+
+  const { data: existingSlug } = await db
+    .from("blog_posts")
+    .select("slug")
+    .eq("slug", slug)
+    .maybeSingle()
+
+  if (existingSlug) return conflict(`Slug "${slug}" sudah digunakan`)
 
   const { data, error } = await db
     .from("blog_posts")
@@ -57,6 +65,9 @@ export async function POST(request: Request) {
       read_time: read_time || "5 min",
       is_published: is_published || false,
       published_at: is_published ? new Date().toISOString() : null,
+      seo_title: seo_title || null,
+      meta_description: meta_description || null,
+      prompt_gambar: prompt_gambar || null,
     })
     .select()
     .single()

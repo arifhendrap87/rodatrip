@@ -1,4 +1,3 @@
-import { execFileSync } from "child_process"
 import type { NearbyPlace } from "@/lib/validators/nearby"
 
 const OVERPASS_URL = "https://overpass-api.de/api/interpreter"
@@ -81,22 +80,25 @@ export async function queryNearbyPlaces(
   limit: number
 ): Promise<NearbyPlace[]> {
   const query = buildQuery(category, lat, lng, radius)
-  const body = `data=${query}`
+  const body = `data=${encodeURIComponent(query)}`
 
   let raw: string
   try {
-    raw = execFileSync("curl", [
-      "-s",
-      "-X", "POST",
-      "-H", "Content-Type: application/x-www-form-urlencoded",
-      "-H", "Accept: */*",
-      "-d", body,
-      OVERPASS_URL,
-    ], {
-      timeout: TIMEOUT * 1000,
-      encoding: "utf-8",
-      maxBuffer: 10 * 1024 * 1024,
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), TIMEOUT * 1000)
+
+    const response = await fetch(OVERPASS_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Accept": "*/*",
+      },
+      body,
+      signal: controller.signal,
     })
+
+    clearTimeout(timeoutId)
+    raw = await response.text()
   } catch {
     return []
   }

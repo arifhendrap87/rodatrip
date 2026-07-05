@@ -7,7 +7,7 @@ import { RoadtripDetailClient } from "./client"
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   const itinerary = await getItineraryBySlug(slug)
-  if (!itinerary) return { title: "Roadtrip Tidak Ditemukan" }
+  if (!itinerary || !itinerary.isPublished) return { title: "Roadtrip Tidak Ditemukan" }
 
   return {
     title: `${itinerary.title} — Roadtrip ${SITE_NAME}`,
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function RoadtripDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const itinerary = await getItineraryBySlug(slug)
-  if (!itinerary) notFound()
+  if (!itinerary || !itinerary.isPublished) notFound()
 
   return <RoadtripDetailClient itinerary={itinerary} />
 }
