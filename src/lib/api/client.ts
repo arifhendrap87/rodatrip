@@ -41,6 +41,15 @@ export const api = {
 
     google: () =>
       request<{ data: { url: string } }>("/auth/google"),
+
+    apple: () =>
+      request<{ data: { url: string } }>("/auth/apple"),
+
+    facebook: () =>
+      request<{ data: { url: string } }>("/auth/facebook"),
+
+    signup: (data: { email: string; password: string; full_name: string }) =>
+      request<{ data: { user: { id: string } } }>("/auth/signup", { method: "POST", body: data }),
   },
 
   spots: {

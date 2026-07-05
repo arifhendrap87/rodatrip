@@ -52,6 +52,39 @@ export async function signInWithGoogle(): Promise<{ data?: { url: string }; erro
   }
 }
 
+export async function signInWithApple(): Promise<{ data?: { url: string }; error?: Error }> {
+  try {
+    const res = await api.auth.apple()
+    if (res.data?.url) {
+      window.location.href = res.data.url
+    }
+    return { data: res.data }
+  } catch (err) {
+    return { error: err as Error }
+  }
+}
+
+export async function signInWithFacebook(): Promise<{ data?: { url: string }; error?: Error }> {
+  try {
+    const res = await api.auth.facebook()
+    if (res.data?.url) {
+      window.location.href = res.data.url
+    }
+    return { data: res.data }
+  } catch (err) {
+    return { error: err as Error }
+  }
+}
+
+export async function signUp(data: { email: string; password: string; full_name: string }): Promise<{ data?: unknown; error?: Error }> {
+  try {
+    const res = await api.auth.signup(data)
+    return { data: res.data }
+  } catch (err) {
+    return { error: err as Error }
+  }
+}
+
 export async function signOut() {
   await api.auth.signout()
   window.location.href = "/admin/login"
