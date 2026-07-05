@@ -23,6 +23,7 @@ import {
   Share2,
   FileText,
   Receipt,
+  MessageCircle,
 } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useState } from "react"
@@ -35,6 +36,7 @@ const navItems = [
   { href: "/admin/blog", label: "Blog", icon: FileText },
   { href: "/admin/media", label: "Media", icon: Image },
   { href: "/admin/regions", label: "Regions", icon: Globe },
+  { href: "/admin/chat", label: "AI Chat", icon: MessageCircle },
   { href: "/admin/content-generator", label: "Konten Sosmed", icon: Share2 },
   { href: "/admin/prompt-generator", label: "Prompt GPT", icon: Sparkles },
   { href: "/admin/waitlist", label: "Waitlist", icon: Mail },
