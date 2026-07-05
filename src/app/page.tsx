@@ -11,12 +11,12 @@ export default function LandingPage() {
       <Hero />
       <LandingMap />
 
-      <div className="bg-[#F0EDE8]">
-        <FeaturedSpots />
-      </div>
-
       <div className="bg-[#FDFBF7]">
         <FeaturedRoadtrips />
+      </div>
+
+      <div className="bg-[#F0EDE8]">
+        <FeaturedSpots />
       </div>
 
       <div className="bg-[#F0EDE8]">
