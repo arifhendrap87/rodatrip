@@ -42,9 +42,6 @@ export function LandingMap() {
         <MapSection />
       </div>
 
-      {/* Gradient overlay on the left so text stays readable */}
-      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-[#F0EDE8] via-[#F0EDE8]/90 to-transparent pointer-events-none" />
-
       {/* Content */}
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 py-20 sm:py-24">
         <motion.div
@@ -52,7 +49,7 @@ export function LandingMap() {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="max-w-md"
+          className="max-w-md rounded-2xl bg-white/90 backdrop-blur-sm p-8 shadow-xl border border-border/50"
         >
           <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-white/90 backdrop-blur-sm px-4 py-1.5 text-sm text-primary shadow-sm mb-4">
             🗺️ Rencanakan Perjalanan
