@@ -2,13 +2,23 @@
 
 import Link from "next/link"
 import { useState, useEffect } from "react"
+import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Logo } from "@/components/icons"
 import { NAV_LINKS, SITE_NAME } from "@/lib/constants"
 import { cn } from "@/lib/utils"
+import { Home, MapPin, Route, FileText } from "lucide-react"
+
+const NAV_ICONS: Record<string, React.ReactNode> = {
+  "/": <Home className="h-5 w-5" />,
+  "/spot-istimewa": <MapPin className="h-5 w-5" />,
+  "/roadtrip": <Route className="h-5 w-5" />,
+  "/blog": <FileText className="h-5 w-5" />,
+}
 
 export function Navbar() {
+  const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [siteName, setSiteName] = useState(SITE_NAME)
@@ -67,19 +77,38 @@ export function Navbar() {
               </svg>
             </SheetTrigger>
           <SheetContent side="right" className="w-72 bg-[#2C4A3E] text-white border-l border-white/10">
-            <div className="mt-8 flex flex-col gap-4">
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setOpen(false)}
-                  className="text-lg font-medium text-white/70 transition-colors hover:text-white font-heading"
-                >
-                  {link.label}
-                </Link>
-              ))}
+            <SheetHeader className="px-4 pt-2">
+              <SheetTitle className="flex items-center gap-2 text-white">
+                <Logo className="h-6 w-6 text-white" />
+                <span className="text-base font-bold font-heading">{siteName}</span>
+              </SheetTitle>
+            </SheetHeader>
+            <div className="flex flex-1 flex-col gap-1 px-3 pt-4">
+              {NAV_LINKS.map((link) => {
+                const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href))
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setOpen(false)}
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+                      isActive
+                        ? "bg-white/10 text-white"
+                        : "text-white/60 hover:bg-white/5 hover:text-white/90"
+                    )}
+                  >
+                    <span className="shrink-0 opacity-70">{NAV_ICONS[link.href]}</span>
+                    {link.label}
+                  </Link>
+                )
+              })}
+            </div>
+            <div className="mt-auto border-t border-white/10 px-3 pt-4">
               <Link href="/roadtrip" onClick={() => setOpen(false)}>
-                <Button className="mt-4 w-full bg-[#D95D39] text-white font-semibold shadow-lg shadow-black/20 hover:bg-[#D95D39]/90 rounded-xl">🚗 Mulai Jelajahi</Button>
+                <Button className="w-full bg-[#D95D39] text-white font-semibold shadow-lg shadow-black/20 hover:bg-[#D95D39]/90 rounded-xl text-sm h-10">
+                  🚗 Mulai Jelajahi
+                </Button>
               </Link>
             </div>
           </SheetContent>
