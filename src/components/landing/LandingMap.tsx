@@ -18,16 +18,19 @@ const BENEFITS = [
     icon: "📍",
     title: "POI Lengkap",
     desc: "Ratusan spot menarik dari alam, kuliner, hingga petualangan.",
+    color: "#D95D39",
   },
   {
     icon: "🗺️",
     title: "Rute Kurasi",
     desc: "Itinerary siap pakai dengan timeline, estimasi biaya, dan tips perjalanan.",
+    color: "#2C4A3E",
   },
   {
     icon: "💰",
     title: "Estimasi Biaya",
     desc: "Hitung estimasi BBM, tol, tiket masuk, dan akomodasi.",
+    color: "#D95D39",
   },
 ]
 
@@ -65,20 +68,70 @@ export function LandingMap() {
               perjalanan — semua dalam satu platform.
             </p>
 
-            <div className="mt-8 space-y-5">
+            {/* Timeline Steps */}
+            <div className="relative mt-10 ml-2">
+              {/* Vertical connecting line */}
+              <div className="absolute left-[17px] top-3 bottom-0 w-0.5 bg-gradient-to-b from-primary/30 via-accent/20 to-primary/10" />
+
               {BENEFITS.map((b, i) => (
                 <motion.div
                   key={i}
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
                   viewport={{ once: true }}
-                  transition={{ delay: 0.3 + i * 0.1 }}
-                  className="flex items-start gap-4"
+                  transition={{
+                    delay: 0.3 + i * 0.25,
+                    type: "spring",
+                    stiffness: 100,
+                    damping: 15,
+                  }}
+                  className="relative mb-8 last:mb-0"
                 >
-                  <span className="mt-0.5 text-2xl">{b.icon}</span>
-                  <div>
-                    <h3 className="font-semibold font-heading">{b.title}</h3>
-                    <p className="text-sm text-muted-foreground">{b.desc}</p>
+                  <div className="flex items-start gap-5">
+                    {/* Number badge */}
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      whileInView={{ scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{
+                        delay: 0.4 + i * 0.25,
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 12,
+                      }}
+                      className="relative z-10 flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full text-sm font-bold text-white shadow-sm"
+                      style={{ backgroundColor: b.color }}
+                    >
+                      {i + 1}
+                    </motion.div>
+
+                    {/* Card */}
+                    <motion.div className="flex-1 rounded-xl border border-border/50 bg-white p-4 shadow-sm">
+                      <div className="flex items-start gap-3">
+                        <motion.span
+                          className="text-xl"
+                          initial={{ scale: 0 }}
+                          whileInView={{ scale: 1 }}
+                          viewport={{ once: true }}
+                          transition={{
+                            delay: 0.5 + i * 0.25,
+                            type: "spring",
+                            stiffness: 300,
+                            damping: 10,
+                          }}
+                        >
+                          {b.icon}
+                        </motion.span>
+                        <div>
+                          <h3 className="font-semibold font-heading">
+                            {b.title}
+                          </h3>
+                          <p className="text-sm text-muted-foreground mt-0.5">
+                            {b.desc}
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
                   </div>
                 </motion.div>
               ))}
