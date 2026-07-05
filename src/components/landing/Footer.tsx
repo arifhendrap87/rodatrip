@@ -16,7 +16,7 @@ export function Footer() {
   const [social, setSocial] = useState(SOCIAL_LINKS)
 
   useEffect(() => {
-    fetch("/api/admin/settings")
+    fetch("/api/settings")
       .then((r) => r.json())
       .then((json) => {
         const d = json.data || {}

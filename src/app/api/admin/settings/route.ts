@@ -3,6 +3,9 @@ import { getServerAdmin } from "@/lib/api/auth"
 import { db } from "@/lib/services/db"
 
 export async function GET() {
+  const admin = await getServerAdmin()
+  if (!admin) return unauthorized()
+
   const { data } = await db.from("settings").select("*")
   const map: Record<string, string> = {}
   for (const row of data || []) {

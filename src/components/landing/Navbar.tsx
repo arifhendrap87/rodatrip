@@ -26,7 +26,7 @@ export function Navbar() {
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener("scroll", onScroll, { passive: true })
-    fetch("/api/admin/settings")
+    fetch("/api/settings")
       .then((r) => r.json())
       .then((json) => {
         if (json.data?.site_name) setSiteName(json.data.site_name)
