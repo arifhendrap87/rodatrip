@@ -186,7 +186,7 @@ export default function MapSection() {
 
   if (loading) {
     return (
-      <div className="h-full w-full rounded-2xl bg-[#F0EDE8] animate-pulse" />
+      <div className="h-full w-full bg-[#F0EDE8] animate-pulse" />
     )
   }
 
@@ -197,7 +197,7 @@ export default function MapSection() {
     <MapContainer
       center={center}
       zoom={8}
-      className="h-full w-full rounded-2xl"
+      className="h-full w-full"
       zoomControl={false}
       scrollWheelZoom={false}
       dragging={false}
