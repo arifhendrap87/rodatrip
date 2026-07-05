@@ -88,9 +88,9 @@ export default function AboutPage() {
                 Jelajahi Spot
               </Button>
             </Link>
-            <Link href="/map">
+            <Link href="/roadtrip">
               <Button size="lg" variant="outline" className="rounded-xl">
-                Cari Rute
+                Jelajahi Roadtrip
               </Button>
             </Link>
           </div>

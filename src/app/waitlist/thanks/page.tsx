@@ -24,9 +24,9 @@ export default function WaitlistThanksPage() {
               Jelajahi Spot Istimewa
             </Button>
           </Link>
-          <Link href="/map">
+          <Link href="/roadtrip">
             <Button size="lg" variant="outline" className="w-full sm:w-auto rounded-xl">
-              Cari Rute
+              Jelajahi Roadtrip
             </Button>
           </Link>
         </div>

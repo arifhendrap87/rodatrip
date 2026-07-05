@@ -55,9 +55,9 @@ export function RouteDetailClient({
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 sm:py-12 space-y-12">
         <div className="flex items-center justify-between">
-          <Link href="/map" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <Link href="/roadtrip" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-            Kembali ke peta
+            Kembali ke Roadtrip
           </Link>
           <button
             onClick={handleShare}

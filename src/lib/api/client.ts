@@ -83,27 +83,6 @@ export const api = {
       request<{ data: { deleted: boolean } }>(`/products/${id}`, { method: "DELETE" }),
   },
 
-  poi: {
-    list: () =>
-      request<{ data: Record<string, unknown>[] }>("/poi"),
-
-    create: (data: Record<string, unknown>) =>
-      request<{ data: { id: string; name: string } }>("/poi", { method: "POST", body: data }),
-  },
-
-  routes: {
-    list: (params?: Record<string, string>) => {
-      const qs = params ? `?${new URLSearchParams(params)}` : ""
-      return request<{ data: Record<string, unknown>[] }>(`/routes${qs}`)
-    },
-
-    get: (slug: string) =>
-      request<{ data: Record<string, unknown> }>(`/routes/${slug}`),
-
-    estimate: (slug: string, vehicle?: string) =>
-      request<{ data: { distanceKm: number; fuelCost: number; totalCost: number } }>(`/routes/${slug}/estimate${vehicle ? `?vehicle=${vehicle}` : ""}`),
-  },
-
   waitlist: {
     add: (email: string, source?: string) =>
       request<{ data: { id: string; email: string; created_at: string } }>("/waitlist", {

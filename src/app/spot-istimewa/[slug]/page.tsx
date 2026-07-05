@@ -3,7 +3,6 @@ import Image from "next/image"
 import Link from "next/link"
 import type { Metadata } from "next"
 import { SPOT_CATEGORIES } from "@/data/spots"
-import { getPopularRoutes } from "@/data/popular-routes"
 import { SITE_NAME } from "@/lib/constants"
 import { SpotCard } from "@/components/spot/SpotCard"
 import { getSpots, getSpotBySlug, getSpotCoordinates } from "@/lib/services/spots"
@@ -91,32 +90,7 @@ export default async function SpotDetailPage({ params }: { params: Promise<{ slu
                   </div>
                 </div>
               )}
-              {(() => {
-                const routes = getPopularRoutes({ province: spot.province, name: spot.name } as any)
-                if (!routes.length) return null
-                return (
-                  <div>
-                    <h3 className="text-lg font-bold font-heading flex items-center gap-2"><span>🚗</span><span>Rute Populer ke {spot.name}</span></h3>
-                    <p className="text-sm text-muted-foreground mt-1 mb-4">Pilih kota asal kamu dan langsung rencanakan perjalanan.</p>
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      {routes.map((r: any) => (
-                        <Link key={r.from} href={`/map?from=${encodeURIComponent(r.from)}&to=${encodeURIComponent(r.to)}&vehicle=mobil`}
-                          className="group flex items-center gap-4 rounded-2xl border border-border/50 bg-white p-4 transition-all duration-300 hover:border-primary/30 hover:shadow-md hover:-translate-y-0.5"
-                        >
-                          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-lg transition-transform duration-300 group-hover:scale-110">🚗</span>
-                          <div className="min-w-0">
-                            <p className="text-sm font-semibold font-heading">{r.from}</p>
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
-                              <span>⏱️ {r.duration}</span><span>→</span><span className="truncate">{r.to}</span>
-                            </div>
-                          </div>
-                          <svg className="ml-auto w-5 h-5 text-muted-foreground transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )
-              })()}
+
               {relatedItineraries.length > 0 && (
                 <div>
                   <h3 className="text-lg font-bold font-heading flex items-center gap-2"><span>🏎️</span><span>Roadtrip Ini Termasuk Dalam</span></h3>
@@ -206,27 +180,7 @@ export default async function SpotDetailPage({ params }: { params: Promise<{ slu
                     </div>
                   )}
                 </div>
-                <div className="mt-6 space-y-3">
-                  {(() => {
-                    const routes = getPopularRoutes({ province: spot.province, name: spot.name } as any)
-                    const firstRoute = routes[0]
-                    return (
-                      <>
-                        {firstRoute && (
-                          <Link href={`/map?from=${encodeURIComponent(firstRoute.from)}&to=${encodeURIComponent(firstRoute.to)}&vehicle=mobil`}
-                            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary via-[hsl(340_85%_55%)] to-accent text-primary-foreground px-4 py-3 text-sm font-semibold shadow-lg shadow-primary/25 transition-all duration-300 hover:shadow-primary/40 hover:-translate-y-0.5"
-                          >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                            Rencanakan Rute dari {firstRoute.from}
-                          </Link>
-                        )}
-                        <Link href={`/map?from=&to=${encodeURIComponent(spot.name)}`}
-                          className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-2.5 text-xs font-medium text-muted-foreground transition-all duration-300 hover:text-foreground hover:border-primary/30"
-                        >Atur asal manual →</Link>
-                      </>
-                    )
-                  })()}
-                </div>
+
               </div>
             </div>
           </div>
