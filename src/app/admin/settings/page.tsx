@@ -12,29 +12,40 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [siteName, setSiteName] = useState("")
+  const [instagram, setInstagram] = useState("")
+  const [tiktok, setTiktok] = useState("")
+  const [twitter, setTwitter] = useState("")
 
   useEffect(() => {
     fetch("/api/admin/settings")
       .then((r) => r.json())
       .then((json) => {
-        setSiteName(json.data?.site_name || "RodaTrip")
+        const d = json.data || {}
+        setSiteName(d.site_name || "RodaTrip")
+        setInstagram(d.instagram_url || "")
+        setTiktok(d.tiktok_url || "")
+        setTwitter(d.twitter_url || "")
         setLoading(false)
       })
       .catch(() => setLoading(false))
   }, [])
 
   async function handleSave() {
-    if (!siteName.trim()) return
     setSaving(true)
     try {
       const res = await fetch("/api/admin/settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ site_name: siteName.trim() }),
+        body: JSON.stringify({
+          site_name: siteName.trim(),
+          instagram: instagram.trim(),
+          tiktok: tiktok.trim(),
+          twitter: twitter.trim(),
+        }),
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error?.message || "Gagal simpan")
-      toast.success("Site name berhasil diperbarui!")
+      toast.success("Pengaturan berhasil disimpan!")
     } catch (err) {
       toast.error("Gagal: " + (err as Error).message)
     }
@@ -73,6 +84,25 @@ export default function SettingsPage() {
                 Nama ini muncul di navbar, footer, title halaman, dan metadata SEO
               </p>
             </div>
+
+            <div className="border-t pt-4">
+              <h3 className="text-sm font-semibold font-heading mb-3">Media Sosial</h3>
+              <div className="space-y-3">
+                <div className="space-y-1.5">
+                  <Label>Instagram URL</Label>
+                  <Input value={instagram} onChange={(e) => setInstagram(e.target.value)} placeholder="https://instagram.com/rodatrip.id" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>TikTok URL</Label>
+                  <Input value={tiktok} onChange={(e) => setTiktok(e.target.value)} placeholder="https://tiktok.com/@rodatrip.id" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Twitter / X URL</Label>
+                  <Input value={twitter} onChange={(e) => setTwitter(e.target.value)} placeholder="https://twitter.com/rodatrip_id" />
+                </div>
+              </div>
+            </div>
+
             <Button onClick={handleSave} disabled={saving}>
               {saving ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Menyimpan...</> : <><Save className="mr-2 h-4 w-4" /> Simpan</>}
             </Button>

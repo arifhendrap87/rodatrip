@@ -13,12 +13,19 @@ import {
 
 export function Footer() {
   const [siteName, setSiteName] = useState(SITE_NAME)
+  const [social, setSocial] = useState(SOCIAL_LINKS)
 
   useEffect(() => {
     fetch("/api/admin/settings")
       .then((r) => r.json())
       .then((json) => {
-        if (json.data?.site_name) setSiteName(json.data.site_name)
+        const d = json.data || {}
+        if (d.site_name) setSiteName(d.site_name)
+        setSocial({
+          instagram: d.instagram_url || SOCIAL_LINKS.instagram,
+          tiktok: d.tiktok_url || SOCIAL_LINKS.tiktok,
+          twitter: d.twitter_url || SOCIAL_LINKS.twitter,
+        })
       })
       .catch(() => {})
   }, [])
@@ -73,17 +80,17 @@ export function Footer() {
                 </li>
               ))}
               <li className="pt-2">
-                <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" className="text-sm text-white/60 transition-colors hover:text-white">
+                <a href={social.instagram} target="_blank" rel="noopener noreferrer" className="text-sm text-white/60 transition-colors hover:text-white">
                   Instagram
                 </a>
               </li>
               <li>
-                <a href={SOCIAL_LINKS.tiktok} target="_blank" rel="noopener noreferrer" className="text-sm text-white/60 transition-colors hover:text-white">
+                <a href={social.tiktok} target="_blank" rel="noopener noreferrer" className="text-sm text-white/60 transition-colors hover:text-white">
                   TikTok
                 </a>
               </li>
               <li>
-                <a href={SOCIAL_LINKS.twitter} target="_blank" rel="noopener noreferrer" className="text-sm text-white/60 transition-colors hover:text-white">
+                <a href={social.twitter} target="_blank" rel="noopener noreferrer" className="text-sm text-white/60 transition-colors hover:text-white">
                   Twitter / X
                 </a>
               </li>

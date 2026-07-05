@@ -17,14 +17,24 @@ export async function PUT(request: Request) {
   if (!admin) return unauthorized()
 
   const body = await request.json()
-  if (!body.site_name || typeof body.site_name !== "string") {
-    return badRequest("site_name required")
+  const upserts: { key: string; value: string }[] = []
+
+  if (body.site_name && typeof body.site_name === "string") {
+    upserts.push({ key: "site_name", value: body.site_name.trim() })
   }
 
-  await db.from("settings").upsert(
-    { key: "site_name", value: body.site_name.trim() },
-    { onConflict: "key" }
-  )
+  const socialKeys = ["instagram", "tiktok", "twitter"] as const
+  for (const key of socialKeys) {
+    if (body[key] !== undefined) {
+      upserts.push({ key: `${key}_url`, value: String(body[key]).trim() })
+    }
+  }
 
-  return success({ site_name: body.site_name.trim() })
+  if (upserts.length === 0) return badRequest("Tidak ada data yang diubah")
+
+  for (const item of upserts) {
+    await db.from("settings").upsert(item, { onConflict: "key" })
+  }
+
+  return success(Object.fromEntries(upserts.map((u) => [u.key.replace("_url", ""), u.value])))
 }
