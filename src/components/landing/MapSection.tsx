@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useMemo } from "react"
+import { useEffect, useState, useMemo, useRef } from "react"
 import {
   MapContainer,
   TileLayer,
@@ -81,22 +81,102 @@ export default function MapSection() {
       .map((s) => [s.lat, s.lng] as [number, number])
   }, [spots])
 
-  const [visiblePoints, setVisiblePoints] = useState<[number, number][]>([])
+  const DURATION_MS = 1800
+  const PULSE_MS = 600
+
+  const [phase, setPhase] = useState<"idle" | "draw" | "move" | "done">("idle")
+  const [drawCount, setDrawCount] = useState(1)
+  const [segIdx, setSegIdx] = useState(0)
+  const [segProg, setSegProg] = useState(0)
+  const [pulseStop, setPulseStop] = useState(-1)
+  const moved = useRef(false)
 
   useEffect(() => {
     if (routePoints.length < 2) return
-    setVisiblePoints([routePoints[0]])
-    let i = 0
-    const timer = setInterval(() => {
+    setPhase("draw")
+    setDrawCount(1)
+    setSegIdx(0)
+    setSegProg(0)
+    setPulseStop(-1)
+    moved.current = false
+    let i = 1
+    const drawTimer = setInterval(() => {
       i++
-      setVisiblePoints(routePoints.slice(0, i + 1))
-      if (i >= routePoints.length - 1) clearInterval(timer)
+      setDrawCount(i)
+      if (i >= routePoints.length) {
+        clearInterval(drawTimer)
+        setTimeout(() => {
+          setPhase("move")
+        }, 500)
+      }
     }, 400)
-    return () => clearInterval(timer)
+    return () => clearInterval(drawTimer)
   }, [routePoints])
 
+  useEffect(() => {
+    if (phase !== "move" || routePoints.length < 2) return
+    if (moved.current) return
+    moved.current = true
+
+    let animId: number
+    let last = performance.now()
+    let segIdxLocal = 0
+    let segProgLocal = 0
+    let pulsing = false
+    let pulseDone = 0
+
+    function tick(now: number) {
+      const dt = now - last
+      last = now
+
+      if (pulsing) {
+        if (Date.now() - pulseDone < PULSE_MS) {
+          animId = requestAnimationFrame(tick)
+          return
+        }
+        pulsing = false
+        setPulseStop(-1)
+      }
+
+      segProgLocal += dt / DURATION_MS
+      if (segProgLocal >= 1) {
+        segProgLocal = 0
+        segIdxLocal++
+        setPulseStop(segIdxLocal)
+        pulsing = true
+        pulseDone = Date.now()
+        if (segIdxLocal >= routePoints.length - 1) {
+          setPhase("done")
+          setSegIdx(segIdxLocal)
+          setSegProg(1)
+          return
+        }
+        setSegIdx(segIdxLocal)
+      }
+      setSegProg(segProgLocal)
+      setSegIdx(segIdxLocal)
+      animId = requestAnimationFrame(tick)
+    }
+    animId = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(animId)
+  }, [phase, routePoints])
+
+  const markerPos: [number, number] | null =
+    phase === "move" && segIdx < routePoints.length - 1
+      ? [
+          routePoints[segIdx][0] +
+            (routePoints[segIdx + 1][0] - routePoints[segIdx][0]) * segProg,
+          routePoints[segIdx][1] +
+            (routePoints[segIdx + 1][1] - routePoints[segIdx][1]) * segProg,
+        ]
+      : phase === "done" && routePoints.length > 0
+        ? routePoints[routePoints.length - 1]
+        : null
+
   if (loading) {
-    return <div className="h-full w-full rounded-2xl bg-[#F0EDE8] animate-pulse" />
+    return (
+      <div className="h-full w-full rounded-2xl bg-[#F0EDE8] animate-pulse" />
+    )
   }
 
   const center: [number, number] =
@@ -119,22 +199,65 @@ export default function MapSection() {
       />
       <MapBoundsUpdater spots={spots} />
 
-      {visiblePoints.length >= 2 && (
-        <Polyline
-          positions={visiblePoints}
-          color="#D95D39"
-          weight={3}
-          opacity={0.8}
-          dashArray="8, 8"
-        />
-      )}
+      {/* Route segments */}
+      {routePoints.length >= 2 &&
+        routePoints.slice(0, -1).map((start, i) => {
+          const end = routePoints[i + 1]
+          const drawn = phase === "idle" || (phase === "draw" && i < drawCount)
+          const visited =
+            phase === "done" || (phase === "move" && i < segIdx)
+          const current = phase === "move" && i === segIdx
+          const future = phase === "draw" || phase === "done" ? false : !visited && !current
 
-      {visiblePoints.length > 0 && (
+          if (phase === "draw" && !drawn) return null
+
+          const midLat =
+            current
+              ? start[0] + (end[0] - start[0]) * segProg
+              : end[0]
+          const midLng =
+            current
+              ? start[1] + (end[1] - start[1]) * segProg
+              : end[1]
+
+          if (current) {
+            return (
+              <Polyline
+                key={`seg-${i}`}
+                positions={
+                  [
+                    [start[0], start[1]],
+                    [midLat, midLng],
+                  ] as [number, number][]
+                }
+                color="#D95D39"
+                weight={3}
+                opacity={0.9}
+              />
+            )
+          }
+
+          if (future) return null
+
+          return (
+            <Polyline
+              key={`seg-${i}`}
+              positions={[start, end] as [number, number][]}
+              color={visited ? "#D95D39" : "#D95D39"}
+              weight={3}
+              opacity={visited ? 1 : 0.35}
+              dashArray={visited ? undefined : "8, 8"}
+            />
+          )
+        })}
+
+      {/* Moving marker */}
+      {markerPos && (
         <CircleMarker
-          center={visiblePoints[0]}
-          radius={8}
+          center={markerPos}
+          radius={7}
           pathOptions={{
-            color: "#D95D39",
+            color: "#fff",
             fillColor: "#D95D39",
             fillOpacity: 1,
             weight: 3,
@@ -142,19 +265,39 @@ export default function MapSection() {
         />
       )}
 
-      {spots.map((spot) => (
+      {/* Pulse effect at stop */}
+      {pulseStop >= 0 && pulseStop < routePoints.length && (
         <CircleMarker
-          key={spot.slug}
-          center={[spot.lat, spot.lng]}
-          radius={5}
+          center={routePoints[pulseStop]}
+          radius={16}
           pathOptions={{
-            color: CATEGORY_COLORS[spot.category] || "#D95D39",
-            fillColor: CATEGORY_COLORS[spot.category] || "#D95D39",
-            fillOpacity: 0.8,
-            weight: 2,
+            color: "#D95D39",
+            fillColor: "#D95D39",
+            fillOpacity: 0.15,
+            weight: 3,
           }}
         />
-      ))}
+      )}
+
+      {/* Spot markers */}
+      {spots.map((spot) => {
+        const isRoutePoint = routePoints.some(
+          (rp) => rp[0] === spot.lat && rp[1] === spot.lng
+        )
+        return (
+          <CircleMarker
+            key={spot.slug}
+            center={[spot.lat, spot.lng]}
+            radius={isRoutePoint ? 5 : 4}
+            pathOptions={{
+              color: CATEGORY_COLORS[spot.category] || "#D95D39",
+              fillColor: CATEGORY_COLORS[spot.category] || "#D95D39",
+              fillOpacity: isRoutePoint ? 1 : 0.6,
+              weight: isRoutePoint ? 2.5 : 1.5,
+            }}
+          />
+        )
+      })}
     </MapContainer>
   )
 }
