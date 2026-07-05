@@ -4,6 +4,7 @@ import { Testimonials } from "@/components/landing/Testimonials"
 import { FeaturedSpots } from "@/components/landing/FeaturedSpots"
 import { FeaturedRoadtrips } from "@/components/landing/FeaturedRoadtrips"
 import { BlogSection } from "@/components/landing/BlogSection"
+import { MusicPlayer } from "@/components/landing/MusicPlayer"
 
 export default function LandingPage() {
   return (
@@ -26,6 +27,8 @@ export default function LandingPage() {
       <div className="bg-[#FDFBF7]">
         <Testimonials />
       </div>
+
+      <MusicPlayer />
     </>
   )
 }
