@@ -7,23 +7,32 @@ import { RoadtripDetailClient } from "./client"
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   const itinerary = await getItineraryBySlug(slug)
-  if (!itinerary || !itinerary.isPublished) return { title: "Roadtrip Tidak Ditemukan" }
+  if (!itinerary || !itinerary.isPublished) {
+    return { title: "Roadtrip Tidak Ditemukan", robots: { index: false, follow: false } }
+  }
+
+  const metaDesc = `Panduan roadtrip ${itinerary.title}: ${itinerary.itineraryDuration}, ${itinerary.totalDistance}, ${itinerary.roadCondition || "cek detail rute"}.`
+  const ogImage = itinerary.coverImage
+    ? [{ url: itinerary.coverImage, width: 1200, height: 630 }]
+    : [{ url: `${SITE_URL}/og-default.jpg`, width: 1200, height: 630 }]
 
   return {
     title: `${itinerary.title} — Roadtrip ${SITE_NAME}`,
-    description: `Panduan roadtrip ${itinerary.title}: ${itinerary.itineraryDuration}, ${itinerary.totalDistance}, ${itinerary.roadCondition || "cek detail rute"}.`,
+    description: metaDesc,
+    alternates: { canonical: `${SITE_URL}/roadtrip/${slug}` },
+    robots: { index: true, follow: true },
     openGraph: {
       title: `${itinerary.title} — ${SITE_NAME}`,
-      description: `Panduan roadtrip ${itinerary.title}: ${itinerary.itineraryDuration}`,
+      description: metaDesc,
       locale: "id_ID",
       type: "article",
       url: `${SITE_URL}/roadtrip/${slug}`,
-      images: itinerary.coverImage ? [{ url: itinerary.coverImage, width: 1200, height: 630 }] : undefined,
+      images: ogImage,
     },
     twitter: {
       card: "summary_large_image",
       title: `${itinerary.title} — ${SITE_NAME}`,
-      description: `Panduan roadtrip ${itinerary.title}: ${itinerary.itineraryDuration}`,
+      description: metaDesc,
       images: itinerary.coverImage ? [itinerary.coverImage] : undefined,
     },
   }
@@ -34,5 +43,21 @@ export default async function RoadtripDetailPage({ params }: { params: Promise<{
   const itinerary = await getItineraryBySlug(slug)
   if (!itinerary || !itinerary.isPublished) notFound()
 
-  return <RoadtripDetailClient itinerary={itinerary} />
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: itinerary.title,
+    description: `Panduan roadtrip ${itinerary.title}: ${itinerary.itineraryDuration}, ${itinerary.totalDistance}.`,
+    image: itinerary.coverImage,
+    datePublished: itinerary.createdAt,
+    dateModified: itinerary.updatedAt,
+    author: { "@type": "Organization", name: SITE_NAME },
+  }
+
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <RoadtripDetailClient itinerary={itinerary} />
+    </>
+  )
 }

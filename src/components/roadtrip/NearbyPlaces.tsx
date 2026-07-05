@@ -95,10 +95,10 @@ export function NearbyPlaces({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-semibold font-heading flex items-center gap-2">
+        <h3 className="text-sm font-semibold font-heading flex items-center gap-2">
           <span>{catInfo.icon}</span>
           <span>{displayTitle}</span>
-        </h4>
+        </h3>
         <span className="text-xs text-muted-foreground">{places.length} tempat</span>
       </div>
       <div className="grid gap-2 sm:grid-cols-2">

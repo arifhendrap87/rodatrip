@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
-import { SITE_NAME } from "@/lib/constants"
+import { SITE_NAME, SITE_URL } from "@/lib/constants"
 import { getPosts, getPostBySlug } from "@/lib/services/blog"
 
 function isHtmlContent(str: string): boolean {
@@ -22,7 +22,26 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: `${seoTitle} — Blog — ${SITE_NAME}`,
     description: metaDesc,
-    openGraph: { title: seoTitle, description: metaDesc, type: "article", publishedTime: post.published_at, authors: [post.author] },
+    alternates: { canonical: `${SITE_URL}/blog/${slug}` },
+    robots: { index: true, follow: true },
+    openGraph: {
+      title: seoTitle,
+      description: metaDesc,
+      type: "article",
+      publishedTime: post.published_at,
+      authors: [post.author],
+      url: `${SITE_URL}/blog/${slug}`,
+      locale: "id_ID",
+      images: post.image_url
+        ? [{ url: post.image_url, width: 1200, height: 630 }]
+        : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: seoTitle,
+      description: metaDesc,
+      images: post.image_url ? [post.image_url] : undefined,
+    },
   }
 }
 
@@ -34,8 +53,22 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const allPosts = await getPosts()
   const related = allPosts.filter((p) => p.slug !== slug).slice(0, 3)
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.excerpt,
+    image: post.image_url,
+    datePublished: post.published_at,
+    dateModified: (post as any).updated_at || post.published_at,
+    author: { "@type": "Person", name: post.author },
+    publisher: { "@type": "Organization", name: SITE_NAME },
+  }
+
   return (
-    <article className="min-h-screen">
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <article className="min-h-screen">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 py-12 sm:py-16">
         <Link href="/blog" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
@@ -110,5 +143,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         </section>
       )}
     </article>
+    </>
   )
 }

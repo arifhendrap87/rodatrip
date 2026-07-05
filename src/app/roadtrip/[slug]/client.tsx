@@ -67,7 +67,7 @@ export function RoadtripDetailClient({ itinerary }: RoadtripDetailClientProps) {
       <section className={`relative overflow-hidden pt-28 pb-20 sm:pt-36 sm:pb-28 ${itinerary.coverImage ? 'text-white' : ''}`}>
         {itinerary.coverImage ? (
           <>
-            <Image src={itinerary.coverImage} alt="" fill className="object-cover" unoptimized priority />
+            <Image src={itinerary.coverImage} alt={`${itinerary.title} — Foto sampul roadtrip`} fill className="object-cover" unoptimized priority />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
           </>
         ) : (

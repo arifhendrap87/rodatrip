@@ -3,7 +3,7 @@ import Image from "next/image"
 import Link from "next/link"
 import type { Metadata } from "next"
 import { SPOT_CATEGORIES } from "@/data/spots"
-import { SITE_NAME } from "@/lib/constants"
+import { SITE_NAME, SITE_URL } from "@/lib/constants"
 import { SpotCard } from "@/components/spot/SpotCard"
 import { getSpots, getSpotBySlug, getSpotCoordinates } from "@/lib/services/spots"
 import { getItinerariesBySpotSlug } from "@/lib/services/itineraries"
@@ -19,10 +19,28 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const spot = await getSpotBySlug(slug)
   if (!spot) return {}
+  const metaDesc = spot.description || `${spot.name} — ${spot.category} di ${spot.province}. Temukan spot istimewa ini di ${SITE_NAME}.`
   return {
     title: `${spot.name} — Spot Istimewa — ${SITE_NAME}`,
-    description: spot.description,
-    openGraph: { title: `${spot.name} — ${SITE_NAME}`, description: spot.description, images: [{ url: spot.image_url, width: 800, height: 600 }] },
+    description: metaDesc,
+    alternates: { canonical: `${SITE_URL}/spot-istimewa/${slug}` },
+    robots: { index: true, follow: true },
+    openGraph: {
+      title: `${spot.name} — ${SITE_NAME}`,
+      description: metaDesc,
+      url: `${SITE_URL}/spot-istimewa/${slug}`,
+      type: "article",
+      locale: "id_ID",
+      images: spot.image_url
+        ? [{ url: spot.image_url, width: 1200, height: 630 }]
+        : [{ url: `${SITE_URL}/og-default.jpg`, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${spot.name} — ${SITE_NAME}`,
+      description: metaDesc,
+      images: spot.image_url ? [spot.image_url] : undefined,
+    },
   }
 }
 
@@ -44,8 +62,22 @@ export default async function SpotDetailPage({ params }: { params: Promise<{ slu
   const { data: allSpots } = await getSpots({ limit: 100 })
   const relatedItineraries = await getItinerariesBySpotSlug(slug)
 
+  const coords = getSpotCoordinates(spot)
+  const jsonLd: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "TouristAttraction",
+    name: spot.name,
+    description: spot.description || "",
+    image: spot.image_url,
+    address: { "@type": "PostalAddress", addressRegion: spot.province, addressCountry: "ID" },
+  }
+  if (coords) {
+    jsonLd.geo = { "@type": "GeoCoordinates", latitude: coords.lat, longitude: coords.lng }
+  }
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <section className="relative min-h-[50vh] flex items-end overflow-hidden">
         <Image src={spot.image_url || "/placeholder.svg"} alt={spot.name} fill className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
