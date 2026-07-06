@@ -4,6 +4,7 @@ import Link from "next/link"
 import type { Metadata } from "next"
 import { SPOT_CATEGORIES } from "@/data/spots"
 import { SITE_NAME, SITE_URL } from "@/lib/constants"
+import { Breadcrumb } from "@/components/ui/Breadcrumb"
 import { SpotCard } from "@/components/spot/SpotCard"
 import { getSpots, getSpotBySlug, getSpotCoordinates } from "@/lib/services/spots"
 import { getItinerariesBySpotSlug } from "@/lib/services/itineraries"
@@ -82,10 +83,9 @@ export default async function SpotDetailPage({ params }: { params: Promise<{ slu
         <Image src={spot.image_url || "/placeholder.svg"} alt={spot.name} fill className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 py-12 w-full">
-          <Link href="/spot-istimewa" className="inline-flex items-center gap-1.5 text-sm text-white/80 hover:text-white transition-colors mb-4">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-            Kembali ke Spot Istimewa
-          </Link>
+          <div className="mb-4">
+            <Breadcrumb items={[{ label: "Spot Istimewa", href: "/spot-istimewa" }, { label: spot.name }]} light />
+          </div>
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <span className="inline-flex items-center gap-1 rounded-full bg-white/20 backdrop-blur-sm px-3 py-1 text-xs font-medium text-white"><span>{cat.icon}</span><span>{cat.label}</span></span>
             <span className="inline-flex items-center gap-1 rounded-full bg-white/20 backdrop-blur-sm px-3 py-1 text-xs font-medium text-white">📍 {spot.province}</span>

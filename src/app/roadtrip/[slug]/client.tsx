@@ -6,6 +6,7 @@ import Link from "next/link"
 import type { Itinerary, ItineraryStop } from "@/types"
 import { ItineraryTimeline } from "./ItineraryTimeline"
 import { parseEmbedUrl } from "@/lib/embed"
+import { Breadcrumb } from "@/components/ui/Breadcrumb"
 
 interface RoadtripDetailClientProps {
   itinerary: Itinerary
@@ -77,15 +78,7 @@ export function RoadtripDetailClient({ itinerary }: RoadtripDetailClientProps) {
           </div>
         )}
         <div className="relative z-10 mx-auto max-w-4xl px-4 sm:px-6">
-          <Link
-            href="/roadtrip"
-            className={`inline-flex items-center gap-1.5 text-sm transition-colors mb-6 ${itinerary.coverImage ? 'text-white/70 hover:text-white' : 'text-muted-foreground hover:text-foreground'}`}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 12H5" /><path d="m12 19-7-7 7-7" />
-            </svg>
-            Semua Roadtrip
-          </Link>
+          <Breadcrumb items={[{ label: "Roadtrip", href: "/roadtrip" }, { label: itinerary.title }]} light={!!itinerary.coverImage} />
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold font-heading tracking-tight leading-tight">
             {itinerary.title}

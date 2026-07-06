@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import { SITE_NAME, SITE_URL } from "@/lib/constants"
 import { getPosts, getPostBySlug } from "@/lib/services/blog"
+import { Breadcrumb } from "@/components/ui/Breadcrumb"
 
 function isHtmlContent(str: string): boolean {
   return /<[a-z][\s\S]*>/i.test(str)
@@ -70,10 +71,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <article className="min-h-screen">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 py-12 sm:py-16">
-        <Link href="/blog" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-          Kembali ke Blog
-        </Link>
+        <Breadcrumb items={[{ label: "Blog", href: "/blog" }, { label: post.title }]} />
 
         <div className="flex items-center gap-3 text-sm text-muted-foreground mb-4">
           <span className="inline-flex items-center rounded-full bg-primary/10 px-3 py-0.5 text-xs font-medium text-primary">{post.category}</span>
