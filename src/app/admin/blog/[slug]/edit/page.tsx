@@ -43,6 +43,9 @@ export default function EditBlogPage() {
     author: "RodaTrip",
     read_time: "5 min",
     tags: "",
+    seo_title: "",
+    meta_description: "",
+    prompt_gambar: "",
     is_published: false,
   })
 
@@ -62,6 +65,9 @@ export default function EditBlogPage() {
             author: post.author || "RodaTrip",
             read_time: post.read_time || "5 min",
             tags: (post.tags || []).join(", "),
+            seo_title: post.seo_title || "",
+            meta_description: post.meta_description || "",
+            prompt_gambar: post.prompt_gambar || "",
             is_published: post.is_published || false,
           })
         }
@@ -368,6 +374,24 @@ export default function EditBlogPage() {
               <div className="space-y-2">
                 <Label>Cover Image URL</Label>
                 <Input value={form.image_url} onChange={(e) => setForm((f) => ({ ...f, image_url: e.target.value }))} />
+              </div>
+            </div>
+
+            <div className="border-t pt-4 space-y-3">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">SEO Settings</p>
+              <div className="grid gap-4 sm:grid-cols-3">
+                <div className="space-y-2">
+                  <Label>SEO Title</Label>
+                  <Input value={form.seo_title} onChange={(e) => setForm((f) => ({ ...f, seo_title: e.target.value }))} placeholder="Auto dari judul" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Meta Description</Label>
+                  <Input value={form.meta_description} onChange={(e) => setForm((f) => ({ ...f, meta_description: e.target.value }))} placeholder="Auto dari excerpt" />
+                </div>
+                <div className="space-y-2">
+                  <Label>AI Image Prompt</Label>
+                  <Input value={form.prompt_gambar} onChange={(e) => setForm((f) => ({ ...f, prompt_gambar: e.target.value }))} placeholder="Prompt gambar" />
+                </div>
               </div>
             </div>
 

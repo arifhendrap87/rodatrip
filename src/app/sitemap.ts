@@ -2,14 +2,16 @@ import type { MetadataRoute } from "next"
 import { getSpots } from "@/lib/services/spots"
 import { getRoutes } from "@/lib/services/routes"
 import { getPosts } from "@/lib/services/blog"
+import { getItineraries } from "@/lib/services/itineraries"
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://gaskuy-roadtrip.vercel.app"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [spotsRes, routes, blog] = await Promise.all([
+  const [spotsRes, routes, blog, itineraries] = await Promise.all([
     getSpots({ limit: 100 }),
     getRoutes().catch(() => []),
     getPosts().catch(() => []),
+    getItineraries({ published: true }).catch(() => []),
   ])
 
   const { data: spots } = spotsRes
@@ -50,5 +52,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
 
-  return [...staticPages, ...routePages, ...spotPages, ...blogPages]
+  const roadtripPages = (itineraries || []).map((itin) => ({
+    url: `${BASE_URL}/roadtrip/${itin.slug}`,
+    lastModified: new Date(itin.updatedAt),
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+  }))
+
+  return [...staticPages, ...routePages, ...spotPages, ...blogPages, ...roadtripPages]
 }
