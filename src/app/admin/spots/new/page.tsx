@@ -19,6 +19,7 @@ import {
   ArrowLeft,
   Save,
   Loader2,
+  Sparkles,
 } from "lucide-react"
 import Link from "next/link"
 import TiptapEditor from "@/components/ui/tiptap/tiptap-editor"
@@ -148,6 +149,35 @@ export default function NewSpotPage() {
       toast.error("Error: " + (err as Error).message)
     }
     setSaving(false)
+  }
+
+  const [generatingField, setGeneratingField] = useState<string | null>(null)
+
+  async function handleGenerate(field: "description" | "why_special" | "tips") {
+    if (!form.name) {
+      toast.error("Isi nama spot dulu")
+      return
+    }
+    setGeneratingField(field)
+    try {
+      const promptMap: Record<string, string> = {
+        description: `Buatkan deskripsi menarik tentang spot "${form.name}" (kategori: ${form.category}) untuk website roadtrip. Format HTML, 2-3 paragraf, ton informatif dan engaging. Jangan pakai H1.`,
+        why_special: `Buatkan alasan kenapa "${form.name}" spesial dan wajib dikunjungi. Format HTML, 1-2 paragraf, singkat dan persuasif.`,
+        tips: `Buatkan tips praktis untuk pengunjung "${form.name}". Format HTML menggunakan <ul>/<li>, 3-5 tips.`,
+      }
+      const res = await fetch("/api/ai/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: [{ role: "user", content: promptMap[field] }] }),
+      })
+      if (!res.ok) throw new Error("Gagal")
+      const json = await res.json()
+      setForm((f) => ({ ...f, [field]: json.data.reply }))
+      toast.success("Konten berhasil digenerate!")
+    } catch {
+      toast.error("Gagal generate konten")
+    }
+    setGeneratingField(null)
   }
 
   return (
@@ -366,21 +396,39 @@ export default function NewSpotPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label>Description *</Label>
+              <div className="flex items-center justify-between">
+                <Label>Description *</Label>
+                <Button type="button" variant="ghost" size="sm" onClick={() => handleGenerate("description")} disabled={generatingField !== null} className="gap-1 text-xs h-7">
+                  {generatingField === "description" ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                  AI Generate
+                </Button>
+              </div>
               <TiptapEditor
                 content={form.description}
                 onChange={(html) => setForm((f) => ({ ...f, description: html }))}
               />
             </div>
             <div className="space-y-2">
-              <Label>Why Special</Label>
+              <div className="flex items-center justify-between">
+                <Label>Why Special</Label>
+                <Button type="button" variant="ghost" size="sm" onClick={() => handleGenerate("why_special")} disabled={generatingField !== null} className="gap-1 text-xs h-7">
+                  {generatingField === "why_special" ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                  AI Generate
+                </Button>
+              </div>
               <TiptapEditor
                 content={form.why_special}
                 onChange={(html) => setForm((f) => ({ ...f, why_special: html }))}
               />
             </div>
             <div className="space-y-2">
-              <Label>Tips</Label>
+              <div className="flex items-center justify-between">
+                <Label>Tips</Label>
+                <Button type="button" variant="ghost" size="sm" onClick={() => handleGenerate("tips")} disabled={generatingField !== null} className="gap-1 text-xs h-7">
+                  {generatingField === "tips" ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                  AI Generate
+                </Button>
+              </div>
               <TiptapEditor
                 content={form.tips}
                 onChange={(html) => setForm((f) => ({ ...f, tips: html }))}
