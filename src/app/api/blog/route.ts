@@ -1,11 +1,11 @@
-import { success, badRequest } from "@/lib/api/response"
+import { success, badRequest, rateLimited } from "@/lib/api/response"
 import { publicLimiter } from "@/lib/api/rate-limit"
 import { getPosts } from "@/lib/services/blog"
 
 export async function GET(request: Request) {
   const ip = request.headers.get("x-forwarded-for") || "unknown"
   const { allowed } = await publicLimiter(`blog:${ip}`)
-  if (!allowed) return badRequest("Rate limited")
+  if (!allowed) return rateLimited(30)
 
   const { searchParams } = new URL(request.url)
   const category = searchParams.get("category") || undefined

@@ -1,4 +1,4 @@
-import { success, badRequest, unauthorized, internalError } from "@/lib/api/response"
+import { success, badRequest, unauthorized, internalError, rateLimited } from "@/lib/api/response"
 import { getServerAdmin } from "@/lib/api/auth"
 import { adminLimiter } from "@/lib/api/rate-limit"
 import { uploadImage } from "@/lib/storage"
@@ -9,7 +9,7 @@ export async function POST(request: Request) {
 
   const ip = request.headers.get("x-forwarded-for") || "unknown"
   const { allowed } = await adminLimiter(`upload:${ip}`)
-  if (!allowed) return unauthorized("Rate limited")
+  if (!allowed) return rateLimited(30)
 
   const formData = await request.formData()
   const file = formData.get("file") as File | null

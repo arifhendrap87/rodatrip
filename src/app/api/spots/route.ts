@@ -1,4 +1,4 @@
-import { success, paginated, badRequest, unauthorized, conflict } from "@/lib/api/response"
+import { success, paginated, badRequest, unauthorized, conflict, rateLimited } from "@/lib/api/response"
 import { publicLimiter, adminLimiter } from "@/lib/api/rate-limit"
 import { createSpotSchema } from "@/lib/validators/spot"
 import { getServerAdmin } from "@/lib/api/auth"
@@ -8,7 +8,7 @@ import { db } from "@/lib/services/db"
 export async function GET(request: Request) {
   const ip = request.headers.get("x-forwarded-for") || "unknown"
   const { allowed } = await publicLimiter(`spots:${ip}`)
-  if (!allowed) return unauthorized("Rate limited")
+  if (!allowed) return rateLimited(30)
 
   const { searchParams } = new URL(request.url)
   const category = searchParams.get("category") || undefined
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
 
   const ip = request.headers.get("x-forwarded-for") || "unknown"
   const { allowed } = await adminLimiter(`spots:post:${ip}`)
-  if (!allowed) return unauthorized("Rate limited")
+  if (!allowed) return rateLimited(30)
 
   const body = await request.json()
   const parsed = createSpotSchema.safeParse(body)

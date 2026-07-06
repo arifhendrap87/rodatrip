@@ -1,4 +1,4 @@
-import { success, badRequest, internalError } from "@/lib/api/response"
+import { success, rateLimited, badRequest, internalError } from "@/lib/api/response"
 import { publicLimiter } from "@/lib/api/rate-limit"
 import { db } from "@/lib/services/db"
 import { z } from "zod"
@@ -20,7 +20,7 @@ const createOrderSchema = z.object({
 export async function POST(request: Request) {
   const ip = request.headers.get("x-forwarded-for") || "unknown"
   const { allowed } = await publicLimiter(`orders:${ip}`)
-  if (!allowed) return badRequest("Rate limited")
+  if (!allowed) return rateLimited(30)
 
   const body = await request.json()
   const parsed = createOrderSchema.safeParse(body)

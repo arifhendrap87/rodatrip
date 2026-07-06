@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js"
-import { success, paginated, badRequest, conflict, internalError, unauthorized, csv } from "@/lib/api/response"
+import { success, rateLimited, paginated, badRequest, conflict, internalError, unauthorized, csv } from "@/lib/api/response"
 import { adminLimiter } from "@/lib/api/rate-limit"
 import { createWaitlistSchema } from "@/lib/validators/waitlist"
 import { getServerAdmin } from "@/lib/api/auth"
@@ -13,7 +13,7 @@ const adminClient = createClient(
 export async function POST(request: Request) {
   const ip = request.headers.get("x-forwarded-for") || "unknown"
   const { allowed } = await adminLimiter(`waitlist:${ip}`)
-  if (!allowed) return unauthorized("Rate limited")
+  if (!allowed) return rateLimited(30)
 
   const body = await request.json()
   const parsed = createWaitlistSchema.safeParse(body)

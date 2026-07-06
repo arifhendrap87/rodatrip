@@ -1,4 +1,4 @@
-import { success, badRequest } from "@/lib/api/response"
+import { success, rateLimited, badRequest } from "@/lib/api/response"
 import { publicLimiter } from "@/lib/api/rate-limit"
 import { nearbyQuerySchema } from "@/lib/validators/nearby"
 import { queryNearbyPlaces } from "@/lib/services/nearby"
@@ -6,7 +6,7 @@ import { queryNearbyPlaces } from "@/lib/services/nearby"
 export async function GET(request: Request) {
   const ip = request.headers.get("x-forwarded-for") || "unknown"
   const { allowed } = await publicLimiter(`nearby:${ip}`)
-  if (!allowed) return badRequest("Rate limited")
+  if (!allowed) return rateLimited(30)
 
   const { searchParams } = new URL(request.url)
   const parsed = nearbyQuerySchema.safeParse({
