@@ -650,6 +650,19 @@ export function renderVisualPrompt(source: ContentSource, platform: string): str
   const catKw = catKeywords[cat] || "travel destination, Indonesia"
   const directPrompt = `\n\n🤖 DIRECT AI PROMPT (copy → paste ke Midjourney / DALL-E / Leonardo AI)\n${title}, ${catKw}, ${prov}, Indonesia, vibrant colors, natural lighting, high quality, 8K, professional photography ${aspect}`
 
+  const catAdj: Record<string, string> = {
+    alam: "beautiful nature, misty morning",
+    kuliner: "delicious food plating",
+    budaya: "traditional culture, heritage",
+    foto: "scenic, photogenic",
+    petualangan: "adventure, outdoor",
+    sejarah: "historical, ancient",
+  }
+  const adj = catAdj[cat] || "travel, destination"
+
+  const slidePrompt = (slide: number, desc: string) =>
+    `  🤖 Prompt: "${desc}, ${adj}, ${prov}, Indonesia, vibrant colors, natural lighting, professional photography, 8K ${aspect}"`
+
   if (platform === "instagram") {
     return `🎨 VISUAL PROMPT — IG CAROUSEL (4-5 Slide)
 ━━━━━━━━━━━━━━━━━━━━━━━
@@ -659,26 +672,31 @@ Slide 1 — Cover:
   🖼️ Gambar: ${imageDesc || `${emoji} ${title}, angle wide, ${cat === "alam" ? "golden hour" : "siang hari"}`}
   📝 Overlay: "${title}" — font bold besar di tengah
   🎨 Style: Foto full, gradient overlay hitam 60%, teks putih
+${slidePrompt(1, `${emoji} ${title} wide angle view, beautiful landscape, ${prov}`)}
 
 Slide 2 — Info Lokasi:
   🖼️ Gambar: ${imageDesc || `Detail ${title}, ${prov}`}
   📝 Overlay: "📍 ${prov}" — font medium, kiri bawah
   🎨 Style: Clean, teks putih dengan background transparan
+${slidePrompt(2, `${title} main entrance, signboard, tourist spot in ${prov}`)}
 
 Slide 3 — Detail:
   🖼️ Gambar: Suasana sekitar ${title}
   📝 Overlay: "${cat === "kuliner" ? "🍜 Rekomendasi kuliner" : "💡 Tips perjalanan"} | ${tips.slice(0, 40)}"
   🎨 Style: Minimalis, teks putih, background orange transparan
+${slidePrompt(3, `${title} atmosphere, visitors enjoying, travel experience`)}"
 
 Slide 4 — Roadtrip Vibe:
   🖼️ Gambar: Roadtrip/car scenery (bisa dari Unsplash)
   📝 Overlay: "🛣️ Planning roadtrip? Yuk cek RodaTrip"
   🎨 Style: Forest green bg, teks putih, logo RodaTrip di kanan atas
+${slidePrompt(4, "road trip adventure, car driving on mountain road, Indonesia travel")}
 
 Slide 5 — CTA:
   🖼️ Gambar: ${imageDesc || `Collage ${title}`}
   📝 Overlay: "👇 Tap link di bio!" + logo RodaTrip
   🎨 Style: Brand orange bg, teks putih bold
+${slidePrompt(5, `${title} collage, best moments, travel memories, Indonesia`)}
 ━━━━━━━━━━━━━━━━━━━━━━━${directPrompt}`
   }
 
@@ -693,21 +711,25 @@ Slide 1 — Hook (0:00-0:03):
   🖼️ Gambar: Foto utama ${title}, landscape crop ke vertikal
   📝 Teks: "${title} 🔥" (font besar, tengah)
   ✂️ Efek: Zoom in pelan
+${slidePrompt(1, `${emoji} ${title} stunning view, vertical shot, ${prov}`)}
 
 Slide 2 — Info (0:03-0:06):
   🖼️ Gambar: Foto ${prov} atau detail spot
   📝 Teks: "📍 ${prov}"
   ✂️ Efek: Swipe up
+${slidePrompt(2, `travel destination ${title}, sign, location in ${prov}`)}
 
 Slide 3 — Tips (0:06-0:09):
   🖼️ Gambar: ${imageDesc || `${cat === "kuliner" ? "Foto makanan" : "Foto spot"}`}
   📝 Teks: "💡 ${tips.slice(0, 50)}"
   ✂️ Efek: Fade
+${slidePrompt(3, `${title} travel tips, tourist activity, ${prov}`)}
 
 Slide 4 — CTA (0:09-0:12):
   🖼️ Gambar: Background roadtrip atau logo RodaTrip
   📝 Teks: "🚗 RodaTrip — Planning roadtrip?" (font kecil, bawah)
   ✂️ Efek: Fade out + logo RodaTrip
+${slidePrompt(4, "Indonesia road trip, adventure travel, car journey")}
 ━━━━━━━━━━━━━━━━━━━━━━━${directPrompt}`
   }
 
