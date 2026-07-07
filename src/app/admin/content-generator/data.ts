@@ -568,22 +568,22 @@ ${platform === "facebook"
 
 [Di baris terakhir: 10-15 hashtag relevan dari data di atas]
 
-Setelah caption, berikan visual guide untuk carousel IG:
-🎨 SLIDE 1 (Cover): deskripsi gambar + teks overlay
-🎨 SLIDE 2 (Info): deskripsi gambar + info lokasi
-🎨 SLIDE 3 (Tips): deskripsi gambar + tips
-🎨 SLIDE 4 (CTA): background + call to action`
+Setelah caption, berikan visual guide untuk carousel IG. SETIAP SLIDE WAJIB SERTAKAN prompt untuk AI image generator (Midjourney/DALL-E):
+🎨 SLIDE 1 (Cover): deskripsi gambar + teks overlay + 🤖 Prompt: "prompt bahasa Inggris untuk generate gambar slide ini"
+🎨 SLIDE 2 (Info): deskripsi gambar + info + 🤖 Prompt: "prompt bahasa Inggris untuk generate gambar"
+🎨 SLIDE 3 (Tips): deskripsi gambar + tips + 🤖 Prompt: "prompt bahasa Inggris"
+🎨 SLIDE 4 (CTA): background + CTA + 🤖 Prompt: "prompt bahasa Inggris"`
   : `Tulis skrip TikTok dengan struktur per segmen dan SERTAKAN:
 [Durasi per segmen]
 [Jenis transisi]
 [Genre musik rekomendasi]
 [Caption untuk editor video]
 
-Setelah skrip, berikan visual guide untuk slideshow TT:
-🎬 SLIDE 1 (Hook): deskripsi gambar + teks overlay
-🎬 SLIDE 2 (Info): deskripsi gambar + teks
-🎬 SLIDE 3 (Tips): deskripsi gambar + teks
-🎬 SLIDE 4 (CTA): logo + teks`}
+Setelah skrip, berikan visual guide untuk slideshow TT. SETIAP SLIDE WAJIB SERTAKAN prompt untuk AI image generator (Midjourney/DALL-E):
+🎬 SLIDE 1 (Hook): deskripsi gambar + teks overlay + 🤖 Prompt: "prompt bahasa Inggris untuk generate gambar slide ini"
+🎬 SLIDE 2 (Info): deskripsi gambar + teks + 🤖 Prompt: "prompt bahasa Inggris"
+🎬 SLIDE 3 (Tips): deskripsi gambar + teks + 🤖 Prompt: "prompt bahasa Inggris"
+🎬 SLIDE 4 (CTA): logo + teks + 🤖 Prompt: "prompt bahasa Inggris"`}
 
 ## ATURAN
 - Bahasa Indonesia natural dan engaging
