@@ -572,7 +572,12 @@ Setelah caption, berikan visual guide untuk carousel IG. SETIAP SLIDE WAJIB SERT
 🎨 SLIDE 1 (Cover): deskripsi gambar + teks overlay + 🤖 Prompt: "prompt bahasa Inggris untuk generate gambar slide ini"
 🎨 SLIDE 2 (Info): deskripsi gambar + info + 🤖 Prompt: "prompt bahasa Inggris untuk generate gambar"
 🎨 SLIDE 3 (Tips): deskripsi gambar + tips + 🤖 Prompt: "prompt bahasa Inggris"
-🎨 SLIDE 4 (CTA): background + CTA + 🤖 Prompt: "prompt bahasa Inggris"`
+🎨 SLIDE 4 (CTA): background + CTA + 🤖 Prompt: "prompt bahasa Inggris"
+
+⚠️ ATURAN PROMPT GAMBAR:
+- Prompt harus untuk REALISTIC PHOTOGRAPHY, bukan ilustrasi atau lukisan
+- JANGAN gunakan kata: "watercolor", "cartoon", "illustration", "sketch", "art style", "painting", "drawing", "digital art"
+- Gunakan kata: "realistic photo", "photography", "natural lighting", "real photo"`
   : `Tulis skrip TikTok dengan struktur per segmen dan SERTAKAN:
 [Durasi per segmen]
 [Jenis transisi]
@@ -583,7 +588,12 @@ Setelah skrip, berikan visual guide untuk slideshow TT. SETIAP SLIDE WAJIB SERTA
 🎬 SLIDE 1 (Hook): deskripsi gambar + teks overlay + 🤖 Prompt: "prompt bahasa Inggris untuk generate gambar slide ini"
 🎬 SLIDE 2 (Info): deskripsi gambar + teks + 🤖 Prompt: "prompt bahasa Inggris"
 🎬 SLIDE 3 (Tips): deskripsi gambar + teks + 🤖 Prompt: "prompt bahasa Inggris"
-🎬 SLIDE 4 (CTA): logo + teks + 🤖 Prompt: "prompt bahasa Inggris"`}
+🎬 SLIDE 4 (CTA): logo + teks + 🤖 Prompt: "prompt bahasa Inggris"
+
+⚠️ ATURAN PROMPT GAMBAR:
+- Prompt harus untuk REALISTIC PHOTOGRAPHY, bukan ilustrasi atau lukisan
+- JANGAN gunakan kata: "watercolor", "cartoon", "illustration", "sketch", "art style", "painting", "drawing", "digital art"
+- Gunakan kata: "realistic photo", "photography", "natural lighting", "real photo"`}
 
 ## ATURAN
 - Bahasa Indonesia natural dan engaging
