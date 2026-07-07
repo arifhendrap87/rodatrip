@@ -130,10 +130,10 @@ export async function POST(request: Request) {
       const aiData = await aiRes.json()
       const caption = aiData?.data?.text || ""
       if (platform === "tiktok") {
-        results[platform] = { caption: "", hashtags: "", skrip_tiktok: caption, visual_prompt: renderTemplate(contentSource, platform, tone).visual_prompt }
+        results[platform] = { caption: "", hashtags: "", skrip_tiktok: caption, visual_prompt: "" }
       } else {
         const template = renderTemplate(contentSource, platform, tone)
-        results[platform] = { caption, hashtags: template.hashtags, skrip_tiktok: "", visual_prompt: template.visual_prompt }
+        results[platform] = { caption, hashtags: template.hashtags, skrip_tiktok: "", visual_prompt: "" }
       }
     } catch {
       results[platform] = renderTemplate(contentSource, platform, tone)
