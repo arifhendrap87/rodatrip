@@ -648,7 +648,7 @@ export function renderVisualPrompt(source: ContentSource, platform: string): str
     sejarah: "historical site, ancient temple",
   }
   const catKw = catKeywords[cat] || "travel destination, Indonesia"
-  const directPrompt = `\n\n🤖 DIRECT AI PROMPT (copy → paste ke Midjourney / DALL-E / Leonardo AI)\n${title}, ${catKw}, ${prov}, Indonesia, vibrant colors, natural lighting, high quality, 8K, professional photography ${aspect}`
+  const directPrompt = `\n\n🤖 DIRECT AI PROMPT (copy → paste ke Midjourney / DALL-E / Leonardo AI)\n${title}, ${catKw}, ${prov}, Indonesia, realistic photo, natural lighting, high quality, 8K, professional photography, no cartoon, no illustration ${aspect}`
 
   const catAdj: Record<string, string> = {
     alam: "beautiful nature, misty morning",
@@ -661,7 +661,7 @@ export function renderVisualPrompt(source: ContentSource, platform: string): str
   const adj = catAdj[cat] || "travel, destination"
 
   const slidePrompt = (slide: number, desc: string) =>
-    `  🤖 Prompt: "${desc}, ${adj}, ${prov}, Indonesia, vibrant colors, natural lighting, professional photography, 8K ${aspect}"`
+    `  🤖 Prompt: "${desc}, ${adj}, ${prov}, Indonesia, realistic photo, natural lighting, professional photography, 8K, no cartoon, no illustration ${aspect}"`
 
   if (platform === "instagram") {
     return `🎨 VISUAL PROMPT — IG CAROUSEL (4-5 Slide)
