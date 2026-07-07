@@ -68,6 +68,8 @@ interface SourceItem {
   category?: string
   province?: string
   rating?: number
+  excerpt?: string
+  author?: string
 }
 
 interface GenerateResult {
@@ -90,7 +92,7 @@ interface DraftPayload {
 }
 
 export default function ContentGeneratorPage() {
-  const [sourceType, setSourceType] = useState<"roadtrip" | "spot">("spot")
+  const [sourceType, setSourceType] = useState<"blog" | "roadtrip" | "spot">("spot")
   const [sources, setSources] = useState<SourceItem[]>([])
   const [loadingSources, setLoadingSources] = useState(false)
   const [search, setSearch] = useState("")
@@ -123,10 +125,28 @@ export default function ContentGeneratorPage() {
   async function fetchSources() {
     setLoadingSources(true)
     try {
-      const endpoint = sourceType === "roadtrip" ? "/api/admin/itineraries" : "/api/spots"
+      let endpoint: string
+      if (sourceType === "roadtrip") endpoint = "/api/admin/itineraries"
+      else if (sourceType === "blog") endpoint = "/api/admin/blog?limit=50"
+      else endpoint = "/api/spots"
+
       const res = await fetch(endpoint)
       const json = await res.json()
-      const list = (json.data || []) as SourceItem[]
+
+      let list: SourceItem[]
+      if (sourceType === "blog") {
+        const posts = json.data?.posts || json.data || []
+        list = (posts as any[]).map((p: any) => ({
+          slug: p.slug,
+          title: p.title,
+          category: p.category,
+          excerpt: p.excerpt,
+          author: p.author,
+        }))
+      } else {
+        list = (json.data || []) as SourceItem[]
+      }
+
       setSources(list)
       if (!selectedItem && list.length > 0) {
         setSelectedItem(list[0])
@@ -311,6 +331,15 @@ export default function ContentGeneratorPage() {
                     <Route className="h-3 w-3" />
                     Roadtrip
                   </Button>
+                  <Button
+                    variant={sourceType === "blog" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSourceType("blog")}
+                    className="h-7 gap-1 text-xs"
+                  >
+                    <FileText className="h-3 w-3" />
+                    Blog
+                  </Button>
                 </div>
               </div>
             </CardHeader>
@@ -351,8 +380,11 @@ export default function ContentGeneratorPage() {
                           <div className="min-w-0 flex-1">
                             <p className="text-sm font-medium truncate">{title}</p>
                             <p className="text-xs text-muted-foreground mt-0.5">
-                              {item.province || ""}
-                              {item.category ? ` · ${item.category}` : ""}
+                              {sourceType === "blog"
+                                ? (item.category || "")
+                                : `${item.province || ""}${item.category ? ` · ${item.category}` : ""}`
+                              }
+                              {sourceType === "blog" && item.author ? ` · ${item.author}` : ""}
                               {item.rating ? (
                                 <span className="inline-flex items-center gap-0.5 ml-1">
                                   <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
@@ -360,6 +392,9 @@ export default function ContentGeneratorPage() {
                                 </span>
                               ) : null}
                             </p>
+                            {sourceType === "blog" && item.excerpt && (
+                              <p className="text-xs text-muted-foreground/70 mt-1 line-clamp-1">{item.excerpt}</p>
+                            )}
                           </div>
                           <div className="flex items-center gap-1 shrink-0 mt-0.5">
                             {PLATFORMS.map((p) => {

@@ -13,8 +13,8 @@ export async function POST(request: Request) {
   const body = await request.json()
   const { sourceType, sourceId, platforms, tones, method } = body
 
-  if (!sourceType || !["roadtrip", "spot"].includes(sourceType)) {
-    return badRequest("sourceType harus 'roadtrip' atau 'spot'")
+  if (!sourceType || !["roadtrip", "spot", "blog"].includes(sourceType)) {
+    return badRequest("sourceType harus 'roadtrip', 'spot', atau 'blog'")
   }
   if (!sourceId) {
     return badRequest("sourceId wajib diisi")
@@ -43,6 +43,10 @@ export async function POST(request: Request) {
     const { data } = await db.from("spots").select("*").eq("slug", sourceId).maybeSingle()
     source = data
     if (!source) return badRequest(`Spot dengan slug "${sourceId}" tidak ditemukan`)
+  } else if (sourceType === "blog") {
+    const { data } = await db.from("blog_posts").select("*").eq("slug", sourceId).maybeSingle()
+    source = data
+    if (!source) return badRequest(`Blog dengan slug "${sourceId}" tidak ditemukan`)
   } else {
     const { data } = await db.from("itineraries").select("*, itinerary_stops(*, spot:spots(*))").eq("slug", sourceId).maybeSingle()
     source = data
@@ -77,6 +81,34 @@ export async function POST(request: Request) {
     nearbyHotels: JSON.stringify(source!.nearby_hotels_jsonb || source!.nearby_hotels || []),
     nearbyRestaurants: JSON.stringify(source!.nearby_restaurants_jsonb || source!.nearby_restaurants || []),
     images: source!.images as { url: string; alt?: string }[],
+  } : sourceType === "blog" ? {
+    type: "spot" as const,
+    id: source!.slug as string,
+    title: source!.title as string,
+    description: source!.excerpt as string || source!.content as string,
+    whySpecial: "",
+    category: source!.category as string,
+    province: "",
+    city: "",
+    region: "",
+    price: "",
+    parkingFee: "",
+    additionalCost: "",
+    tips: source!.content ? ((source!.content as string).replace(/<[^>]+>/g, "").slice(0, 300)) : "",
+    rating: 0,
+    bestTime: "",
+    bestVisitHour: "",
+    visitDuration: "",
+    physicalEffort: "",
+    openingHours: "",
+    roadAccess: "",
+    spotImportantNote: "",
+    distanceFromCity: "",
+    facilities: [],
+    popularRoutes: [],
+    nearbyHotels: "",
+    nearbyRestaurants: "",
+    images: source!.image_url ? [{ url: source!.image_url as string }] : [],
   } : {
     type: "roadtrip" as const,
     id: source!.slug as string,
