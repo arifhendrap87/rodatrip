@@ -638,6 +638,18 @@ export function renderVisualPrompt(source: ContentSource, platform: string): str
   const tips = source.tips ? source.tips.slice(0, 60) : "Rencanakan perjalanan dengan baik"
   const imageDesc = source.images?.[0]?.url || source.coverImage || ""
 
+  const aspect = platform === "instagram" ? "--ar 1:1" : "--ar 9:16"
+  const catKeywords: Record<string, string> = {
+    alam: "beautiful nature, mountain landscape, tropical",
+    kuliner: "delicious food photography, Indonesian cuisine",
+    budaya: "Indonesian culture, traditional architecture",
+    foto: "scenic viewpoint, photography spot",
+    petualangan: "adventure travel, outdoor activity",
+    sejarah: "historical site, ancient temple",
+  }
+  const catKw = catKeywords[cat] || "travel destination, Indonesia"
+  const directPrompt = `\n\n🤖 DIRECT AI PROMPT (copy → paste ke Midjourney / DALL-E / Leonardo AI)\n${title}, ${catKw}, ${prov}, Indonesia, vibrant colors, natural lighting, high quality, 8K, professional photography ${aspect}`
+
   if (platform === "instagram") {
     return `🎨 VISUAL PROMPT — IG CAROUSEL (4-5 Slide)
 ━━━━━━━━━━━━━━━━━━━━━━━
@@ -655,7 +667,7 @@ Slide 2 — Info Lokasi:
 
 Slide 3 — Detail:
   🖼️ Gambar: Suasana sekitar ${title}
-  📝 Overlay: "${cat === "kuliner" ? "🍜 Rekomendasi kuliner" : "💡 Tips perjalanan"} | $tips.slice(0, 40)}"
+  📝 Overlay: "${cat === "kuliner" ? "🍜 Rekomendasi kuliner" : "💡 Tips perjalanan"} | ${tips.slice(0, 40)}"
   🎨 Style: Minimalis, teks putih, background orange transparan
 
 Slide 4 — Roadtrip Vibe:
@@ -667,7 +679,7 @@ Slide 5 — CTA:
   🖼️ Gambar: ${imageDesc || `Collage ${title}`}
   📝 Overlay: "👇 Tap link di bio!" + logo RodaTrip
   🎨 Style: Brand orange bg, teks putih bold
-━━━━━━━━━━━━━━━━━━━━━━━`
+━━━━━━━━━━━━━━━━━━━━━━━${directPrompt}`
   }
 
   if (platform === "tiktok") {
@@ -696,7 +708,7 @@ Slide 4 — CTA (0:09-0:12):
   🖼️ Gambar: Background roadtrip atau logo RodaTrip
   📝 Teks: "🚗 RodaTrip — Planning roadtrip?" (font kecil, bawah)
   ✂️ Efek: Fade out + logo RodaTrip
-━━━━━━━━━━━━━━━━━━━━━━━`
+━━━━━━━━━━━━━━━━━━━━━━━${directPrompt}`
   }
 
   return ""
