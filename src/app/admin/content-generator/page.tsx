@@ -74,6 +74,7 @@ interface GenerateResult {
   caption: string
   hashtags: string
   skrip_tiktok: string
+  visual_prompt: string
 }
 
 interface DraftPayload {
@@ -109,6 +110,7 @@ export default function ContentGeneratorPage() {
   const [debugPrompts, setDebugPrompts] = useState<Record<string, Record<string, { prompt: string }>> | null>(null)
   const [showDebug, setShowDebug] = useState(false)
   const [savedPlatforms, setSavedPlatforms] = useState<Record<string, boolean>>({})
+  const [showVisual, setShowVisual] = useState(false)
 
   useEffect(() => {
     fetchSources()
@@ -547,8 +549,9 @@ export default function ContentGeneratorPage() {
                   const toneResult = results[platform]?.[selectedTone]
                   if (!toneResult) return null
 
-                  const displayText = getResultText(platform, selectedTone, toneResult)
-                  const copyKey = `${platform}-${selectedTone}`
+                  const showVisualMode = showVisual && toneResult.visual_prompt
+                  const displayText = showVisualMode ? toneResult.visual_prompt : getResultText(platform, selectedTone, toneResult)
+                  const copyKey = `${platform}-${selectedTone}${showVisualMode ? "-visual" : ""}`
 
                   return (
                     <Card>
@@ -557,7 +560,7 @@ export default function ContentGeneratorPage() {
                           <div>
                             <CardTitle className="capitalize text-base">{platform}</CardTitle>
                             <CardDescription>
-                              {platform === "tiktok" ? "Skrip video TikTok" : `Caption ${platform}`}
+                              {showVisual && toneResult.visual_prompt ? `Visual guide — ${platform === "tiktok" ? "Storyboard" : "Carousel"}` : platform === "tiktok" ? "Skrip video TikTok" : `Caption ${platform}`}
                             </CardDescription>
                           </div>
                           <div className="flex items-center gap-2">
@@ -603,7 +606,17 @@ export default function ContentGeneratorPage() {
                             <Badge variant="outline" className="gap-1 text-muted-foreground">
                               📋 {PLATFORM_SPECS[platform].structure}
                             </Badge>
-                            <div className="ml-auto">
+                            <div className="ml-auto flex items-center gap-2">
+                              <button
+                                onClick={() => setShowVisual(!showVisual)}
+                                className={`text-xs font-medium px-2.5 py-1 rounded-md border transition-colors ${
+                                  showVisual
+                                    ? "bg-primary/10 text-primary border-primary/20"
+                                    : "bg-muted text-muted-foreground border-border"
+                                }`}
+                              >
+                                🎨 Visual
+                              </button>
                               <button
                                 onClick={() => setShowStructure(!showStructure)}
                                 className={`text-xs font-medium px-2.5 py-1 rounded-md border transition-colors ${

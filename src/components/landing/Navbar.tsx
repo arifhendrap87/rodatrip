@@ -88,11 +88,13 @@ export function Navbar() {
               </div>
             ) : (
               <>
-                <Link href="/login" className="text-sm text-white/70 hover:text-white transition-colors">
-                  Masuk
+                <Link href="/login">
+                  <Button size="sm" variant="ghost" className="text-[#D95D39] hover:text-white hover:bg-[#D95D39]/20 rounded-xl text-xs font-semibold">
+                    Masuk
+                  </Button>
                 </Link>
                 <Link href="/register">
-                  <Button size="sm" variant="outline" className="border-white/30 text-white bg-transparent hover:bg-white/10 rounded-xl text-xs">
+                  <Button size="sm" className="bg-[#D95D39] text-white font-semibold shadow-lg shadow-black/20 hover:bg-[#D95D39]/90 rounded-xl text-xs">
                     Daftar
                   </Button>
                 </Link>
@@ -159,12 +161,12 @@ export function Navbar() {
               ) : (
                 <div className="flex gap-2 px-3">
                   <Link href="/login" onClick={() => setOpen(false)} className="flex-1">
-                    <Button variant="outline" className="w-full border-white/30 text-white bg-transparent hover:bg-white/10 rounded-xl text-sm">
+                    <Button variant="ghost" className="w-full text-[#D95D39] hover:text-white hover:bg-[#D95D39]/20 rounded-xl text-sm font-semibold">
                       Masuk
                     </Button>
                   </Link>
                   <Link href="/register" onClick={() => setOpen(false)} className="flex-1">
-                    <Button className="w-full bg-[#D95D39] text-white hover:bg-[#D95D39]/90 rounded-xl text-sm">
+                    <Button className="w-full bg-[#D95D39] text-white font-semibold hover:bg-[#D95D39]/90 rounded-xl text-sm">
                       Daftar
                     </Button>
                   </Link>

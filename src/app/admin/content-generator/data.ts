@@ -566,12 +566,24 @@ ${platform === "facebook"
 [Detail singkat]
 [CTA interaksi: ajakan komen/simpan/share]
 
-[Di baris terakhir: 10-15 hashtag relevan dari data di atas]`
+[Di baris terakhir: 10-15 hashtag relevan dari data di atas]
+
+Setelah caption, berikan visual guide untuk carousel IG:
+🎨 SLIDE 1 (Cover): deskripsi gambar + teks overlay
+🎨 SLIDE 2 (Info): deskripsi gambar + info lokasi
+🎨 SLIDE 3 (Tips): deskripsi gambar + tips
+🎨 SLIDE 4 (CTA): background + call to action`
   : `Tulis skrip TikTok dengan struktur per segmen dan SERTAKAN:
 [Durasi per segmen]
 [Jenis transisi]
 [Genre musik rekomendasi]
-[Caption untuk editor video]`}
+[Caption untuk editor video]
+
+Setelah skrip, berikan visual guide untuk slideshow TT:
+🎬 SLIDE 1 (Hook): deskripsi gambar + teks overlay
+🎬 SLIDE 2 (Info): deskripsi gambar + teks
+🎬 SLIDE 3 (Tips): deskripsi gambar + teks
+🎬 SLIDE 4 (CTA): logo + teks`}
 
 ## ATURAN
 - Bahasa Indonesia natural dan engaging
@@ -589,13 +601,15 @@ const platformSpecs: Record<string, { maxChars: string; style: string; structure
   tiktok: { maxChars: "15-60 detik", style: "Cepat, engaging, text overlay", structure: "Hook → Info → Tips → CTA → Outro" },
 }
 
-export function renderTemplate(source: ContentSource, platform: string, tone: string): { caption: string; hashtags: string; skrip_tiktok: string } {
+export function renderTemplate(source: ContentSource, platform: string, tone: string): { caption: string; hashtags: string; skrip_tiktok: string; visual_prompt: string } {
+  const visualPrompt = renderVisualPrompt(source, platform)
+
   if (platform === "tiktok") {
     const tiktokFns: Record<string, (s: ContentSource) => string> = {
       promo: tiktokPromo, edukasi: tiktokEdukasi, inspirasi: tiktokInspirasi, storytelling: tiktokStorytelling,
     }
     const skrip = (tiktokFns[tone] || tiktokPromo)(source)
-    return { caption: skrip, hashtags: "", skrip_tiktok: skrip }
+    return { caption: skrip, hashtags: "", skrip_tiktok: skrip, visual_prompt: visualPrompt }
   }
 
   const fbFns: Record<string, (s: ContentSource) => string> = {
@@ -613,7 +627,79 @@ export function renderTemplate(source: ContentSource, platform: string, tone: st
   const caption = genMap[platform]?.[tone]?.(source) || facebookPromo(source)
   const hashtags = generateHashtags(source, platform)
 
-  return { caption, hashtags, skrip_tiktok: "" }
+  return { caption, hashtags, skrip_tiktok: "", visual_prompt: visualPrompt }
+}
+
+export function renderVisualPrompt(source: ContentSource, platform: string): string {
+  const emoji = getCategoryEmoji(source)
+  const title = source.title
+  const prov = source.province || "Indonesia"
+  const cat = source.category || "wisata"
+  const tips = source.tips ? source.tips.slice(0, 60) : "Rencanakan perjalanan dengan baik"
+  const imageDesc = source.images?.[0]?.url || source.coverImage || ""
+
+  if (platform === "instagram") {
+    return `🎨 VISUAL PROMPT — IG CAROUSEL (4-5 Slide)
+━━━━━━━━━━━━━━━━━━━━━━━
+Format: 1080×1080 px | Font: Montserrat | Warna brand: #D95D39 (orange) & #2C4A3E (hijau)
+
+Slide 1 — Cover:
+  🖼️ Gambar: ${imageDesc || `${emoji} ${title}, angle wide, ${cat === "alam" ? "golden hour" : "siang hari"}`}
+  📝 Overlay: "${title}" — font bold besar di tengah
+  🎨 Style: Foto full, gradient overlay hitam 60%, teks putih
+
+Slide 2 — Info Lokasi:
+  🖼️ Gambar: ${imageDesc || `Detail ${title}, ${prov}`}
+  📝 Overlay: "📍 ${prov}" — font medium, kiri bawah
+  🎨 Style: Clean, teks putih dengan background transparan
+
+Slide 3 — Detail:
+  🖼️ Gambar: Suasana sekitar ${title}
+  📝 Overlay: "${cat === "kuliner" ? "🍜 Rekomendasi kuliner" : "💡 Tips perjalanan"} | $tips.slice(0, 40)}"
+  🎨 Style: Minimalis, teks putih, background orange transparan
+
+Slide 4 — Roadtrip Vibe:
+  🖼️ Gambar: Roadtrip/car scenery (bisa dari Unsplash)
+  📝 Overlay: "🛣️ Planning roadtrip? Yuk cek RodaTrip"
+  🎨 Style: Forest green bg, teks putih, logo RodaTrip di kanan atas
+
+Slide 5 — CTA:
+  🖼️ Gambar: ${imageDesc || `Collage ${title}`}
+  📝 Overlay: "👇 Tap link di bio!" + logo RodaTrip
+  🎨 Style: Brand orange bg, teks putih bold
+━━━━━━━━━━━━━━━━━━━━━━━`
+  }
+
+  if (platform === "tiktok") {
+    return `🎬 PROMPT VISUAL — TT SLIDESHOW (9:16 vertikal)
+━━━━━━━━━━━━━━━━━━━━━━━
+Durasi: 0-3 dtk per slide | Total: ~15 dtk
+Musik: ${cat === "alam" ? "Lo-fi / chill" : "Upbeat / trending"}
+Font: bold, putih, posisi tengah
+
+Slide 1 — Hook (0:00-0:03):
+  🖼️ Gambar: Foto utama ${title}, landscape crop ke vertikal
+  📝 Teks: "${title} 🔥" (font besar, tengah)
+  ✂️ Efek: Zoom in pelan
+
+Slide 2 — Info (0:03-0:06):
+  🖼️ Gambar: Foto ${prov} atau detail spot
+  📝 Teks: "📍 ${prov}"
+  ✂️ Efek: Swipe up
+
+Slide 3 — Tips (0:06-0:09):
+  🖼️ Gambar: ${imageDesc || `${cat === "kuliner" ? "Foto makanan" : "Foto spot"}`}
+  📝 Teks: "💡 ${tips.slice(0, 50)}"
+  ✂️ Efek: Fade
+
+Slide 4 — CTA (0:09-0:12):
+  🖼️ Gambar: Background roadtrip atau logo RodaTrip
+  📝 Teks: "🚗 RodaTrip — Planning roadtrip?" (font kecil, bawah)
+  ✂️ Efek: Fade out + logo RodaTrip
+━━━━━━━━━━━━━━━━━━━━━━━`
+  }
+
+  return ""
 }
 
 export function getPlatformSpecs() {
