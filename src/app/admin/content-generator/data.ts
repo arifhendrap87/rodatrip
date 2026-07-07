@@ -1,5 +1,5 @@
 interface ContentSource {
-  type: "roadtrip" | "spot"
+  type: "roadtrip" | "spot" | "blog"
   id: string
   title: string
   description?: string
@@ -734,6 +734,21 @@ ${slidePrompt(4, "Indonesia road trip, adventure travel, car journey")}
   }
 
   return ""
+}
+
+export function getAutoTone(source: ContentSource): string {
+  if (source.type === "blog") return "edukasi"
+  if (source.type === "roadtrip") return "inspirasi"
+  const cat = source.category || ""
+  const toneMap: Record<string, string> = {
+    alam: "inspirasi",
+    kuliner: "promo",
+    budaya: "edukasi",
+    foto: "inspirasi",
+    petualangan: "promo",
+    sejarah: "edukasi",
+  }
+  return toneMap[cat] || "promo"
 }
 
 export function getPlatformSpecs() {

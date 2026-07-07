@@ -100,19 +100,12 @@ export default function ContentGeneratorPage() {
 
   const [selectedItem, setSelectedItem] = useState<SourceItem | null>(null)
 
-  // Generate form state
   const [selectedPlatform, setSelectedPlatform] = useState("facebook")
-  const [selectedTone, setSelectedTone] = useState("promo")
-  const [method, setMethod] = useState<"template" | "ai">("template")
   const [generating, setGenerating] = useState(false)
-  const [results, setResults] = useState<Record<string, Record<string, GenerateResult>> | null>(null)
-  const [activePlatform, setActivePlatform] = useState("facebook")
+  const [results, setResults] = useState<Record<string, GenerateResult> | null>(null)
   const [copied, setCopied] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
-  const [debugPrompts, setDebugPrompts] = useState<Record<string, Record<string, { prompt: string }>> | null>(null)
-  const [showDebug, setShowDebug] = useState(false)
   const [savedPlatforms, setSavedPlatforms] = useState<Record<string, boolean>>({})
-  const [showVisual, setShowVisual] = useState(false)
 
   useEffect(() => {
     fetchSources()
@@ -185,7 +178,6 @@ export default function ContentGeneratorPage() {
   async function handleSelectItem(item: SourceItem) {
     setSelectedItem(item)
     setResults(null)
-    setDebugPrompts(null)
   }
 
   async function handleGenerate() {
@@ -202,15 +194,12 @@ export default function ContentGeneratorPage() {
           sourceType,
           sourceId: slug,
           platforms: [selectedPlatform],
-          tones: [selectedTone],
-          method,
         }),
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json?.error?.message || "Gagal generate")
       setResults(json.data.results)
-      setDebugPrompts(json.data.debug || null)
-      setActivePlatform(selectedPlatform)
+      setSavedPlatforms({})
       toast.success("Konten berhasil digenerate!")
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Gagal generate konten")
@@ -218,7 +207,7 @@ export default function ContentGeneratorPage() {
     setGenerating(false)
   }
 
-  async function handleSave(platform: string, tone: string, result: GenerateResult) {
+  async function handleSave(platform: string, result: GenerateResult) {
     if (!selectedItem) return
     const slug = selectedItem.slug
     const title = selectedItem.title || selectedItem.name || slug
@@ -228,9 +217,9 @@ export default function ContentGeneratorPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: `${title} — ${platform} (${tone})`,
+          title: `${title} — ${platform}`,
           platform,
-          tone,
+          tone: "auto",
           content_type: sourceType,
           source_id: slug,
           source_title: title,
@@ -257,7 +246,7 @@ export default function ContentGeneratorPage() {
     toast.success("Tersalin!")
   }
 
-  const [showStructure, setShowStructure] = useState(false)
+  const [showStructure, setShowStructure] = useState(true)
 
   function cleanCaption(text: string): string {
     return text
@@ -472,34 +461,7 @@ export default function ContentGeneratorPage() {
                       <CardDescription>Pilih platform, tone, dan metode generate</CardDescription>
                     </div>
                     <div className="hidden sm:flex items-center gap-2">
-                      <div className="flex gap-1 bg-muted rounded-lg p-0.5">
-                        <button
-                          onClick={() => setMethod("template")}
-                          className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors ${
-                            method === "template" ? "bg-background shadow-sm" : "text-muted-foreground"
-                          }`}
-                        >
-                          Template
-                        </button>
-                        <button
-                          onClick={() => setMethod("ai")}
-                          className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors ${
-                            method === "ai" ? "bg-background shadow-sm" : "text-muted-foreground"
-                          }`}
-                        >
-                          AI DeepSeek
-                        </button>
-                      </div>
-                      <Select value={selectedTone} onValueChange={(v) => v && setSelectedTone(v)}>
-                        <SelectTrigger className="h-7 w-28 text-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {TONES.map((t) => (
-                            <SelectItem key={t.value} value={t.value} className="text-xs">{t.label}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <span className="text-xs text-muted-foreground">✨ AI DeepSeek — otomatis</span>
                     </div>
                   </div>
                 </CardHeader>
@@ -528,35 +490,8 @@ export default function ContentGeneratorPage() {
                   </div>
 
                   {/* Mobile: tone + method */}
-                  <div className="flex sm:hidden items-center gap-2">
-                    <div className="flex gap-1 bg-muted rounded-lg p-0.5">
-                      <button
-                        onClick={() => setMethod("template")}
-                        className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors ${
-                          method === "template" ? "bg-background shadow-sm" : "text-muted-foreground"
-                        }`}
-                      >
-                        Template
-                      </button>
-                      <button
-                        onClick={() => setMethod("ai")}
-                        className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors ${
-                          method === "ai" ? "bg-background shadow-sm" : "text-muted-foreground"
-                        }`}
-                      >
-                        AI
-                      </button>
-                    </div>
-                    <Select value={selectedTone} onValueChange={(v) => v && setSelectedTone(v)}>
-                      <SelectTrigger className="h-7 flex-1 text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {TONES.map((t) => (
-                          <SelectItem key={t.value} value={t.value} className="text-xs">{t.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  <div className="flex sm:hidden items-center">
+                    <span className="text-xs text-muted-foreground">✨ AI DeepSeek — otomatis</span>
                   </div>
 
                   <Button
@@ -572,7 +507,7 @@ export default function ContentGeneratorPage() {
                     )}
                     {generating
                       ? `Generate ${selectedPlatform}...`
-                      : `✨ Generate ${selectedPlatform} — ${selectedTone}`}
+                      : `✨ Generate ${selectedPlatform}`}
                   </Button>
                 </CardContent>
               </Card>
@@ -581,12 +516,11 @@ export default function ContentGeneratorPage() {
               {results ? (
                 (() => {
                   const platform = selectedPlatform
-                  const toneResult = results[platform]?.[selectedTone]
+                  const toneResult = results[platform]
                   if (!toneResult) return null
 
-                  const showVisualMode = showVisual && toneResult.visual_prompt
-                  const displayText = showVisualMode ? toneResult.visual_prompt : getResultText(platform, selectedTone, toneResult)
-                  const copyKey = `${platform}-${selectedTone}${showVisualMode ? "-visual" : ""}`
+                  const fullText = `📝 CAPTION\n${toneResult.caption}${toneResult.hashtags ? `\n\n🏷️ HASHTAG\n${toneResult.hashtags}` : ""}${toneResult.skrip_tiktok ? `\n\n🎬 SKRIP TIKTOK\n${toneResult.skrip_tiktok}` : ""}${toneResult.visual_prompt ? `\n\n${toneResult.visual_prompt}` : ""}`
+                  const copyKey = `${platform}`
 
                   return (
                     <Card>
@@ -595,7 +529,7 @@ export default function ContentGeneratorPage() {
                           <div>
                             <CardTitle className="capitalize text-base">{platform}</CardTitle>
                             <CardDescription>
-                              {showVisual && toneResult.visual_prompt ? `Visual guide — ${platform === "tiktok" ? "Storyboard" : "Carousel"}` : platform === "tiktok" ? "Skrip video TikTok" : `Caption ${platform}`}
+                              {platform === "tiktok" ? "Skrip + Visual" : "Caption + Visual"}
                             </CardDescription>
                           </div>
                           <div className="flex items-center gap-2">
@@ -603,17 +537,17 @@ export default function ContentGeneratorPage() {
                               variant="outline"
                               size="sm"
                               className="gap-1.5"
-                              onClick={() => handleCopy(displayText, copyKey)}
+                              onClick={() => handleCopy(fullText, copyKey)}
                             >
                               {copied === copyKey ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                              {copied === copyKey ? "Tersalin!" : "Copy"}
+                              {copied === copyKey ? "Tersalin!" : "Copy All"}
                             </Button>
                             {!savedPlatforms[platform] ? (
                               <Button
                                 variant="default"
                                 size="sm"
                                 className="gap-1.5"
-                                onClick={() => handleSave(platform, selectedTone, toneResult)}
+                                onClick={() => handleSave(platform, toneResult)}
                                 disabled={saving}
                               >
                                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
@@ -628,74 +562,12 @@ export default function ContentGeneratorPage() {
                           </div>
                         </div>
                       </CardHeader>
-                      <CardContent className="space-y-4">
-                        {PLATFORM_SPECS[platform] && (
-                          <div className="flex flex-wrap items-center gap-2">
-                            <Badge variant="secondary" className="gap-1">
-                              <Info className="h-3 w-3" />
-                              {PLATFORM_SPECS[platform].maxChars}
-                            </Badge>
-                            <Badge variant="outline" className="gap-1 text-muted-foreground">
-                              🎨 {PLATFORM_SPECS[platform].style}
-                            </Badge>
-                            <Badge variant="outline" className="gap-1 text-muted-foreground">
-                              📋 {PLATFORM_SPECS[platform].structure}
-                            </Badge>
-                            <div className="ml-auto flex items-center gap-2">
-                              <button
-                                onClick={() => setShowVisual(!showVisual)}
-                                className={`text-xs font-medium px-2.5 py-1 rounded-md border transition-colors ${
-                                  showVisual
-                                    ? "bg-primary/10 text-primary border-primary/20"
-                                    : "bg-muted text-muted-foreground border-border"
-                                }`}
-                              >
-                                🎨 Visual
-                              </button>
-                              <button
-                                onClick={() => setShowStructure(!showStructure)}
-                                className={`text-xs font-medium px-2.5 py-1 rounded-md border transition-colors ${
-                                  showStructure
-                                    ? "bg-muted text-muted-foreground border-border"
-                                    : "bg-primary/10 text-primary border-primary/20"
-                                }`}
-                              >
-                                {showStructure ? "Tampilkan Struktur" : "Siap Posting"}
-                              </button>
-                            </div>
-                          </div>
-                        )}
-
+                      <CardContent>
                         <Textarea
-                          value={displayText}
+                          value={fullText}
                           readOnly
-                          className="min-h-[350px] font-mono text-sm leading-relaxed resize-y whitespace-pre"
+                          className="min-h-[450px] font-mono text-sm leading-relaxed resize-y whitespace-pre"
                         />
-
-                        {/* Debug prompt */}
-                        {debugPrompts?.[platform]?.[selectedTone]?.prompt && method === "ai" && (
-                          <div className="border rounded-lg overflow-hidden">
-                            <button
-                              onClick={() => setShowDebug(!showDebug)}
-                              className="flex w-full items-center justify-between gap-2 bg-muted/50 px-4 py-2.5 text-xs font-medium text-muted-foreground hover:bg-muted transition-colors"
-                            >
-                              <span className="flex items-center gap-1.5">
-                                <Code className="h-3.5 w-3.5" />
-                                Prompt yang dikirim ke DeepSeek
-                              </span>
-                              {showDebug ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
-                            </button>
-                            {showDebug && (
-                              <div className="border-t">
-                                <Textarea
-                                  value={debugPrompts[platform][selectedTone].prompt}
-                                  readOnly
-                                  className="min-h-[200px] font-mono text-xs leading-relaxed resize-y rounded-none border-0 whitespace-pre"
-                                />
-                              </div>
-                            )}
-                          </div>
-                        )}
                       </CardContent>
                     </Card>
                   )

@@ -1,17 +1,16 @@
 import { success, badRequest, unauthorized, internalError } from "@/lib/api/response"
 import { getServerAdmin } from "@/lib/api/auth"
 import { db } from "@/lib/services/db"
-import { renderTemplate, generateAIPrompt } from "@/app/admin/content-generator/data"
+import { renderTemplate, generateAIPrompt, getAutoTone } from "@/app/admin/content-generator/data"
 
 const PLATFORMS = ["facebook", "instagram", "tiktok"] as const
-const TONES = ["promo", "edukasi", "inspirasi", "storytelling"] as const
 
 export async function POST(request: Request) {
   const admin = await getServerAdmin()
   if (!admin) return unauthorized()
 
   const body = await request.json()
-  const { sourceType, sourceId, platforms, tones, method } = body
+  const { sourceType, sourceId, platforms } = body
 
   if (!sourceType || !["roadtrip", "spot", "blog"].includes(sourceType)) {
     return badRequest("sourceType harus 'roadtrip', 'spot', atau 'blog'")
@@ -22,20 +21,11 @@ export async function POST(request: Request) {
   if (!platforms || !Array.isArray(platforms) || platforms.length === 0) {
     return badRequest("platforms wajib diisi (array)")
   }
-  if (!tones || !Array.isArray(tones) || tones.length === 0) {
-    return badRequest("tones wajib diisi (array)")
-  }
 
   const invalidPlatforms = platforms.filter((p: string) => !PLATFORMS.includes(p as any))
   if (invalidPlatforms.length > 0) {
     return badRequest(`Platform tidak valid: ${invalidPlatforms.join(", ")}`)
   }
-  const invalidTones = tones.filter((t: string) => !TONES.includes(t as any))
-  if (invalidTones.length > 0) {
-    return badRequest(`Tone tidak valid: ${invalidTones.join(", ")}`)
-  }
-
-  const useAI = method === "ai"
 
   let source: Record<string, unknown> | null = null
 
@@ -126,38 +116,32 @@ export async function POST(request: Request) {
     })).filter((s: any) => s.name),
   }
 
-  const results: Record<string, Record<string, { caption: string; hashtags: string; skrip_tiktok: string }>> = {}
-  const debugLogs: Record<string, Record<string, { prompt: string }>> = {}
+  const results: Record<string, { caption: string; hashtags: string; skrip_tiktok: string; visual_prompt: string }> = {}
 
   for (const platform of platforms) {
-    results[platform] = {}
-    debugLogs[platform] = {}
-    for (const tone of tones) {
-      if (useAI) {
-        const prompt = generateAIPrompt(contentSource, platform, tone)
-        debugLogs[platform][tone] = { prompt }
-        try {
-          const aiRes = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/ai/generate-content`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ prompt }),
-          })
-          const aiData = await aiRes.json()
-          const caption = aiData?.data?.text || ""
-          results[platform][tone] = { caption, hashtags: "", skrip_tiktok: platform === "tiktok" ? caption : "" }
-        } catch {
-          debugLogs[platform][tone].prompt += "\n\n[FALLBACK] AI gagal, menggunakan template."
-          results[platform][tone] = renderTemplate(contentSource, platform, tone)
-        }
+    const tone = getAutoTone(contentSource)
+    const prompt = generateAIPrompt(contentSource, platform, tone)
+    try {
+      const aiRes = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/ai/generate-content`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      })
+      const aiData = await aiRes.json()
+      const caption = aiData?.data?.text || ""
+      if (platform === "tiktok") {
+        results[platform] = { caption: "", hashtags: "", skrip_tiktok: caption, visual_prompt: renderTemplate(contentSource, platform, tone).visual_prompt }
       } else {
-        results[platform][tone] = renderTemplate(contentSource, platform, tone)
+        const template = renderTemplate(contentSource, platform, tone)
+        results[platform] = { caption, hashtags: template.hashtags, skrip_tiktok: "", visual_prompt: template.visual_prompt }
       }
+    } catch {
+      results[platform] = renderTemplate(contentSource, platform, tone)
     }
   }
 
   return success({
     source: contentSource,
     results,
-    debug: useAI ? debugLogs : undefined,
   })
 }
