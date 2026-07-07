@@ -92,7 +92,7 @@ export function Navbar() {
                   Masuk
                 </Link>
                 <Link href="/register">
-                  <Button size="sm" variant="outline" className="border-white/30 text-white hover:bg-white/10 rounded-xl text-xs">
+                  <Button size="sm" variant="outline" className="border-white/30 text-white bg-transparent hover:bg-white/10 rounded-xl text-xs">
                     Daftar
                   </Button>
                 </Link>
@@ -159,7 +159,7 @@ export function Navbar() {
               ) : (
                 <div className="flex gap-2 px-3">
                   <Link href="/login" onClick={() => setOpen(false)} className="flex-1">
-                    <Button variant="outline" className="w-full border-white/30 text-white hover:bg-white/10 rounded-xl text-sm">
+                    <Button variant="outline" className="w-full border-white/30 text-white bg-transparent hover:bg-white/10 rounded-xl text-sm">
                       Masuk
                     </Button>
                   </Link>
