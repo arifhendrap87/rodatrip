@@ -25,6 +25,7 @@ import {
   FileText,
   Receipt,
   MessageCircle,
+  CheckCircle,
 } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useState } from "react"
@@ -40,6 +41,7 @@ const navItems = [
   { href: "/admin/chat", label: "AI Chat", icon: MessageCircle },
   { href: "/admin/content-generator", label: "Konten Sosmed", icon: Share2 },
   { href: "/admin/prompt-generator", label: "Prompt GPT", icon: Sparkles },
+  { href: "/admin/content-readiness", label: "Kesiapan", icon: CheckCircle },
   { href: "/admin/waitlist", label: "Waitlist", icon: Mail },
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/admin/invoice", label: "Invoice", icon: Receipt },
