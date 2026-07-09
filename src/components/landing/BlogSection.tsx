@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { api } from "@/lib/api/client"
@@ -10,6 +10,7 @@ import type { BlogPostData } from "@/lib/services/blog"
 export function BlogSection() {
   const [posts, setPosts] = useState<BlogPostData[]>([])
   const [loading, setLoading] = useState(true)
+  const [erroredImages, setErroredImages] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     api.blog
@@ -71,12 +72,13 @@ export function BlogSection() {
                   >
                     {/* Cover image */}
                     <div className="relative aspect-[16/9] overflow-hidden">
-                      {post.image_url ? (
+                      {post.image_url && !erroredImages.has(post.slug) ? (
                         <img
                           src={post.image_url}
                           alt={post.title}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                           loading="lazy"
+                          onError={() => setErroredImages((prev) => new Set(prev).add(post.slug))}
                         />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
