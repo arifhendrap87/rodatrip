@@ -14,13 +14,44 @@ interface BlogPost {
   id: string
   slug: string
   title: string
+  content?: string
   excerpt: string
   category: string
   author: string
   is_published: boolean
   read_time: string
+  image_url?: string
+  tags?: string[]
+  seo_title?: string
+  meta_description?: string
   published_at: string | null
   created_at: string
+}
+
+function blogScore(post: BlogPost): number {
+  const checks = [
+    !!post.title,
+    !!post.content,
+    !!post.image_url,
+    !!post.seo_title,
+    !!post.meta_description,
+    (post.tags || []).length > 0,
+    !!post.category,
+    !!post.is_published,
+  ]
+  return Math.round((checks.filter(Boolean).length / checks.length) * 100)
+}
+
+function scoreColor(score: number): string {
+  if (score >= 80) return "bg-green-500"
+  if (score >= 50) return "bg-yellow-500"
+  return "bg-red-500"
+}
+
+function scoreLabel(score: number): string {
+  if (score >= 80) return "✅"
+  if (score >= 50) return "⚠️"
+  return "❌"
 }
 
 export default function BlogAdminPage() {
@@ -109,18 +140,38 @@ export default function BlogAdminPage() {
           <CardContent className="p-0">
             <div className="divide-y">
               {posts.map((post) => (
-                <div key={post.slug} className="flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors">
+                <div key={post.slug} className="flex items-start gap-4 p-4 hover:bg-muted/50 transition-colors">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-medium truncate">{post.title}</h3>
+                      <h3 className="font-medium truncate">{post.title || "(tanpa judul)"}</h3>
                       <Badge variant={post.is_published ? "default" : "secondary"}>
                         {post.is_published ? "Published" : "Draft"}
                       </Badge>
                       <span className="text-xs text-muted-foreground bg-muted rounded px-1.5 py-0.5">{post.category}</span>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-1 line-clamp-1">
-                      {post.excerpt || "Tidak ada excerpt"}
-                    </p>
+
+                    {/* Score */}
+                    {(() => {
+                      const score = blogScore(post)
+                      return (
+                        <div className="mt-2 flex items-center gap-3">
+                          <span className="text-xs font-medium shrink-0">{scoreLabel(score)} {score}%</span>
+                          <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden max-w-[120px]">
+                            <div className={`h-full rounded-full ${scoreColor(score)}`} style={{ width: `${score}%` }} />
+                          </div>
+                        </div>
+                      )
+                    })()}
+
+                    {/* Checklist */}
+                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1">
+                      <span className={`text-[11px] ${post.title ? "text-green-600" : "text-red-400"}`}>{post.title ? "✅" : "❌"} Judul</span>
+                      <span className={`text-[11px] ${post.content ? "text-green-600" : "text-red-400"}`}>{post.content ? "✅" : "❌"} Konten</span>
+                      <span className={`text-[11px] ${post.image_url ? "text-green-600" : "text-red-400"}`}>{post.image_url ? "✅" : "❌"} Gambar</span>
+                      <span className={`text-[11px] ${post.seo_title ? "text-green-600" : "text-red-400"}`}>{post.seo_title ? "✅" : "❌"} SEO</span>
+                      <span className={`text-[11px] ${(post.tags || []).length > 0 ? "text-green-600" : "text-red-400"}`}>{(post.tags || []).length > 0 ? "✅" : "❌"} Tags</span>
+                    </div>
+
                     <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
                       <span>{post.author}</span>
                       <span>•</span>
@@ -129,7 +180,7 @@ export default function BlogAdminPage() {
                       <span>{post.published_at ? new Date(post.published_at).toLocaleDateString("id-ID") : "Belum dipublish"}</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 shrink-0">
+                  <div className="flex items-center gap-1 shrink-0 pt-1">
                     <Link href={`/admin/blog/preview/${post.slug}`} target="_blank"
                       className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted">
                       <Eye className="h-4 w-4" />

@@ -11,6 +11,30 @@ import { Badge } from "@/components/ui/badge"
 import { Plus, Search, Edit, Trash2, ExternalLink, EyeOff, FileDown } from "lucide-react"
 import { useDebounce } from "@/hooks/useDebounce"
 
+function roadtripScore(rt: any): number {
+  const checks = [
+    !!rt.title,
+    !!rt.coverImage,
+    !!rt.itineraryDuration,
+    (rt.stops || []).length > 0,
+    !!rt.roadCondition,
+    !!rt.isPublished,
+  ]
+  return Math.round((checks.filter(Boolean).length / checks.length) * 100)
+}
+
+function scoreColor(s: number): string {
+  if (s >= 80) return "bg-green-500"
+  if (s >= 50) return "bg-yellow-500"
+  return "bg-red-500"
+}
+
+function scoreLabel(s: number): string {
+  if (s >= 80) return "✅"
+  if (s >= 50) return "⚠️"
+  return "❌"
+}
+
 export default function RoadtripsPage() {
   const router = useRouter()
   const [roadtrips, setRoadtrips] = useState<any[]>([])
@@ -127,6 +151,22 @@ export default function RoadtripsPage() {
                       <span className="text-xs text-muted-foreground">·</span>
                       <span className="text-xs text-muted-foreground">{rt.stops?.length || 0} stops</span>
                     </div>
+
+                    {/* Score */}
+                    {(() => {
+                      const score = roadtripScore(rt)
+                      return (
+                        <div className="mt-2 flex items-center gap-3">
+                          <span className="text-xs font-medium shrink-0">{scoreLabel(score)} {score}%</span>
+                          <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden max-w-[120px]">
+                            <div className={`h-full rounded-full ${scoreColor(score)}`} style={{ width: `${score}%` }} />
+                          </div>
+                          <span className="text-[11px] text-muted-foreground">
+                            {rt.coverImage ? "✅ Cover" : "❌ Cover"} · {rt.roadCondition ? "✅ Kondisi" : "❌ Kondisi"}
+                          </span>
+                        </div>
+                      )
+                    })()}
                   </div>
 
                   <div className="flex items-center gap-1">

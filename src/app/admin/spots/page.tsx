@@ -18,6 +18,28 @@ import {
 } from "@/components/ui/select"
 import { useDebounce } from "@/hooks/useDebounce"
 
+function spotScore(spot: any): number {
+  const loc = spot.location as { coordinates?: number[] } | null
+  const latLngValid = !!loc?.coordinates && loc.coordinates[0] !== 0 && loc.coordinates[1] !== 0
+  const checks = [
+    !!spot.name, !!spot.description, !!spot.image_url,
+    !!spot.category, !!spot.province, latLngValid, (spot.rating || 0) > 0,
+  ]
+  return Math.round((checks.filter(Boolean).length / checks.length) * 100)
+}
+
+function scoreColor(s: number): string {
+  if (s >= 80) return "bg-green-500"
+  if (s >= 50) return "bg-yellow-500"
+  return "bg-red-500"
+}
+
+function scoreLabel(s: number): string {
+  if (s >= 80) return "✅"
+  if (s >= 50) return "⚠️"
+  return "❌"
+}
+
 const CATEGORIES = [
   { value: "alam", label: "Alam", color: "emerald" },
   { value: "kuliner", label: "Kuliner", color: "orange" },
@@ -235,6 +257,22 @@ Tambah Spot
                           👁 {spot.view_count || 0}
                         </span>
                       </div>
+
+                      {/* Score */}
+                      {(() => {
+                        const score = spotScore(spot)
+                        return (
+                          <div className="mt-2 flex items-center gap-3">
+                            <span className="text-xs font-medium shrink-0">{scoreLabel(score)} {score}%</span>
+                            <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden max-w-[120px]">
+                              <div className={`h-full rounded-full ${scoreColor(score)}`} style={{ width: `${score}%` }} />
+                            </div>
+                            <span className="text-[11px] text-muted-foreground">
+                              {spot.image_url ? "✅ Gambar" : "❌ Gambar"} · {spot.description ? "✅ Deskripsi" : "❌ Deskripsi"}
+                            </span>
+                          </div>
+                        )
+                      })()}
                     </div>
 
                     <div className="flex items-center gap-1">
