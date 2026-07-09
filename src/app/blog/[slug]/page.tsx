@@ -4,6 +4,11 @@ import type { Metadata } from "next"
 import { SITE_NAME, SITE_URL } from "@/lib/constants"
 import { getPosts, getPostBySlug } from "@/lib/services/blog"
 import { Breadcrumb } from "@/components/ui/Breadcrumb"
+import { SpotCard } from "@/components/spot/SpotCard"
+import { RoadtripCard } from "@/components/roadtrip/RoadtripCard"
+import { getSpots } from "@/lib/services/spots"
+import { getItineraries } from "@/lib/services/itineraries"
+import type { Itinerary } from "@/types"
 
 function isHtmlContent(str: string): boolean {
   return /<[a-z][\s\S]*>/i.test(str)
@@ -53,6 +58,22 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   const allPosts = await getPosts()
   const related = allPosts.filter((p) => p.slug !== slug).slice(0, 3)
+
+  const categoryMap: Record<string, string> = {
+    Tips: "",
+    Inspirasi: "alam",
+    Destinasi: "alam",
+    Tutorial: "",
+    Review: "",
+    "Perawatan Mobil": "",
+    Kendaraan: "",
+  }
+  const spotCategory = categoryMap[post.category] || ""
+  const { data: relatedSpots } = spotCategory ? await getSpots({ category: spotCategory, limit: 3 }) : { data: [] }
+  const roadtrips = await getItineraries({ published: true })
+  const hasRoadtripSpot = (itin: Itinerary): boolean =>
+    relatedSpots.some((s) => itin.stops.some((st) => st.spotSlug === s.slug))
+  const relatedRoadtrips = roadtrips.filter(hasRoadtripSpot).slice(0, 3)
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -118,6 +139,38 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           ))}
         </div>
       </div>
+
+      {relatedSpots.length > 0 && (
+        <section className="border-t border-border/30 py-12 sm:py-16 bg-muted/30">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-bold font-heading">📍 Spot Terkait</h2>
+              <Link href="/spot-istimewa" className="text-sm text-primary hover:underline">Lihat Semua →</Link>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {relatedSpots.slice(0, 3).map((spot: any) => (
+                <SpotCard key={spot.slug} spot={spot} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {relatedRoadtrips.length > 0 && (
+        <section className="border-t border-border/30 py-12 sm:py-16">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-bold font-heading">🏎️ Roadtrip Terkait</h2>
+              <Link href="/roadtrip" className="text-sm text-primary hover:underline">Lihat Semua →</Link>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {relatedRoadtrips.slice(0, 3).map((itin) => (
+                <RoadtripCard key={itin.id} itinerary={itin} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {related.length > 0 && (
         <section className="border-t border-border/30 py-12 sm:py-16">
