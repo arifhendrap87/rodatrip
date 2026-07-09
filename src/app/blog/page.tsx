@@ -2,6 +2,7 @@ import Link from "next/link"
 import { SITE_NAME } from "@/lib/constants"
 import { getPosts } from "@/lib/services/blog"
 import type { BlogPostData } from "@/lib/services/blog"
+import { BlogImage } from "@/components/ui/BlogImage"
 
 export const dynamic = "force-dynamic"
 
@@ -70,8 +71,8 @@ export default async function BlogPage(props: { searchParams?: Promise<{ categor
                 <Link key={post.slug} href={`/blog/${post.slug}`}
                   className="group rounded-2xl border border-border/50 bg-white overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
                 >
-                  <div className="aspect-[16/9] bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
-                    <span className="text-5xl opacity-30">🚗</span>
+                  <div className="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10">
+                    <BlogImage src={post.image_url} alt={post.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                   </div>
                   <div className="p-5">
                     <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">

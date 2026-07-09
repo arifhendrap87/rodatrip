@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState } from "react"
-import Image from "next/image"
 import Link from "next/link"
 import type { Itinerary, ItineraryStop } from "@/types"
 import { ItineraryTimeline } from "./ItineraryTimeline"
@@ -52,6 +51,8 @@ function buildDirectionsFromStartUrl(stops: ItineraryStop[]): string {
 
 export function RoadtripDetailClient({ itinerary }: RoadtripDetailClientProps) {
   const [copied, setCopied] = useState(false)
+  const [coverError, setCoverError] = useState(false)
+  const showCover = itinerary.coverImage && !coverError
 
   const handleShare = async () => {
     const url = window.location.href
@@ -67,9 +68,9 @@ export function RoadtripDetailClient({ itinerary }: RoadtripDetailClientProps) {
   return (
     <div className="min-h-screen">
       <section className={`relative overflow-hidden pt-28 pb-20 sm:pt-36 sm:pb-28 ${itinerary.coverImage ? 'text-white' : ''}`}>
-        {itinerary.coverImage ? (
+        {showCover ? (
           <>
-            <Image src={itinerary.coverImage} alt={`${itinerary.title} — Foto sampul roadtrip`} fill className="object-cover" unoptimized priority />
+            <img src={itinerary.coverImage} alt={`${itinerary.title} — Foto sampul roadtrip`} className="absolute inset-0 w-full h-full object-cover" onError={() => setCoverError(true)} />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
           </>
         ) : (

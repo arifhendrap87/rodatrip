@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { notFound } from "next/navigation"
-import Image from "next/image"
 import Link from "next/link"
 import type { Metadata } from "next"
 import { SPOT_CATEGORIES } from "@/data/spots"
@@ -81,7 +80,7 @@ export default async function SpotDetailPage({ params }: { params: Promise<{ slu
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <section className="relative min-h-[50vh] flex items-end overflow-hidden">
-        <Image src={spot.image_url || "/placeholder.svg"} alt={spot.name} fill className="object-cover" priority />
+        <img src={spot.image_url || "/placeholder.svg"} alt={spot.name} className="absolute inset-0 w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg" }} />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 py-12 w-full">
           <div className="mb-4">
