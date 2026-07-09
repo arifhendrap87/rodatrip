@@ -200,7 +200,7 @@ export default function RoadtripsPage() {
                             <div className={`h-full rounded-full ${scoreColor(score)}`} style={{ width: `${score}%` }} />
                           </div>
                           <span className="text-[11px] text-muted-foreground">
-                            {rt.coverImage ? "✅ Cover" : "❌ Cover"} · {rt.roadCondition ? "✅ Kondisi" : "❌ Kondisi"}
+                            {rt.title ? "✅" : "❌"} Judul · {rt.coverImage ? "✅" : "❌"} Cover · {rt.itineraryDuration ? "✅" : "❌"} Durasi · {(rt.stops || []).length > 0 ? "✅" : "❌"} Stops · {rt.roadCondition ? "✅" : "❌"} Kondisi · {rt.isPublished ? "✅" : "❌"} Publish
                           </span>
                         </div>
                       )

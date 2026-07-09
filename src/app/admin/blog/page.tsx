@@ -225,7 +225,10 @@ export default function BlogAdminPage() {
                       <span className={`text-[11px] ${post.content ? "text-green-600" : "text-red-400"}`}>{post.content ? "✅" : "❌"} Konten</span>
                       <span className={`text-[11px] ${post.image_url ? "text-green-600" : "text-red-400"}`}>{post.image_url ? "✅" : "❌"} Gambar</span>
                       <span className={`text-[11px] ${post.seo_title ? "text-green-600" : "text-red-400"}`}>{post.seo_title ? "✅" : "❌"} SEO</span>
+                      <span className={`text-[11px] ${post.meta_description ? "text-green-600" : "text-red-400"}`}>{post.meta_description ? "✅" : "❌"} Meta Desc</span>
                       <span className={`text-[11px] ${(post.tags || []).length > 0 ? "text-green-600" : "text-red-400"}`}>{(post.tags || []).length > 0 ? "✅" : "❌"} Tags</span>
+                      <span className={`text-[11px] ${post.category ? "text-green-600" : "text-red-400"}`}>{post.category ? "✅" : "❌"} Kategori</span>
+                      <span className={`text-[11px] ${post.is_published ? "text-green-600" : "text-red-400"}`}>{post.is_published ? "✅" : "❌"} Publish</span>
                     </div>
 
                     <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">

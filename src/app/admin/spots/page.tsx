@@ -296,7 +296,7 @@ Tambah Spot
                               <div className={`h-full rounded-full ${scoreColor(score)}`} style={{ width: `${score}%` }} />
                             </div>
                             <span className="text-[11px] text-muted-foreground">
-                              {spot.image_url ? "✅ Gambar" : "❌ Gambar"} · {spot.description ? "✅ Deskripsi" : "❌ Deskripsi"}
+                              {spot.name ? "✅" : "❌"} Nama · {spot.description ? "✅" : "❌"} Deskripsi · {spot.image_url ? "✅" : "❌"} Gambar · {spot.category ? "✅" : "❌"} Kategori · {spot.province ? "✅" : "❌"} Provinsi · {(spot.location as any)?.coordinates?.[0] ? "✅" : "❌"} Koordinat · {(spot.rating || 0) > 0 ? "✅" : "❌"} Rating
                             </span>
                           </div>
                         )
