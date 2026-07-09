@@ -22,6 +22,8 @@ export function SpotCard({ spot }: { spot: any }) {
               src={imageUrl}
               alt={spot.name}
               className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
+              loading="lazy"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               onError={() => setImgError(true)}
             />
           ) : (
