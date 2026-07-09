@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { ArrowLeft, Save, Loader2, Sparkles, Lightbulb, FileText, Check, Image as ImageIcon, Copy, Tags as TagsIcon } from "lucide-react"
+import { ArrowLeft, Save, Loader2, Sparkles, Lightbulb, Check, Image as ImageIcon, Copy } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 
@@ -28,14 +28,11 @@ export default function NewBlogPage() {
   const router = useRouter()
   const [saving, setSaving] = useState(false)
   const [generatingIde, setGeneratingIde] = useState(false)
-  const [generatingContent, setGeneratingContent] = useState(false)
-  const [generatingSeo, setGeneratingSeo] = useState(false)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [ideResults, setIdeResults] = useState<any[]>([])
   const [generatingImage, setGeneratingImage] = useState(false)
   const [imagePrompt, setImagePrompt] = useState("")
   const [copiedPrompt, setCopiedPrompt] = useState(false)
-  const [generatingTags, setGeneratingTags] = useState(false)
 
   const [aiTopic, setAiTopic] = useState("Tips Roadtrip")
 
@@ -89,72 +86,6 @@ export default function NewBlogPage() {
     setGeneratingIde(false)
   }
 
-  async function handleWriteContent() {
-    setGeneratingContent(true)
-    try {
-      const res = await fetch("/api/ai/generate-blog", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "tulis",
-          topic: form.title,
-          existingData: {
-            title: form.title,
-            excerpt: form.excerpt,
-            category: form.category,
-          },
-        }),
-      })
-      const json = await res.json()
-      if (!res.ok) throw new Error(json?.error?.message || "Gagal generate konten")
-
-      const content = json.data?.text || ""
-      setForm((f) => ({ ...f, content }))
-      toast.success("Konten berhasil digenerate!")
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Gagal generate konten")
-    }
-    setGeneratingContent(false)
-  }
-
-  async function handleGenerateSeo() {
-    setGeneratingSeo(true)
-    try {
-      const res = await fetch("/api/ai/generate-blog", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "seo",
-          existingData: {
-            title: form.title,
-            excerpt: form.excerpt,
-            content: form.content,
-          },
-        }),
-      })
-      const json = await res.json()
-      if (!res.ok) throw new Error(json?.error?.message || "Gagal generate SEO")
-
-      const text = json.data?.text || ""
-      const match = text.match(/\{[\s\S]*\}/)
-      if (match) {
-        const seo = JSON.parse(match[0])
-        setForm((f) => ({
-          ...f,
-          slug: seo.slug || f.slug,
-          excerpt: seo.description || f.excerpt,
-          tags: (seo.tags || []).join(", "),
-        }))
-        toast.success("SEO data berhasil digenerate!")
-      } else {
-        toast.error("Gagal parse SEO data")
-      }
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Gagal generate SEO")
-    }
-    setGeneratingSeo(false)
-  }
-
   async function handleGenerateImage() {
     setGeneratingImage(true)
     setImagePrompt("")
@@ -178,36 +109,7 @@ export default function NewBlogPage() {
     setGeneratingImage(false)
   }
 
-  async function handleGenerateTags() {
-    setGeneratingTags(true)
-    try {
-      const res = await fetch("/api/ai/generate-blog", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "tags",
-          topic: aiTopic,
-          existingData: { title: form.title, category: form.category, excerpt: form.excerpt },
-        }),
-      })
-      const json = await res.json()
-      if (!res.ok) throw new Error(json?.error?.message || "Gagal generate tags")
-      const text = json.data?.text || ""
-      const match = text.match(/\[[\s\S]*\]/)
-      if (match) {
-        const tags = JSON.parse(match[0]) as string[]
-        setForm((f) => ({ ...f, tags: tags.join(", ") }))
-        toast.success(`${tags.length} tags berhasil digenerate!`)
-      } else {
-        toast.error("Gagal parse tags")
-      }
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Gagal generate tags")
-    }
-    setGeneratingTags(false)
-  }
-
-  function selectIdea(idea: any) {
+  async function selectIdea(idea: any) {
     setForm((f) => ({
       ...f,
       title: idea.title || f.title,
@@ -216,7 +118,47 @@ export default function NewBlogPage() {
       category: idea.category || f.category,
     }))
     setIdeResults([])
-    toast.success("Ide dipilih — edit manual jika perlu")
+    toast.info("Menggenerate konten...")
+
+    try {
+      const res = await fetch("/api/ai/generate-blog", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "tulis",
+          topic: idea.title,
+          existingData: { title: idea.title, excerpt: idea.excerpt, category: idea.category },
+        }),
+      })
+      const json = await res.json()
+      if (json.data?.text) {
+        setForm((f) => ({ ...f, content: json.data.text }))
+      }
+
+      const seoRes = await fetch("/api/ai/generate-blog", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "seo",
+          existingData: { title: idea.title, excerpt: idea.excerpt, content: json.data?.text || "" },
+        }),
+      })
+      const seoJson = await seoRes.json()
+      const text = seoJson.data?.text || ""
+      const match = text.match(/\{[\s\S]*\}/)
+      if (match) {
+        const seo = JSON.parse(match[0])
+        setForm((f) => ({
+          ...f,
+          slug: seo.slug || f.slug,
+          excerpt: seo.description || f.excerpt,
+          tags: (seo.tags || []).join(", "),
+        }))
+      }
+      toast.success("Konten + SEO siap!")
+    } catch {
+      toast.error("Gagal generate konten, silakan edit manual")
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -292,18 +234,6 @@ export default function NewBlogPage() {
                 className="gap-1.5 bg-white">
                 {generatingIde ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lightbulb className="h-4 w-4" />}
                 {generatingIde ? "Generating..." : "💡 Ide Konten"}
-              </Button>
-              <Button type="button" variant="outline" size="sm"
-                onClick={handleWriteContent} disabled={generatingContent || !form.title}
-                className="gap-1.5 bg-white">
-                {generatingContent ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
-                {generatingContent ? "Generating..." : "🤖 Bantu Tulis"}
-              </Button>
-              <Button type="button" variant="outline" size="sm"
-                onClick={handleGenerateSeo} disabled={generatingSeo || !form.title}
-                className="gap-1.5 bg-white">
-                {generatingSeo ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                {generatingSeo ? "Generating..." : "✨ SEO"}
               </Button>
               <Button type="button" variant="outline" size="sm"
                 onClick={handleGenerateImage} disabled={generatingImage || !form.title}
@@ -415,13 +345,7 @@ export default function NewBlogPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label>Tags (comma-separated)</Label>
-                <div className="flex gap-2">
-                  <Input value={form.tags} onChange={(e) => setForm((f) => ({ ...f, tags: e.target.value }))} placeholder="roadtrip, tips, jawa-barat" className="flex-1" />
-                  <Button type="button" variant="outline" size="sm" onClick={handleGenerateTags} disabled={generatingTags || !form.title} className="shrink-0 gap-1.5">
-                    {generatingTags ? <Loader2 className="h-4 w-4 animate-spin" /> : <TagsIcon className="h-4 w-4" />}
-                    {generatingTags ? "..." : "Generate"}
-                  </Button>
-                </div>
+                <Input value={form.tags} onChange={(e) => setForm((f) => ({ ...f, tags: e.target.value }))} placeholder="roadtrip, tips, jawa-barat" />
               </div>
               <ImageUpload
                 value={form.image_url}
