@@ -19,6 +19,7 @@ import {
 import { ArrowLeft, Save, Loader2, Sparkles, Lightbulb, Check, Image as ImageIcon, Copy } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
+import { ReadinessScore } from "@/components/ui/ReadinessScore"
 
 function generateSlug(title: string) {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
@@ -28,6 +29,7 @@ export default function NewBlogPage() {
   const router = useRouter()
   const [saving, setSaving] = useState(false)
   const [generatingIde, setGeneratingIde] = useState(false)
+  const [generatingFull, setGeneratingFull] = useState(false)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [ideResults, setIdeResults] = useState<any[]>([])
   const [generatingImage, setGeneratingImage] = useState(false)
@@ -110,6 +112,7 @@ export default function NewBlogPage() {
   }
 
   async function selectIdea(idea: any) {
+    setGeneratingFull(true)
     setForm((f) => ({
       ...f,
       title: idea.title || f.title,
@@ -118,7 +121,6 @@ export default function NewBlogPage() {
       category: idea.category || f.category,
     }))
     setIdeResults([])
-    toast.info("Menggenerate konten...")
 
     try {
       const res = await fetch("/api/ai/generate-blog", {
@@ -159,6 +161,7 @@ export default function NewBlogPage() {
     } catch {
       toast.error("Gagal generate konten, silakan edit manual")
     }
+    setGeneratingFull(false)
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -199,6 +202,32 @@ export default function NewBlogPage() {
           <p className="text-muted-foreground">Buat artikel blog baru dengan bantuan AI</p>
         </div>
       </div>
+
+      <ReadinessScore
+        checks={[
+          { label: "Judul", ok: !!form.title },
+          { label: "Konten", ok: !!form.content },
+          { label: "Gambar", ok: !!form.image_url },
+          { label: "SEO Title", ok: !!form.seo_title },
+          { label: "Meta Desc", ok: !!form.meta_description },
+          { label: "Tags", ok: form.tags.split(",").filter(Boolean).length > 0 },
+          { label: "Kategori", ok: !!form.category },
+          { label: "Publish", ok: form.is_published },
+        ]}
+      />
+
+      {/* Loading overlay */}
+      {generatingFull && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20">
+          <div className="rounded-xl bg-white p-6 shadow-xl flex items-center gap-4 min-w-[320px]">
+            <Loader2 className="h-6 w-6 animate-spin text-primary shrink-0" />
+            <div>
+              <p className="font-semibold text-sm">Menggenerate konten...</p>
+              <p className="text-xs text-muted-foreground mt-0.5">AI sedang menulis artikel + SEO</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* AI Assist */}
