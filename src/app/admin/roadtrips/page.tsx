@@ -11,6 +11,17 @@ import { Badge } from "@/components/ui/badge"
 import { Plus, Search, Edit, Trash2, ExternalLink, EyeOff, FileDown } from "lucide-react"
 import { useDebounce } from "@/hooks/useDebounce"
 
+const SORT_OPTIONS = [
+  { value: "terbaru", label: "Terbaru" },
+  { value: "judul", label: "Judul A-Z" },
+]
+
+const STATUS_OPTIONS = [
+  { value: "", label: "Semua Status" },
+  { value: "published", label: "Published" },
+  { value: "draft", label: "Draft" },
+]
+
 function roadtripScore(rt: any): number {
   const checks = [
     !!rt.title,
@@ -41,31 +52,54 @@ export default function RoadtripsPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const debouncedSearch = useDebounce(search, 300)
+  const [status, setStatus] = useState("")
+  const [sort, setSort] = useState("terbaru")
+  const [offset, setOffset] = useState(0)
+  const [hasMore, setHasMore] = useState(false)
+  const [total, setTotal] = useState(0)
 
-  useEffect(() => {
-    fetchRoadtrips()
-  }, [debouncedSearch])
-
-  async function fetchRoadtrips() {
+  async function fetchRoadtrips(pageOffset = 0) {
     setLoading(true)
     try {
-      const res = await api.admin.itineraries.list()
-      setRoadtrips(res.data as any[])
+      const params = new URLSearchParams({ limit: "20", offset: String(pageOffset) })
+      if (debouncedSearch) params.set("search", debouncedSearch)
+      if (status) params.set("status", status)
+      if (sort !== "terbaru") params.set("sort", sort)
+
+      const res = await fetch(`/api/admin/itineraries?${params}`)
+      const json = await res.json()
+      const data = json.data?.data || json.data || []
+
+      let filtered = data
+      if (status === "published") filtered = data.filter((r: any) => r.isPublished)
+      else if (status === "draft") filtered = data.filter((r: any) => !r.isPublished)
+
+      if (pageOffset === 0) {
+        setRoadtrips(filtered)
+      } else {
+        setRoadtrips((prev) => [...prev, ...filtered])
+      }
+      setHasMore(json.data?.pagination?.hasMore || false)
+      setTotal(json.data?.pagination?.total || 0)
+      setOffset(pageOffset)
     } catch {
-      setRoadtrips([])
+      if (pageOffset === 0) setRoadtrips([])
     }
     setLoading(false)
   }
 
+  useEffect(() => {
+    setOffset(0)
+    setRoadtrips([])
+    fetchRoadtrips(0)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch, status, sort])
+
   async function handleDelete(slug: string, title: string) {
     if (!confirm(`Hapus "${title}"?`)) return
     await api.admin.itineraries.delete(slug)
-    fetchRoadtrips()
+    fetchRoadtrips(0)
   }
-
-  const filtered = search
-    ? roadtrips.filter((r) => r.title?.toLowerCase().includes(search.toLowerCase()))
-    : roadtrips
 
   return (
     <div>
@@ -97,20 +131,24 @@ export default function RoadtripsPage() {
           <div className="flex flex-wrap gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Cari roadtrip..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-9"
-              />
+              <Input placeholder="Cari roadtrip..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
             </div>
+            <select value={status} onChange={(e) => setStatus(e.target.value)}
+              className="h-9 rounded-lg border border-input bg-background px-3 text-sm text-muted-foreground">
+              {STATUS_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+            </select>
+            <select value={sort} onChange={(e) => setSort(e.target.value)}
+              className="h-9 rounded-lg border border-input bg-background px-3 text-sm text-muted-foreground">
+              {SORT_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+            </select>
+            <span className="text-xs text-muted-foreground self-center hidden sm:inline">{total} total</span>
           </div>
         </CardContent>
       </Card>
 
       {loading ? (
         <div className="py-12 text-center text-muted-foreground">Memuat roadtrip...</div>
-      ) : filtered.length === 0 ? (
+      ) : roadtrips.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center gap-4 py-12">
             <p className="text-lg font-medium">Belum ada roadtrip</p>
@@ -129,7 +167,7 @@ export default function RoadtripsPage() {
         <Card>
           <CardContent className="p-0">
             <div className="divide-y">
-              {filtered.map((rt) => (
+              {roadtrips.map((rt) => (
                 <div
                   key={rt.id}
                   className="flex items-center gap-4 p-4 transition-colors hover:bg-muted/50"
@@ -197,6 +235,13 @@ export default function RoadtripsPage() {
             </div>
           </CardContent>
         </Card>
+      )}
+      {!loading && hasMore && (
+        <div className="mt-4 text-center">
+          <Button variant="outline" onClick={() => fetchRoadtrips(offset + 20)} className="gap-2">
+            Muat Lebih Banyak ({total - (offset + 20) > 0 ? total - (offset + 20) : 0} tersisa)
+          </Button>
+        </div>
       )}
     </div>
   )

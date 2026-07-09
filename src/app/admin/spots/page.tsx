@@ -49,6 +49,13 @@ const CATEGORIES = [
   { value: "sejarah", label: "Sejarah", color: "amber" },
 ]
 
+const SORT_OPTIONS = [
+  { value: "terbaru", label: "Terbaru" },
+  { value: "nama", label: "Nama A-Z" },
+  { value: "rating", label: "Rating" },
+  { value: "dilihat", label: "Paling Dilihat" },
+]
+
 const PLATFORM_BADGES: Record<string, { label: string; className: string }> = {
   facebook: { label: "f", className: "bg-[#1877F2] text-white min-w-[18px]" },
   instagram: { label: "IG", className: "bg-gradient-to-br from-[#833AB4] via-[#FD1D1D] to-[#FCAF45] text-white min-w-[22px]" },
@@ -65,32 +72,45 @@ export default function SpotsPage() {
   const [provinceList, setProvinceList] = useState<{ code: string; name: string }[]>([])
   const [loadingProv, setLoadingProv] = useState(true)
   const [contentStatus, setContentStatus] = useState<Record<string, Record<string, { tone: string; updatedAt: string }>>>({})
+  const [sort, setSort] = useState("terbaru")
+  const [offset, setOffset] = useState(0)
+  const [hasMore, setHasMore] = useState(false)
+  const [total, setTotal] = useState(0)
   const initialFetchDone = useRef(false)
 
   useEffect(() => {
-    // Fetch provinces from API
     fetch("/api/wilayah/provinces")
       .then((r) => r.json())
-      .then((json) => {
-        setProvinceList(json.data || [])
-        setLoadingProv(false)
-      })
+      .then((json) => { setProvinceList(json.data || []); setLoadingProv(false) })
       .catch(() => setLoadingProv(false))
   }, [])
 
   useEffect(() => {
-    fetchSpots()
-  }, [debouncedSearch, categoryFilter, provinceFilter])
+    setOffset(0)
+    setSpots([])
+    fetchSpots(0)
+  }, [debouncedSearch, categoryFilter, provinceFilter, sort])
 
-  async function fetchSpots() {
+  async function fetchSpots(pageOffset = 0) {
     setLoading(true)
-    const params: Record<string, string> = {}
+    const params: Record<string, string> = { limit: "20", offset: String(pageOffset) }
     if (debouncedSearch) params.search = debouncedSearch
     if (categoryFilter !== "all") params.category = categoryFilter
     if (provinceFilter !== "all") params.province = provinceFilter
+    if (sort !== "terbaru") params.sort = sort
 
     const res = await api.spots.list(params)
-    setSpots(res.data as any[])
+    const data = res.data as any[]
+    const pagination = (res as any).pagination
+
+    if (pageOffset === 0) {
+      setSpots(data || [])
+    } else {
+      setSpots((prev) => [...prev, ...(data || [])])
+    }
+    setTotal(pagination?.total || data?.length || 0)
+    setHasMore((pagination?.offset || 0) + (pagination?.limit || 20) < (pagination?.total || 0))
+    setOffset(pageOffset)
     setLoading(false)
   }
 
@@ -178,6 +198,14 @@ export default function SpotsPage() {
                 )}
               </SelectContent>
             </Select>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-muted-foreground hidden sm:inline">Urut:</span>
+              <select value={sort} onChange={(e) => setSort(e.target.value)}
+                className="h-9 rounded-lg border border-input bg-background px-3 text-sm text-muted-foreground">
+                {SORT_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+              </select>
+              <span className="text-xs text-muted-foreground hidden sm:inline">{total} total</span>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -304,6 +332,13 @@ Tambah Spot
             </div>
           </CardContent>
         </Card>
+      )}
+      {!loading && hasMore && (
+        <div className="mt-4 text-center">
+          <Button variant="outline" onClick={() => fetchSpots(offset + 20)} className="gap-2">
+            Muat Lebih Banyak ({total - (offset + 20) > 0 ? total - (offset + 20) : 0} tersisa)
+          </Button>
+        </div>
       )}
     </div>
   )

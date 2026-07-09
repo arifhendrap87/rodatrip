@@ -16,11 +16,12 @@ export async function GET(request: Request) {
   const province = searchParams.get("province") || undefined
   const city = searchParams.get("city") || undefined
   const search = searchParams.get("search") || undefined
+  const sort = searchParams.get("sort") || undefined
   const limit = Math.min(Number(searchParams.get("limit")) || 20, 100)
   const offset = Number(searchParams.get("offset")) || 0
 
   try {
-    const { data, total } = await getSpots({ category, region, province, city, search, limit, offset })
+    const { data, total } = await getSpots({ category, region, province, city, search, sort, limit, offset })
     return paginated(data, total, limit, offset)
   } catch {
     return paginated([], 0, limit, offset)

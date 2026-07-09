@@ -46,6 +46,7 @@ export async function getSpots(options?: {
   featured?: boolean
   limit?: number
   offset?: number
+  sort?: string
 }): Promise<{ data: SpotData[]; total: number }> {
   try {
     let query = db.from("spots").select("*", { count: "exact" })
@@ -60,8 +61,14 @@ export async function getSpots(options?: {
     const limit = options?.limit || 20
     const offset = options?.offset || 0
 
+    let orderColumn = "created_at"
+    let orderAsc = false
+    if (options?.sort === "nama") { orderColumn = "name"; orderAsc = true }
+    else if (options?.sort === "rating") { orderColumn = "rating"; orderAsc = false }
+    else if (options?.sort === "dilihat") { orderColumn = "view_count"; orderAsc = false }
+
     const { data, count, error } = await query
-      .order("created_at", { ascending: false })
+      .order(orderColumn, { ascending: orderAsc })
       .range(offset, offset + limit - 1)
 
     if (error) return { data: [], total: 0 }

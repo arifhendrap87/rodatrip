@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Search, Edit, Trash2, Eye, ExternalLink, FileText } from "lucide-react"
+import { Plus, Search, Edit, Trash2, Eye, ExternalLink, FileText, ChevronDown } from "lucide-react"
 import { useDebounce } from "@/hooks/useDebounce"
 import { toast } from "sonner"
 
@@ -54,33 +54,81 @@ function scoreLabel(score: number): string {
   return "❌"
 }
 
+const CATEGORIES_FILTER = [
+  { value: "", label: "Semua Kategori" },
+  { value: "Tips", label: "Tips" },
+  { value: "Inspirasi", label: "Inspirasi" },
+  { value: "Destinasi", label: "Destinasi" },
+  { value: "Tutorial", label: "Tutorial" },
+  { value: "Review", label: "Review" },
+  { value: "Perawatan Mobil", label: "Perawatan Mobil" },
+  { value: "Kendaraan", label: "Kendaraan" },
+]
+
+const STATUS_OPTIONS = [
+  { value: "", label: "Semua Status" },
+  { value: "published", label: "Published" },
+  { value: "draft", label: "Draft" },
+]
+
+const SORT_OPTIONS = [
+  { value: "terbaru", label: "Terbaru" },
+  { value: "judul", label: "Judul A-Z" },
+  { value: "judul_desc", label: "Judul Z-A" },
+]
+
 export default function BlogAdminPage() {
   const [posts, setPosts] = useState<BlogPost[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
+  const [category, setCategory] = useState("")
+  const [status, setStatus] = useState("")
+  const [sort, setSort] = useState("terbaru")
+  const [offset, setOffset] = useState(0)
+  const [hasMore, setHasMore] = useState(false)
+  const [total, setTotal] = useState(0)
   const debouncedSearch = useDebounce(search, 300)
 
-  async function fetchPosts() {
+  function buildParams(pageOffset = 0) {
+    const params = new URLSearchParams({ limit: "20", offset: String(pageOffset) })
+    if (debouncedSearch) params.set("search", debouncedSearch)
+    if (category) params.set("category", category)
+    if (status) params.set("status", status)
+    params.set("sort", sort)
+    return params
+  }
+
+  async function fetchPosts(pageOffset = 0) {
     setLoading(true)
     try {
-      const params = new URLSearchParams({ limit: "50" })
-      if (debouncedSearch) params.set("search", debouncedSearch)
-
-      const res = await fetch(`/api/admin/blog?${params}`)
+      const res = await fetch(`/api/admin/blog?${buildParams(pageOffset)}`)
       if (!res.ok) throw new Error(res.statusText)
       const json = await res.json()
-      setPosts(json.data?.posts || [])
+      const data = json.data
+      if (pageOffset === 0) {
+        setPosts(data?.posts || [])
+      } else {
+        setPosts((prev) => [...prev, ...(data?.posts || [])])
+      }
+      setHasMore(data?.pagination?.hasMore || false)
+      setTotal(data?.pagination?.total || 0)
+      setOffset(pageOffset)
     } catch {
       toast.error("Gagal memuat blog")
-      setPosts([])
+      if (pageOffset === 0) setPosts([])
     }
     setLoading(false)
   }
 
+  function handleFilterChange() {
+    setOffset(0)
+    fetchPosts(0)
+  }
+
   useEffect(() => {
-    fetchPosts()
+    handleFilterChange()
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch])
+  }, [debouncedSearch, category, status, sort])
 
   async function handleDelete(slug: string, title: string) {
     if (!confirm(`Hapus "${title}"?`)) return
@@ -110,16 +158,24 @@ export default function BlogAdminPage() {
       </div>
 
       <Card className="mb-6">
-        <CardContent className="p-4">
-          <div className="relative">
+        <CardContent className="p-4 flex flex-wrap gap-3">
+          <div className="relative flex-1 min-w-[200px]">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Cari blog..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9"
-            />
+            <Input placeholder="Cari blog..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
           </div>
+          <select value={category} onChange={(e) => setCategory(e.target.value)}
+            className="h-9 rounded-lg border border-input bg-background px-3 text-sm text-muted-foreground">
+            {CATEGORIES_FILTER.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+          </select>
+          <select value={status} onChange={(e) => setStatus(e.target.value)}
+            className="h-9 rounded-lg border border-input bg-background px-3 text-sm text-muted-foreground">
+            {STATUS_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+          </select>
+          <select value={sort} onChange={(e) => setSort(e.target.value)}
+            className="h-9 rounded-lg border border-input bg-background px-3 text-sm text-muted-foreground">
+            {SORT_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+          </select>
+          <span className="text-xs text-muted-foreground self-center hidden sm:inline">{total} total</span>
         </CardContent>
       </Card>
 
@@ -205,6 +261,13 @@ export default function BlogAdminPage() {
             </div>
           </CardContent>
         </Card>
+      )}
+      {!loading && hasMore && (
+        <div className="mt-4 text-center">
+          <Button variant="outline" onClick={() => fetchPosts(offset + 20)} className="gap-2">
+            Muat Lebih Banyak ({total - (offset + 20) > 0 ? total - (offset + 20) : 0} tersisa)
+          </Button>
+        </div>
       )}
     </div>
   )

@@ -10,11 +10,26 @@ export async function GET(request: Request) {
   const limit = Math.min(Number(searchParams.get("limit")) || 50, 100)
   const offset = Number(searchParams.get("offset")) || 0
   const search = searchParams.get("search") || undefined
+  const category = searchParams.get("category") || undefined
+  const status = searchParams.get("status") || undefined
+  const sort = searchParams.get("sort") || "terbaru"
 
-  let query = db.from("blog_posts").select("*", { count: "exact" }).order("created_at", { ascending: false })
+  let query = db.from("blog_posts").select("*", { count: "exact" })
+
+  if (sort === "terbaru") query = query.order("created_at", { ascending: false })
+  else if (sort === "judul") query = query.order("title", { ascending: true })
+  else if (sort === "judul_desc") query = query.order("title", { ascending: false })
 
   if (search) {
     query = query.ilike("title", `%${search}%`)
+  }
+  if (category) {
+    query = query.eq("category", category)
+  }
+  if (status === "published") {
+    query = query.eq("is_published", true)
+  } else if (status === "draft") {
+    query = query.eq("is_published", false)
   }
 
   query = query.range(offset, offset + limit - 1)
