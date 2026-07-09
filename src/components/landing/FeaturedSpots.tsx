@@ -1,11 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { motion } from "framer-motion"
 import Link from "next/link"
 import { SpotCard } from "@/components/spot/SpotCard"
 import { api } from "@/lib/api/client"
-import { staggerContainer, fadeInUp } from "@/lib/animations"
 
 export function FeaturedSpots() {
   const [spots, setSpots] = useState<any[]>([])
@@ -26,12 +24,7 @@ export function FeaturedSpots() {
       <div className="absolute inset-0 bg-gradient-to-b from-accent/[0.03] via-transparent to-primary/[0.03]" />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mx-auto max-w-2xl text-center"
-        >
+        <div className="mx-auto max-w-2xl text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm text-primary shadow-sm mb-4">
             ✨ Tempat Istimewa
           </span>
@@ -41,15 +34,9 @@ export function FeaturedSpots() {
           <p className="mt-4 text-muted-foreground">
             Hidden gems, panorama ikonik, dan tempat seru di sepanjang rute roadtrip kamu.
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div
-          variants={staggerContainer}
-          initial="initial"
-          whileInView="whileInView"
-          viewport={{ once: true }}
-          className="mt-12 grid gap-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
-        >
+        <div className="mt-12 grid gap-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
           {loading
             ? Array.from({ length: 8 }).map((_, i) => (
                 <div
@@ -63,20 +50,13 @@ export function FeaturedSpots() {
                   </div>
                 </div>
               ))
-            : spots.map((spot, i) => (
-                <motion.div key={spot.slug} variants={fadeInUp}>
-                  <SpotCard spot={spot} />
-                </motion.div>
+            : spots.map((spot) => (
+                <SpotCard key={spot.slug} spot={spot} />
               ))}
-        </motion.div>
+        </div>
 
         {!loading && spots.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mt-12 text-center"
-          >
+          <div className="mt-12 text-center">
             <Link
               href="/spot-istimewa"
               className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
@@ -87,7 +67,7 @@ export function FeaturedSpots() {
                 <path d="m12 5 7 7-7 7" />
               </svg>
             </Link>
-          </motion.div>
+          </div>
         )}
       </div>
     </section>

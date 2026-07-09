@@ -1,10 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { motion } from "framer-motion"
 import Link from "next/link"
 import { RoadtripCard } from "@/components/roadtrip/RoadtripCard"
-import { staggerContainer, fadeInUp } from "@/lib/animations"
 import type { Itinerary } from "@/types"
 
 export function FeaturedRoadtrips() {
@@ -25,12 +23,7 @@ export function FeaturedRoadtrips() {
       <div className="absolute inset-0 bg-gradient-to-r from-accent/[0.02] via-transparent to-secondary/[0.02]" />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mx-auto max-w-2xl text-center"
-        >
+        <div className="mx-auto max-w-2xl text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm text-primary shadow-sm mb-4">
             🏎️ Roadtrip Kurasi
           </span>
@@ -40,15 +33,9 @@ export function FeaturedRoadtrips() {
           <p className="mt-4 text-muted-foreground">
             Itinerary siap pakai dengan timeline, estimasi biaya, dan spot-spot menarik di sepanjang jalan.
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div
-          variants={staggerContainer}
-          initial="initial"
-          whileInView="whileInView"
-          viewport={{ once: true }}
-          className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-        >
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {loading ? (
             Array.from({ length: 6 }).map((_, i) => (
               <div
@@ -65,39 +52,25 @@ export function FeaturedRoadtrips() {
               </div>
             ))
           ) : roadtrips.length === 0 ? null : (
-            roadtrips.map((itinerary, i) => (
-              <motion.div key={itinerary.id} variants={fadeInUp}>
-                <RoadtripCard itinerary={itinerary} />
-              </motion.div>
+            roadtrips.map((itinerary) => (
+              <RoadtripCard key={itinerary.id} itinerary={itinerary} />
             ))
           )}
-        </motion.div>
+        </div>
 
         {!loading && roadtrips.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mt-12 text-center"
-          >
+          <div className="mt-12 text-center">
             <Link
               href="/roadtrip"
               className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
             >
               Lihat Semua Roadtrip
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M5 12h14" />
                 <path d="m12 5 7 7-7 7" />
               </svg>
             </Link>
-          </motion.div>
+          </div>
         )}
       </div>
     </section>
