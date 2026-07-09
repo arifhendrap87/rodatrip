@@ -6,6 +6,7 @@ import { SPOT_CATEGORIES } from "@/data/spots"
 import { SITE_NAME, SITE_URL } from "@/lib/constants"
 import { Breadcrumb } from "@/components/ui/Breadcrumb"
 import { SpotCard } from "@/components/spot/SpotCard"
+import { SpotHeroImage } from "@/components/spot/SpotHeroImage"
 import { getSpots, getSpotBySlug, getSpotCoordinates } from "@/lib/services/spots"
 import { getItinerariesBySpotSlug } from "@/lib/services/itineraries"
 import type { SpotData } from "@/lib/services/spots"
@@ -80,7 +81,7 @@ export default async function SpotDetailPage({ params }: { params: Promise<{ slu
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <section className="relative min-h-[50vh] flex items-end overflow-hidden">
-        <img src={spot.image_url || "/placeholder.svg"} alt={spot.name} className="absolute inset-0 w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg" }} />
+        <SpotHeroImage src={spot.image_url} alt={spot.name} />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 py-12 w-full">
           <div className="mb-4">
