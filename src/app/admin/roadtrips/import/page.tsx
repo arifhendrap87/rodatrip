@@ -229,7 +229,12 @@ function PreviewCard({ parsed }: { parsed: Record<string, unknown> }) {
                       {stop.visit_duration && <span>⏱️ {stop.visit_duration}</span>}
                       {stop.ticket_price && <span>🎟️ {stop.ticket_price}</span>}
                       {stop.physical_effort && <span>🏃 {stop.physical_effort}</span>}
+                      {stop.road_access && <span>🛣️ {stop.road_access}</span>}
+                      {stop.opening_hours && <span>🕐 {stop.opening_hours}</span>}
                     </div>
+                    {stop.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{stop.description}</p>}
+                    {stop.tips && <p className="text-xs text-muted-foreground mt-0.5">💡 {stop.tips}</p>}
+                    {stop.facilities && <div className="flex flex-wrap gap-1 mt-1">{String(stop.facilities).split(",").map((f: string) => <span key={f} className="rounded bg-muted px-1.5 py-0.5 text-[10px]">{f.trim()}</span>)}</div>}
                   </div>
                 </div>
               ))}
