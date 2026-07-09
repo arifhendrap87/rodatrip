@@ -2,6 +2,7 @@ import { success, badRequest, unauthorized, internalError, rateLimited } from "@
 import { getServerAdmin } from "@/lib/api/auth"
 import { adminLimiter } from "@/lib/api/rate-limit"
 import { uploadImage } from "@/lib/storage"
+import sharp from "sharp"
 
 export async function POST(request: Request) {
   const admin = await getServerAdmin()
@@ -17,15 +18,27 @@ export async function POST(request: Request) {
 
   if (!file) return badRequest("File required")
 
-  const maxSize = 5 * 1024 * 1024
-  if (file.size > maxSize) return badRequest("File maksimal 5MB")
+  const maxSize = 10 * 1024 * 1024
+  if (file.size > maxSize) return badRequest("File maksimal 10MB")
 
   const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"]
   if (!allowedTypes.includes(file.type)) return badRequest("Tipe file harus jpg, png, webp, atau avif")
 
   try {
-    const buffer = Buffer.from(await file.arrayBuffer())
-    const fileName = file.name.replace(/[^a-zA-Z0-9.-]/g, "-")
+    let buffer = Buffer.from(await file.arrayBuffer())
+    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg"
+    let fileName = file.name.replace(/[^a-zA-Z0-9.-]/g, "-").replace(/\.[^.]+$/, ".webp")
+
+    // Optimize with sharp: resize max 1200px + convert to WebP
+    const img = sharp(buffer)
+    const metadata = await img.metadata()
+    const width = metadata.width || 1920
+
+    if (width > 1200 || ext !== "webp") {
+      const resized = sharp(buffer).resize(Math.min(width, 1200), undefined, { withoutEnlargement: true })
+      buffer = await resized.webp({ quality: 80 }).toBuffer()
+    }
+
     const url = await uploadImage(buffer, fileName, folder)
 
     return success({ url })

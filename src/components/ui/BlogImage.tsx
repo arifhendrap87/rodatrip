@@ -11,6 +11,7 @@ export function BlogImage({ src, alt, className }: { src?: string; alt: string; 
         src={src}
         alt={alt}
         className={className || "w-full h-full object-cover"}
+        loading="lazy"
         onError={() => setErrored(true)}
       />
     )
