@@ -178,12 +178,10 @@ export async function getItineraries(options?: {
     if (error) return []
 
     const rows = data as ItineraryRow[]
-    const itineraries: Itinerary[] = []
-
-    for (const row of rows) {
-      const stops = await getStopsForItinerary(row.id)
-      itineraries.push(rowToItinerary(row, stops))
-    }
+    const allStops = await Promise.all(
+      rows.map((row) => getStopsForItinerary(row.id))
+    )
+    const itineraries = rows.map((row, i) => rowToItinerary(row, allStops[i]))
 
     return itineraries
   } catch {
