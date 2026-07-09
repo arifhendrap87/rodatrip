@@ -153,7 +153,8 @@ export default function NewBlogPage() {
         setForm((f) => ({
           ...f,
           slug: seo.slug || f.slug,
-          excerpt: seo.description || f.excerpt,
+          seo_title: seo.title || f.seo_title,
+          meta_description: seo.description || f.meta_description,
           tags: (seo.tags || []).join(", "),
         }))
       }
