@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useDebounce } from "@/hooks/useDebounce"
+import { toast } from "sonner"
 
 function spotScore(spot: any): number {
   const loc = spot.location as { coordinates?: number[] } | null
@@ -77,6 +78,8 @@ export default function SpotsPage() {
   const [hasMore, setHasMore] = useState(false)
   const [total, setTotal] = useState(0)
   const initialFetchDone = useRef(false)
+  const [selectedSlugs, setSelectedSlugs] = useState<Set<string>>(new Set())
+  const [batchLoading, setBatchLoading] = useState(false)
 
   useEffect(() => {
     fetch("/api/wilayah/provinces")
@@ -124,6 +127,41 @@ export default function SpotsPage() {
       const json = await res.json()
       if (res.ok) setContentStatus(json.data.status || {})
     } catch {}
+  }
+
+  // Selection
+  const allSelected = spots.length > 0 && selectedSlugs.size === spots.length
+
+  function toggleSelect(slug: string) {
+    setSelectedSlugs((prev) => {
+      const next = new Set(prev)
+      if (next.has(slug)) next.delete(slug)
+      else next.add(slug)
+      return next
+    })
+  }
+
+  function toggleSelectAll() {
+    if (allSelected) setSelectedSlugs(new Set())
+    else setSelectedSlugs(new Set(spots.map((s) => s.slug)))
+  }
+
+  async function handleBatch(action: "delete") {
+    if (selectedSlugs.size === 0) return
+    if (!confirm(`Hapus ${selectedSlugs.size} spot?`)) return
+    setBatchLoading(true)
+    try {
+      await fetch("/api/admin/spots/batch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, slugs: [...selectedSlugs] }),
+      })
+      setSelectedSlugs(new Set())
+      fetchSpots(offset)
+      fetchContentStatus()
+      toast.success(`${selectedSlugs.size} spot dihapus`)
+    } catch { toast.error("Gagal") }
+    setBatchLoading(false)
   }
 
   async function handleDelete(slug: string, name: string) {
@@ -210,6 +248,13 @@ export default function SpotsPage() {
         </CardContent>
       </Card>
 
+      {selectedSlugs.size > 0 && (
+        <div className="flex items-center gap-3 px-4 py-2.5 mb-4 rounded-lg border border-primary/20 bg-primary/5">
+          <span className="text-sm font-medium">{selectedSlugs.size} terpilih</span>
+          <Button size="sm" variant="destructive" onClick={() => handleBatch("delete")} disabled={batchLoading}>Hapus</Button>
+        </div>
+      )}
+
       {loading ? (
         <div className="py-12 text-center text-muted-foreground">
           Memuat spot...
@@ -235,13 +280,24 @@ Tambah Spot
         <Card>
           <CardContent className="p-0">
             <div className="divide-y">
+              {spots.length > 0 && (
+                <div className="flex items-center gap-3 px-4 py-2 bg-muted/30 text-xs text-muted-foreground">
+                  <input type="checkbox" checked={allSelected}
+                    onChange={toggleSelectAll}
+                    className="shrink-0 rounded border-gray-300" />
+                  <span>{allSelected ? `${spots.length} terpilih` : "Pilih semua"}</span>
+                </div>
+              )}
               {spots.map((spot) => {
                 const cat = CATEGORIES.find((c) => c.value === spot.category)
                 return (
                   <div
                     key={spot.id}
-                    className="flex items-center gap-4 p-4 transition-colors hover:bg-muted/50"
+                    className="flex items-center gap-3 p-4 transition-colors hover:bg-muted/50"
                   >
+                    <input type="checkbox" checked={selectedSlugs.has(spot.slug)}
+                      onChange={() => toggleSelect(spot.slug)}
+                      className="shrink-0 rounded border-gray-300" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <h3 className="font-medium truncate">{spot.name}</h3>
