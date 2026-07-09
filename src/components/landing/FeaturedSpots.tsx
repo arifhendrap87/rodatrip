@@ -47,6 +47,7 @@ export function FeaturedSpots() {
           variants={staggerContainer}
           initial="initial"
           whileInView="whileInView"
+          viewport={{ once: true }}
           className="mt-12 grid gap-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
         >
           {loading
