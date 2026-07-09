@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { ReadinessScore } from "@/components/ui/ReadinessScore"
 import { ArrowLeft, Save, Loader2, Plus, Trash2, ExternalLink, Copy, Check } from "lucide-react"
 import Link from "next/link"
 import { SpotSelect } from "@/components/admin/SpotSelect"
@@ -195,6 +196,18 @@ export default function EditRoadtripPage() {
         <Link href="/admin/roadtrips"><Button variant="ghost" size="icon"><ArrowLeft className="h-4 w-4" /></Button></Link>
         <div><h1 className="text-2xl font-bold font-heading">Edit Roadtrip</h1><p className="text-muted-foreground">Atur urutan spot dalam roadtrip</p></div>
       </div>
+
+      <ReadinessScore
+        checks={[
+          { label: "Judul", ok: !!form.title },
+          { label: "Cover", ok: !!form.coverImage },
+          { label: "Durasi", ok: !!form.itineraryDuration },
+          { label: "Stops", ok: stops.length > 0 },
+          { label: "Kondisi", ok: !!form.roadCondition },
+          { label: "Publish", ok: form.isPublished },
+        ]}
+      />
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <Card>
           <CardHeader><CardTitle>Informasi Roadtrip</CardTitle><CardDescription>Data makro perjalanan</CardDescription></CardHeader>

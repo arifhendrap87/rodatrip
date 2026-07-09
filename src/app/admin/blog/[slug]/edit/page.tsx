@@ -18,6 +18,7 @@ import {
 import { ArrowLeft, Save, Loader2, Sparkles, FileText, Image as ImageIcon, Copy, Check, Eye, ExternalLink, Tags as TagsIcon } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
+import { ReadinessScore } from "@/components/ui/ReadinessScore"
 
 export default function EditBlogPage() {
   const router = useRouter()
@@ -267,6 +268,19 @@ export default function EditBlogPage() {
           </Button>
         </div>
       </div>
+
+      <ReadinessScore
+        checks={[
+          { label: "Judul", ok: !!form.title },
+          { label: "Konten", ok: !!form.content },
+          { label: "Gambar", ok: !!form.image_url },
+          { label: "SEO Title", ok: !!form.seo_title },
+          { label: "Meta Desc", ok: !!form.meta_description },
+          { label: "Tags", ok: form.tags.split(",").filter(Boolean).length > 0 },
+          { label: "Kategori", ok: !!form.category },
+          { label: "Publish", ok: form.is_published },
+        ]}
+      />
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* AI Assist */}

@@ -22,6 +22,7 @@ import TiptapEditor from "@/components/ui/tiptap/tiptap-editor"
 import { ImageUpload } from "@/components/ui/image-upload"
 import { ImageGallery, type GalleryImage } from "@/components/admin/ImageGallery"
 import { toast } from "sonner"
+import { ReadinessScore } from "@/components/ui/ReadinessScore"
 
 const CATEGORIES = [
   { value: "alam", label: "Alam" },
@@ -188,6 +189,18 @@ export default function EditSpotPage() {
           <p className="text-muted-foreground">{form.name}</p>
         </div>
       </div>
+
+      <ReadinessScore
+        checks={[
+          { label: "Nama", ok: !!form.name },
+          { label: "Deskripsi", ok: !!form.description },
+          { label: "Gambar", ok: !!form.image_url },
+          { label: "Kategori", ok: !!form.category },
+          { label: "Provinsi", ok: !!form.province },
+          { label: "Koordinat", ok: !!form.lat && !!form.lng && parseFloat(form.lat) !== 0 },
+          { label: "Rating", ok: parseFloat(form.rating) > 0 },
+        ]}
+      />
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <Card>
