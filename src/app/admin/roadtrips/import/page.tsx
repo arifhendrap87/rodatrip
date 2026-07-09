@@ -73,7 +73,7 @@ export default function ImportRoadtripPage() {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2 items-start">
         <Card>
           <CardHeader>
             <CardTitle>Input JSON</CardTitle>
@@ -182,10 +182,11 @@ export default function ImportRoadtripPage() {
 }
 
 function PreviewCard({ parsed }: { parsed: Record<string, unknown> }) {
-  const stops = (parsed.stops as Record<string, unknown>[]) || []
+  const p = parsed as Record<string, string>
+  const stops = (parsed.stops as Array<Record<string, string>>) || []
 
   return (
-    <>
+    <div className="space-y-4">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -195,17 +196,17 @@ function PreviewCard({ parsed }: { parsed: Record<string, unknown> }) {
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="space-y-1">
-            <p className="text-lg font-bold font-heading">{parsed.title as string}</p>
+            <p className="text-lg font-bold font-heading">{p.title || "(tanpa judul)"}</p>
             <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-              {parsed.itinerary_duration as string && <span>⏱️ {parsed.itinerary_duration as string}</span>}
-              {parsed.total_distance as string && <span>📏 {parsed.total_distance as string}</span>}
-              {parsed.estimated_cost as string && <span>💰 {parsed.estimated_cost as string}</span>}
+              {p.itinerary_duration && <span>⏱️ {p.itinerary_duration}</span>}
+              {p.total_distance && <span>📏 {p.total_distance}</span>}
+              {p.estimated_cost && <span>💰 {p.estimated_cost}</span>}
             </div>
           </div>
 
-          {parsed.maps_embed_url as string && (
+          {p.maps_embed_url && (
             <div className="rounded-lg bg-blue-50 border border-blue-100 p-2 text-xs text-blue-600 truncate">
-              📍 {parsed.maps_embed_url as string}
+              📍 {p.maps_embed_url}
             </div>
           )}
 
@@ -213,34 +214,25 @@ function PreviewCard({ parsed }: { parsed: Record<string, unknown> }) {
             <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">
               Destinasi ({stops.length})
             </p>
-            <div className="space-y-2">
-              {stops.map((raw, i) => {
-                const stop = raw as Record<string, string | string[] | undefined>
-                return (
+            <div className="space-y-2 max-h-[400px] overflow-y-auto">
+              {stops.map((stop, i) => (
                 <div key={i} className="flex gap-3 rounded-xl border border-border/40 p-3">
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                     {i + 1}
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium">{stop.name as string}</p>
-                      <span className="text-[10px] uppercase text-muted-foreground">{stop.category as string}</span>
+                  <div className="min-w-0 flex-1 break-words">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <p className="text-sm font-medium">{stop.name || "(tanpa nama)"}</p>
+                      {stop.category && <span className="text-[10px] uppercase px-1.5 py-0.5 rounded bg-muted text-muted-foreground">{stop.category}</span>}
                     </div>
-                    <div className="flex flex-wrap gap-x-3 text-xs text-muted-foreground mt-0.5">
-                      {stop.visit_duration && <span>⏱️ {stop.visit_duration as string}</span>}
-                      {stop.ticket_price && <span>🎟️ {stop.ticket_price as string}</span>}
-                      {stop.physical_effort && <span>🏃 {stop.physical_effort as string}</span>}
+                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground mt-1">
+                      {stop.visit_duration && <span>⏱️ {stop.visit_duration}</span>}
+                      {stop.ticket_price && <span>🎟️ {stop.ticket_price}</span>}
+                      {stop.physical_effort && <span>🏃 {stop.physical_effort}</span>}
                     </div>
-                    {Array.isArray((raw as Record<string, unknown>).nearby_hotels) && ((raw as Record<string, unknown>).nearby_hotels as unknown[]).length > 0 && (
-                      <p className="text-xs text-blue-500 mt-1">🏨 {((raw as Record<string, unknown>).nearby_hotels as unknown[]).length} hotel</p>
-                    )}
-                    {Array.isArray((raw as Record<string, unknown>).nearby_restaurants) && ((raw as Record<string, unknown>).nearby_restaurants as unknown[]).length > 0 && (
-                      <p className="text-xs text-orange-500">🍜 {((raw as Record<string, unknown>).nearby_restaurants as unknown[]).length} restoran</p>
-                    )}
                   </div>
                 </div>
-                )
-              })}
+              ))}
             </div>
           </div>
         </CardContent>
@@ -260,6 +252,6 @@ function PreviewCard({ parsed }: { parsed: Record<string, unknown> }) {
           <p>✏️ Setelah import, edit roadtrip untuk meninjau dan publikasikan</p>
         </CardContent>
       </Card>
-    </>
+    </div>
   )
 }
