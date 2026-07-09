@@ -87,6 +87,8 @@ export default function BlogAdminPage() {
   const [offset, setOffset] = useState(0)
   const [hasMore, setHasMore] = useState(false)
   const [total, setTotal] = useState(0)
+  const [selectedSlugs, setSelectedSlugs] = useState<Set<string>>(new Set())
+  const [batchLoading, setBatchLoading] = useState(false)
   const debouncedSearch = useDebounce(search, 300)
 
   function buildParams(pageOffset = 0) {
@@ -130,19 +132,55 @@ export default function BlogAdminPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearch, category, status, sort])
 
-  async function handleDelete(slug: string, title: string) {
-    if (!confirm(`Hapus "${title}"?`)) return
-    try {
-      const res = await fetch(`/api/admin/blog/${slug}`, { method: "DELETE" })
-      if (res.ok) {
-        setPosts((prev) => prev.filter((p) => p.slug !== slug))
-        toast.success("Blog dihapus")
-      } else {
-        throw new Error(res.statusText)
-      }
-    } catch {
-      toast.error("Gagal menghapus blog")
+  // Selection
+  const allSelected = posts.length > 0 && selectedSlugs.size === posts.length
+
+  function toggleSelect(slug: string) {
+    setSelectedSlugs((prev) => {
+      const next = new Set(prev)
+      if (next.has(slug)) next.delete(slug)
+      else next.add(slug)
+      return next
+    })
+  }
+
+  function toggleSelectAll() {
+    if (allSelected) {
+      setSelectedSlugs(new Set())
+    } else {
+      setSelectedSlugs(new Set(posts.map((p) => p.slug)))
     }
+  }
+
+  async function handleBatch(action: "publish" | "unpublish" | "delete") {
+    if (selectedSlugs.size === 0) return
+    if (action === "delete" && !confirm(`Hapus ${selectedSlugs.size} blog?`)) return
+
+    setBatchLoading(true)
+    try {
+      await fetch("/api/admin/blog/batch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, slugs: [...selectedSlugs] }),
+      })
+      setSelectedSlugs(new Set())
+      fetchPosts(offset)
+      const label = action === "delete" ? "dihapus" : action === "publish" ? "dipublikasi" : "diunpublikasi"
+      toast.success(`${selectedSlugs.size} blog ${label}`)
+    } catch {
+      toast.error("Gagal memproses")
+    }
+    setBatchLoading(false)
+  }
+
+  async function handleSinglePublish(slug: string, publish: boolean) {
+    await fetch(`/api/admin/blog/${slug}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ is_published: publish }),
+    })
+    fetchPosts(offset)
+    toast.success(publish ? "Dipublikasi" : "Diunpublikasi")
   }
 
   return (
@@ -179,6 +217,16 @@ export default function BlogAdminPage() {
         </CardContent>
       </Card>
 
+      {/* Batch action bar */}
+      {selectedSlugs.size > 0 && (
+        <div className="flex items-center gap-3 px-4 py-2.5 mb-4 rounded-lg border border-primary/20 bg-primary/5">
+          <span className="text-sm font-medium">{selectedSlugs.size} terpilih</span>
+          <Button size="sm" variant="default" onClick={() => handleBatch("publish")} disabled={batchLoading}>Publish</Button>
+          <Button size="sm" variant="secondary" onClick={() => handleBatch("unpublish")} disabled={batchLoading}>Unpublish</Button>
+          <Button size="sm" variant="destructive" onClick={() => handleBatch("delete")} disabled={batchLoading}>Hapus</Button>
+        </div>
+      )}
+
       {loading ? (
         <div className="py-12 text-center text-muted-foreground">Memuat blog...</div>
       ) : posts.length === 0 ? (
@@ -195,14 +243,29 @@ export default function BlogAdminPage() {
         <Card>
           <CardContent className="p-0">
             <div className="divide-y">
+              {posts.length > 0 && (
+                <div className="flex items-center gap-3 px-4 py-2 bg-muted/30 text-xs text-muted-foreground">
+                  <input type="checkbox" checked={allSelected}
+                    onChange={toggleSelectAll}
+                    className="shrink-0 rounded border-gray-300" />
+                  <span>{allSelected ? `${posts.length} terpilih` : "Pilih semua"}</span>
+                </div>
+              )}
               {posts.map((post) => (
-                <div key={post.slug} className="flex items-start gap-4 p-4 hover:bg-muted/50 transition-colors">
+                <div key={post.slug} className="flex items-start gap-3 p-4 hover:bg-muted/50 transition-colors">
+                  <input type="checkbox" checked={selectedSlugs.has(post.slug)}
+                    onChange={() => toggleSelect(post.slug)}
+                    className="mt-1 shrink-0 rounded border-gray-300" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <h3 className="font-medium truncate">{post.title || "(tanpa judul)"}</h3>
-                      <Badge variant={post.is_published ? "default" : "secondary"}>
+                      <Badge variant={post.is_published ? "default" : "secondary"} className="shrink-0">
                         {post.is_published ? "Published" : "Draft"}
                       </Badge>
+                      <button onClick={() => handleSinglePublish(post.slug, !post.is_published)}
+                        className="text-xs text-muted-foreground hover:text-primary shrink-0">
+                        {post.is_published ? "Unpublish" : "Publish"}
+                      </button>
                       <span className="text-xs text-muted-foreground bg-muted rounded px-1.5 py-0.5">{post.category}</span>
                     </div>
 
@@ -255,7 +318,16 @@ export default function BlogAdminPage() {
                       <Edit className="h-4 w-4" />
                     </Link>
                     <Button variant="ghost" size="icon" className="text-destructive h-8 w-8"
-                      onClick={() => handleDelete(post.slug, post.title)}>
+                      onClick={async () => {
+                        if (!confirm(`Hapus "${post.title}"?`)) return
+                        await fetch("/api/admin/blog/batch", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ action: "delete", slugs: [post.slug] }),
+                        })
+                        fetchPosts(offset)
+                        toast.success("Blog dihapus")
+                      }}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
