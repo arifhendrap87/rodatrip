@@ -1,16 +1,17 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { api } from "@/lib/api/client"
 import { staggerContainer, fadeInUp } from "@/lib/animations"
 import type { BlogPostData } from "@/lib/services/blog"
+import { BlogImage } from "@/components/ui/BlogImage"
 
 export function BlogSection() {
   const [posts, setPosts] = useState<BlogPostData[]>([])
   const [loading, setLoading] = useState(true)
-  const [erroredImages, setErroredImages] = useState<Set<string>>(new Set())
+
 
   useEffect(() => {
     api.blog
@@ -72,19 +73,7 @@ export function BlogSection() {
                   >
                     {/* Cover image */}
                     <div className="relative aspect-[16/9] overflow-hidden">
-                      {post.image_url && !erroredImages.has(post.slug) ? (
-                        <img
-                          src={post.image_url}
-                          alt={post.title}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                          loading="lazy"
-                          onError={() => setErroredImages((prev) => new Set(prev).add(post.slug))}
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
-                          <span className="text-5xl opacity-30">🚗</span>
-                        </div>
-                      )}
+                      <BlogImage src={post.image_url} alt={post.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                       <div className="absolute top-3 left-3">
                         <span className="inline-flex items-center rounded-full bg-white/90 backdrop-blur-sm px-2.5 py-0.5 text-xs font-medium text-foreground shadow-sm">
                           {post.category}

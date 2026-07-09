@@ -4,6 +4,7 @@ import type { Metadata } from "next"
 import { SITE_NAME, SITE_URL } from "@/lib/constants"
 import { getPosts, getPostBySlug } from "@/lib/services/blog"
 import { Breadcrumb } from "@/components/ui/Breadcrumb"
+import { BlogImage } from "@/components/ui/BlogImage"
 import { SpotCard } from "@/components/spot/SpotCard"
 import { RoadtripCard } from "@/components/roadtrip/RoadtripCard"
 import { getSpots } from "@/lib/services/spots"
@@ -106,13 +107,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         </div>
 
         <div className="mt-8 aspect-[16/9] rounded-2xl overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10">
-          {post.image_url ? (
-            <img src={post.image_url} alt={post.title} className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <span className="text-6xl opacity-30">🚗</span>
-            </div>
-          )}
+          <BlogImage src={post.image_url} alt={post.title} className="w-full h-full object-cover" />
         </div>
 
         <div className="mt-10 prose prose-gray max-w-none">
