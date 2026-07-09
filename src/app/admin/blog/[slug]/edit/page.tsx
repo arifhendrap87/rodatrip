@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import TiptapEditor from "@/components/ui/tiptap/tiptap-editor"
+import { ImageUpload } from "@/components/ui/image-upload"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Select,
@@ -385,10 +386,12 @@ export default function EditBlogPage() {
                   </Button>
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label>Cover Image URL</Label>
-                <Input value={form.image_url} onChange={(e) => setForm((f) => ({ ...f, image_url: e.target.value }))} />
-              </div>
+              <ImageUpload
+                value={form.image_url}
+                onChange={(v) => setForm((f) => ({ ...f, image_url: v }))}
+                label="Cover Image"
+                folder="blog"
+              />
             </div>
 
             <div className="border-t pt-4 space-y-3">
