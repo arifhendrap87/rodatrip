@@ -127,16 +127,6 @@ export function RoadtripDetailClient({ itinerary }: RoadtripDetailClientProps) {
           </div>
         )}
 
-        {itinerary.estimatedCost && (
-          <div className="flex items-start gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-5">
-            <span className="text-2xl shrink-0">💰</span>
-            <div>
-              <p className="text-sm font-semibold font-heading">Estimasi Biaya</p>
-              <p className="text-sm text-muted-foreground mt-1">{itinerary.estimatedCost}</p>
-            </div>
-          </div>
-        )}
-
         {itinerary.bestDrivingTime && (
           <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-5">
             <span className="text-2xl shrink-0">🌅</span>
