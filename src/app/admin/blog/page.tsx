@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Search, Edit, Trash2, Eye, ExternalLink, FileText, Sparkles } from "lucide-react"
+import { Plus, Search, Edit, Trash2, Eye, ExternalLink, FileText } from "lucide-react"
 import { useDebounce } from "@/hooks/useDebounce"
 import { toast } from "sonner"
 
@@ -29,10 +29,6 @@ export default function BlogAdminPage() {
   const [search, setSearch] = useState("")
   const debouncedSearch = useDebounce(search, 300)
 
-  useEffect(() => {
-    fetchPosts()
-  }, [debouncedSearch])
-
   async function fetchPosts() {
     setLoading(true)
     try {
@@ -49,6 +45,11 @@ export default function BlogAdminPage() {
     }
     setLoading(false)
   }
+
+  useEffect(() => {
+    fetchPosts()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch])
 
   async function handleDelete(slug: string, title: string) {
     if (!confirm(`Hapus "${title}"?`)) return

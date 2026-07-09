@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect, useCallback } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
@@ -18,6 +18,11 @@ interface Session {
   created_at: string
 }
 
+interface ApiMessage {
+  role: string
+  content: string
+}
+
 export default function ChatPage() {
   const [sessions, setSessions] = useState<Session[]>([])
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null)
@@ -29,20 +34,14 @@ export default function ChatPage() {
   const [sideOpen, setSideOpen] = useState(true)
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const initialized = useRef(false)
 
   // Load sessions
-  const loadSessions = useCallback(async () => {
-    try {
-      const res = await fetch("/api/chat/sessions")
-      const json = await res.json()
-      if (json.data) setSessions(json.data)
-    } catch {}
-  }, [])
-
   useEffect(() => {
-    loadSessions()
-  }, [loadSessions])
+    fetch("/api/chat/sessions")
+      .then((r) => r.json())
+      .then((json) => { if (json.data) setSessions(json.data) })
+      .catch(() => {})
+  }, [])
 
   // Load messages when session changes
   useEffect(() => {
@@ -52,7 +51,10 @@ export default function ChatPage() {
       .then((r) => r.json())
       .then((json) => {
         if (json.data?.messages) {
-          setMessages(json.data.messages.map((m: any) => ({ role: m.role, content: m.content })))
+          setMessages(json.data.messages.map((m: ApiMessage) => ({
+            role: m.role as "user" | "assistant",
+            content: m.content,
+          })))
         }
       })
       .catch(() => setMessages([]))
@@ -82,7 +84,7 @@ export default function ChatPage() {
       if (json.data?.id) {
         setActiveSessionId(json.data.id)
         setMessages([])
-        loadSessions()
+        fetch("/api/chat/sessions").then((r) => r.json()).then((j) => { if (j.data) setSessions(j.data) }).catch(() => {})
         return json.data.id
       }
     } catch {}
@@ -133,7 +135,7 @@ export default function ChatPage() {
       const reply = json.data.reply
       setMessages((prev) => [...prev, { role: "assistant", content: reply }])
       saveMessage(sessionId, "assistant", reply)
-      loadSessions()
+      fetch("/api/chat/sessions").then((r) => r.json()).then((j) => { if (j.data) setSessions(j.data) }).catch(() => {})
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Gagal chat")
     }
@@ -143,7 +145,6 @@ export default function ChatPage() {
   async function handleNewChat() {
     setActiveSessionId(null)
     setMessages([])
-    initialized.current = false
   }
 
   async function handleDeleteSession(id: string) {
@@ -152,7 +153,7 @@ export default function ChatPage() {
       setActiveSessionId(null)
       setMessages([])
     }
-    loadSessions()
+    fetch("/api/chat/sessions").then((r) => r.json()).then((j) => { if (j.data) setSessions(j.data) }).catch(() => {})
     toast.success("Sesi dihapus")
   }
 
@@ -224,7 +225,7 @@ export default function ChatPage() {
               <span className="text-4xl mb-4">🤖</span>
               <p className="text-lg font-medium">AI Chat RodaTrip</p>
               <p className="text-sm mt-1 max-w-md">
-                Klik "Chat Baru" untuk memulai percakapan. Tanya apapun tentang konten!
+                {`Klik "Chat Baru" untuk memulai percakapan. Tanya apapun tentang konten!`}
               </p>
             </div>
           ) : loadingMsgs ? (

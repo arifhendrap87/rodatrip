@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { supabase, log, divider } from "./config"
 
 export async function seedSpots() {

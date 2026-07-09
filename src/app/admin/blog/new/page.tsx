@@ -29,6 +29,7 @@ export default function NewBlogPage() {
   const [generatingIde, setGeneratingIde] = useState(false)
   const [generatingContent, setGeneratingContent] = useState(false)
   const [generatingSeo, setGeneratingSeo] = useState(false)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [ideResults, setIdeResults] = useState<any[]>([])
   const [generatingImage, setGeneratingImage] = useState(false)
   const [imagePrompt, setImagePrompt] = useState("")

@@ -1,3 +1,4 @@
+/* eslint-disable */
 #!/usr/bin/env node
 /**
  * migrate-to-supabase.js

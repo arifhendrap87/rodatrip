@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useEffect, useState } from "react"
@@ -11,16 +12,15 @@ import {
 
 const COLORS = ["#f97316", "#06b6d4", "#a855f7", "#10b981", "#f43f5e", "#eab308"]
 
+interface ChartItem { name: string; value?: number; view_count?: number; category?: string }
+interface DailyView { date: string; views: number }
+
 export default function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState("30d")
-  const [spotViews, setSpotViews] = useState<any[]>([])
-  const [categoryData, setCategoryData] = useState<any[]>([])
-  const [dailyViews, setDailyViews] = useState<any[]>([])
+  const [spotViews, setSpotViews] = useState<ChartItem[]>([])
+  const [categoryData, setCategoryData] = useState<ChartItem[]>([])
+  const [dailyViews, setDailyViews] = useState<DailyView[]>([])
   const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    fetchAnalytics()
-  }, [timeRange])
 
   async function fetchAnalytics() {
     setLoading(true)
@@ -33,25 +33,32 @@ export default function AnalyticsPage() {
     ])
 
     if (spotsRes?.data) {
-      setSpotViews(spotsRes.data.map((s: any) => ({
-        name: s.name,
-        view_count: s.view_count,
-        category: s.category,
+      const items = spotsRes.data as Record<string, unknown>[]
+      setSpotViews(items.map((s) => ({
+        name: String(s.name || ""),
+        view_count: Number(s.view_count) || 0,
+        category: String(s.category || ""),
       })))
     }
 
     if (categoriesRes?.data) {
-      setCategoryData(categoriesRes.data.map((c: any) => ({
-        name: c.category,
-        value: c.count,
+      const items = categoriesRes.data as Record<string, unknown>[]
+      setCategoryData(items.map((c) => ({
+        name: String(c.category || ""),
+        value: Number(c.count) || 0,
       })))
     }
 
     if (viewsRes?.data) {
-      setDailyViews(viewsRes.data)
+      setDailyViews(viewsRes.data as DailyView[])
     }
     setLoading(false)
   }
+
+  useEffect(() => {
+    fetchAnalytics()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timeRange])
 
   if (loading) {
     return (

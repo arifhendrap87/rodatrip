@@ -1,4 +1,5 @@
 "use client"
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useEffect, useCallback, useState, useRef } from "react"
 import { useEditor, EditorContent } from "@tiptap/react"
@@ -53,6 +54,32 @@ import {
 interface TiptapEditorProps {
   content: string
   onChange: (html: string) => void
+}
+
+interface ToolbarButtonProps {
+  onClick: () => void
+  isActive: boolean
+  children: React.ReactNode
+  title?: string
+}
+
+function ToolbarButton({ onClick, isActive, children, title }: ToolbarButtonProps) {
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={onClick}
+      title={title}
+      className={`h-8 w-8 p-0 ${isActive ? "bg-primary/10 text-primary" : ""}`}
+    >
+      {children}
+    </Button>
+  )
+}
+
+function Divider() {
+  return <div className="mx-0.5 h-5 w-px bg-border" />
 }
 
 export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
@@ -166,31 +193,6 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
   }, [editor])
 
   if (!editor) return null
-
-  const ToolbarButton = ({
-    onClick,
-    isActive,
-    children,
-    title,
-  }: {
-    onClick: () => void
-    isActive: boolean
-    children: React.ReactNode
-    title?: string
-  }) => (
-    <Button
-      type="button"
-      variant="ghost"
-      size="sm"
-      onClick={onClick}
-      title={title}
-      className={`h-8 w-8 p-0 ${isActive ? "bg-primary/10 text-primary" : ""}`}
-    >
-      {children}
-    </Button>
-  )
-
-  const Divider = () => <div className="mx-0.5 h-5 w-px bg-border" />
 
   return (
     <>

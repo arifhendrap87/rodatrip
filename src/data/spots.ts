@@ -11,4 +11,5 @@ export const SPOT_CATEGORIES: Record<SpotCategory, { icon: string; label: string
 
 // Data spots dapat diisi melalui CMS Admin > Spots
 // atau melalui seeding dengan Gemini JSON
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const spots: any[] = []

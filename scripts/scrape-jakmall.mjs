@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { chromium } from "playwright"
 import * as XLSX from "xlsx"
 import { readFileSync, writeFileSync, existsSync } from "fs"

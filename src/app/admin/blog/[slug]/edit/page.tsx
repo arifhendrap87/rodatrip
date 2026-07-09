@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { ArrowLeft, Save, Loader2, Sparkles, FileText, Trash2, Image as ImageIcon, Copy, Check, Eye, ExternalLink, Tags as TagsIcon } from "lucide-react"
+import { ArrowLeft, Save, Loader2, Sparkles, FileText, Image as ImageIcon, Copy, Check, Eye, ExternalLink, Tags as TagsIcon } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 

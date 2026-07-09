@@ -16,7 +16,7 @@ function isAllowedOrigin(origin: string): boolean {
 }
 
 export async function middleware(request: NextRequest) {
-  const { pathname, origin } = request.nextUrl
+  const { pathname } = request.nextUrl
   const response = NextResponse.next()
 
   // Set pathname header for root layout

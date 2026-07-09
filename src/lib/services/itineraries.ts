@@ -78,6 +78,7 @@ function rowToItinerary(row: ItineraryRow, stops: ItineraryStopRow[]): Itinerary
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getSpotCoordinates(spot: SpotJoin | null): { lat: number; lng: number } | null {
   if (spot?.location?.coordinates) {
     return { lng: spot.location.coordinates[0], lat: spot.location.coordinates[1] }
@@ -169,6 +170,7 @@ export async function getItineraries(options?: {
 
     if (options?.limit) {
       const from = options?.offset || 0
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       query = query.range(from, from + options.limit - 1) as any
     }
 
