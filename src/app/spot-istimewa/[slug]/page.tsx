@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       locale: "id_ID",
       images: spot.image_url
         ? [{ url: spot.image_url, width: 1200, height: 630 }]
-        : [{ url: `${SITE_URL}/og-default.jpg`, width: 1200, height: 630 }],
+        : [{ url: `${SITE_URL}/og-default.png`, width: 1200, height: 630 }],
     },
     twitter: {
       card: "summary_large_image",

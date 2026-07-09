@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const metaDesc = `Panduan roadtrip ${itinerary.title}: ${itinerary.itineraryDuration}, ${itinerary.totalDistance}, ${itinerary.roadCondition || "cek detail rute"}.`
   const ogImage = itinerary.coverImage
     ? [{ url: itinerary.coverImage, width: 1200, height: 630 }]
-    : [{ url: `${SITE_URL}/og-default.jpg`, width: 1200, height: 630 }]
+    : [{ url: `${SITE_URL}/og-default.png`, width: 1200, height: 630 }]
 
   return {
     title: `${itinerary.title} — Roadtrip ${SITE_NAME}`,
