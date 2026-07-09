@@ -22,7 +22,7 @@ export default function LandingPage() {
         <FeaturedSpots />
       </div>
 
-      <div className="bg-[#F0EDE8]">
+      <div className="bg-[#FDFBF7]">
         <BlogSection />
       </div>
 
