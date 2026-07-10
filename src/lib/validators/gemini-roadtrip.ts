@@ -2,6 +2,8 @@ import { z } from "zod"
 
 const geminiNearbyRestaurantSchema = z.object({
   name: z.string().min(1),
+  lat: z.number().optional(),
+  lng: z.number().optional(),
   distance: z.string().optional(),
   price: z.string().optional(),
   maps_url: z.string().optional(),
@@ -9,6 +11,8 @@ const geminiNearbyRestaurantSchema = z.object({
 
 const geminiNearbyHotelSchema = z.object({
   name: z.string().min(1),
+  lat: z.number().optional(),
+  lng: z.number().optional(),
   distance: z.string().optional(),
   price: z.string().optional(),
   maps_url: z.string().optional(),
@@ -17,7 +21,9 @@ const geminiNearbyHotelSchema = z.object({
 
 const geminiStopSchema = z.object({
   name: z.string().min(1),
-  category: z.enum(["alam", "kuliner", "budaya", "foto", "petualangan", "sejarah"]),
+  lat: z.number().optional(),
+  lng: z.number().optional(),
+  category: z.enum(["alam", "kuliner", "budaya", "foto", "petualangan", "sejarah", "hotel", "restaurant"]),
   province: z.string().min(1),
   city: z.string().optional(),
   description: z.string().optional(),

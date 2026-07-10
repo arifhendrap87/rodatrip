@@ -51,10 +51,12 @@ function getCoords(province: string): { lat: number; lng: number } {
 }
 
 function transformStopForDb(stop: Record<string, unknown>, province: string) {
-  const { nearby_hotels, nearby_restaurants, ...fields } = stop
+  const { nearby_hotels, nearby_restaurants, lat, lng, ...fields } = stop
   const name = (fields.name as string) || ""
   const description = (fields.description as string) || name
-  const coords = getCoords(province)
+  const coords = (lat && lng)
+    ? { lat: Number(lat), lng: Number(lng) }
+    : getCoords(province)
   return {
     ...fields,
     description,

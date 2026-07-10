@@ -7,6 +7,8 @@ export const SPOT_CATEGORIES: Record<SpotCategory, { icon: string; label: string
   foto: { icon: "📸", label: "Spot Fotografi", gradient: "from-purple-500/20 to-pink-500/10", color: "text-purple-600" },
   petualangan: { icon: "🏞️", label: "Petualangan", gradient: "from-blue-500/20 to-cyan-500/10", color: "text-blue-600" },
   sejarah: { icon: "🏛️", label: "Sejarah & Budaya", gradient: "from-amber-500/20 to-orange-500/10", color: "text-amber-600" },
+  hotel: { icon: "🏨", label: "Hotel & Penginapan", gradient: "from-blue-500/20 to-indigo-500/10", color: "text-blue-600" },
+  restaurant: { icon: "🍽️", label: "Restoran", gradient: "from-red-500/20 to-orange-500/10", color: "text-red-600" },
 }
 
 // Data spots dapat diisi melalui CMS Admin > Spots

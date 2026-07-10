@@ -50,7 +50,7 @@ export interface NavLink {
   label: string
 }
 
-export type SpotCategory = "alam" | "kuliner" | "budaya" | "foto" | "petualangan" | "sejarah"
+export type SpotCategory = "alam" | "kuliner" | "budaya" | "foto" | "petualangan" | "sejarah" | "hotel" | "restaurant"
 
 export interface Spot {
   slug: string

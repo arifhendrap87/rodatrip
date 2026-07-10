@@ -31,6 +31,8 @@ const CATEGORIES = [
   { value: "foto", label: "Spot Foto" },
   { value: "petualangan", label: "Petualangan" },
   { value: "sejarah", label: "Sejarah" },
+  { value: "hotel", label: "Hotel" },
+  { value: "restaurant", label: "Restoran" },
 ]
 
 export default function EditSpotPage() {

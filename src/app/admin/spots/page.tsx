@@ -48,6 +48,8 @@ const CATEGORIES = [
   { value: "foto", label: "Spot Foto", color: "pink" },
   { value: "petualangan", label: "Petualangan", color: "blue" },
   { value: "sejarah", label: "Sejarah", color: "amber" },
+  { value: "hotel", label: "Hotel", color: "indigo" },
+  { value: "restaurant", label: "Restoran", color: "red" },
 ]
 
 const SORT_OPTIONS = [

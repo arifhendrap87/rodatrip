@@ -44,7 +44,7 @@ function stars(rating?: number): string {
 }
 
 const CATEGORY_EMOJI: Record<string, string> = {
-  alam: "🏔️", kuliner: "🍜", budaya: "🏛️", foto: "📸", petualangan: "🏞️", sejarah: "🏛️",
+  alam: "🏔️", kuliner: "🍜", budaya: "🏛️", foto: "📸", petualangan: "🏞️", sejarah: "🏛️", hotel: "🏨", restaurant: "🍽️",
 }
 
 const ENGAGEMENT_HOOKS: Record<string, string[]> = {
@@ -134,6 +134,8 @@ function categoryHook(source: ContentSource): string {
     foto: `${emoji} ${title} — spot foto paling estetik! ${desc ? `\n${desc}` : ""}`,
     petualangan: `${emoji} ${title} — tantangan seru buat jiwa petualang! ${desc || ""}`,
     sejarah: `${emoji} ${title} — menyimpan cerita dari masa lalu. ${desc ? `\n${desc.slice(0, 100)}` : ""}`,
+    hotel: `${emoji} ${title} — tempat menginap paling nyaman! ${desc ? `\n${desc}` : ""}`,
+    restaurant: `${emoji} ${title} — kuliner yang wajib kamu cobain! ${desc ? `\n${desc.slice(0, 100)}` : ""}`,
   }
   return hooks[cat] || `${emoji} ${title} — ${desc || "wajib dikunjungi!"}`
 }
@@ -464,6 +466,7 @@ export function generateHashtags(source: ContentSource, platform: string): strin
     const catTags: Record<string, string> = {
       alam: "#SpotAlam", kuliner: "#KulinerNusantara", budaya: "#BudayaIndonesia",
       foto: "#SpotFoto", petualangan: "#Petualangan", sejarah: "#Sejarah",
+      hotel: "#HotelMurah", restaurant: "#KulinerEnak",
     }
     if (catTags[source.category]) base.push(catTags[source.category])
   }
@@ -657,6 +660,8 @@ export function renderVisualPrompt(source: ContentSource, platform: string): str
     foto: "scenic viewpoint, photography spot",
     petualangan: "adventure travel, outdoor activity",
     sejarah: "historical site, ancient temple",
+    hotel: "luxury hotel, accommodation, resort",
+    restaurant: "restaurant interior, food plating, dining",
   }
   const catKw = catKeywords[cat] || "travel destination, Indonesia"
   const directPrompt = `\n\n🤖 DIRECT AI PROMPT (copy → paste ke Midjourney / DALL-E / Leonardo AI)\n${title}, ${catKw}, ${prov}, Indonesia, realistic photo, natural lighting, high quality, 8K, professional photography, no cartoon, no illustration ${aspect}`
@@ -668,6 +673,8 @@ export function renderVisualPrompt(source: ContentSource, platform: string): str
     foto: "scenic, photogenic",
     petualangan: "adventure, outdoor",
     sejarah: "historical, ancient",
+    hotel: "comfortable stay, modern interior",
+    restaurant: "cozy dining, delicious food",
   }
   const adj = catAdj[cat] || "travel, destination"
 
@@ -758,6 +765,8 @@ export function getAutoTone(source: ContentSource): string {
     foto: "inspirasi",
     petualangan: "promo",
     sejarah: "edukasi",
+    hotel: "promo",
+    restaurant: "promo",
   }
   return toneMap[cat] || "promo"
 }
