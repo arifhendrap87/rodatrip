@@ -4,6 +4,7 @@
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { api } from "@/lib/api/client"
+import { parseLocation } from "@/lib/utils/location"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -20,11 +21,10 @@ import { useDebounce } from "@/hooks/useDebounce"
 import { toast } from "sonner"
 
 function spotScore(spot: any): number {
-  const loc = spot.location as { coordinates?: number[] } | null
-  const latLngValid = !!loc?.coordinates && loc.coordinates[0] !== 0 && loc.coordinates[1] !== 0
+  const parsed = parseLocation(spot.location)
   const checks = [
     !!spot.name, !!spot.description, !!spot.image_url,
-    !!spot.category, !!spot.province, latLngValid, (spot.rating || 0) > 0,
+    !!spot.category, !!spot.province, parsed !== null, (spot.rating || 0) > 0,
   ]
   return Math.round((checks.filter(Boolean).length / checks.length) * 100)
 }
@@ -74,6 +74,9 @@ export default function SpotsPage() {
   const [provinceFilter, setProvinceFilter] = useState("all")
   const [provinceList, setProvinceList] = useState<{ code: string; name: string }[]>([])
   const [loadingProv, setLoadingProv] = useState(true)
+  const [roadtripFilter, setRoadtripFilter] = useState("all")
+  const [roadtripList, setRoadtripList] = useState<{ id: string; title: string }[]>([])
+  const [loadingRoadtrips, setLoadingRoadtrips] = useState(true)
   const [contentStatus, setContentStatus] = useState<Record<string, Record<string, { tone: string; updatedAt: string }>>>({})
   const [sort, setSort] = useState("terbaru")
   const [offset, setOffset] = useState(0)
@@ -88,13 +91,18 @@ export default function SpotsPage() {
       .then((r) => r.json())
       .then((json) => { setProvinceList(json.data || []); setLoadingProv(false) })
       .catch(() => setLoadingProv(false))
+
+    fetch("/api/admin/roadtrips-mini")
+      .then((r) => r.json())
+      .then((json) => { setRoadtripList(json.data || []); setLoadingRoadtrips(false) })
+      .catch(() => setLoadingRoadtrips(false))
   }, [])
 
   useEffect(() => {
     setOffset(0)
     setSpots([])
     fetchSpots(0)
-  }, [debouncedSearch, categoryFilter, provinceFilter, sort])
+  }, [debouncedSearch, categoryFilter, provinceFilter, roadtripFilter, sort])
 
   async function fetchSpots(pageOffset = 0) {
     setLoading(true)
@@ -102,6 +110,7 @@ export default function SpotsPage() {
     if (debouncedSearch) params.search = debouncedSearch
     if (categoryFilter !== "all") params.category = categoryFilter
     if (provinceFilter !== "all") params.province = provinceFilter
+    if (roadtripFilter !== "all") params.roadtrip = roadtripFilter
     if (sort !== "terbaru") params.sort = sort
 
     const res = await api.spots.list(params)
@@ -238,6 +247,27 @@ export default function SpotsPage() {
                 )}
               </SelectContent>
             </Select>
+            <Select value={roadtripFilter} onValueChange={(v) => v && setRoadtripFilter(v)}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Roadtrip">
+                  {roadtripFilter !== "all"
+                    ? roadtripList.find(r => r.id === roadtripFilter)?.title
+                    : undefined}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Roadtrip</SelectItem>
+                {loadingRoadtrips ? (
+                  <SelectItem value="loading" disabled>Loading...</SelectItem>
+                ) : roadtripList.length === 0 ? (
+                  <SelectItem value="empty" disabled>Tidak ada roadtrip</SelectItem>
+                ) : (
+                  roadtripList.map((r) => (
+                    <SelectItem key={r.id} value={r.id}>{r.title}</SelectItem>
+                  ))
+                )}
+              </SelectContent>
+            </Select>
             <div className="flex items-center gap-2 text-sm">
               <span className="text-muted-foreground hidden sm:inline">Urut:</span>
               <select value={sort} onChange={(e) => setSort(e.target.value)}
@@ -354,7 +384,7 @@ Tambah Spot
                               <div className={`h-full rounded-full ${scoreColor(score)}`} style={{ width: `${score}%` }} />
                             </div>
                             <span className="text-[11px] text-muted-foreground">
-                              {spot.name ? "✅" : "❌"} Nama · {spot.description ? "✅" : "❌"} Deskripsi · {spot.image_url ? "✅" : "❌"} Gambar · {spot.category ? "✅" : "❌"} Kategori · {spot.province ? "✅" : "❌"} Provinsi · {(spot.location as any)?.coordinates?.[0] ? "✅" : "❌"} Koordinat · {(spot.rating || 0) > 0 ? "✅" : "❌"} Rating
+                              {spot.name ? "✅" : "❌"} Nama · {spot.description ? "✅" : "❌"} Deskripsi · {spot.image_url ? "✅" : "❌"} Gambar · {spot.category ? "✅" : "❌"} Kategori · {spot.province ? "✅" : "❌"} Provinsi · {parseLocation(spot.location) ? "✅" : "❌"} Koordinat · {(spot.rating || 0) > 0 ? "✅" : "❌"} Rating
                             </span>
                           </div>
                         )

@@ -4,6 +4,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { api } from "@/lib/api/client"
+import { parseLocation } from "@/lib/utils/location"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -113,8 +114,8 @@ export default function EditSpotPage() {
             distance_from_city: data.distance_from_city || "",
             facilities: ((data.facilities as string[]) || []).join(", "),
             tags: ((data.tags as string[]) || []).join(", "),
-            lat: (data.location as { coordinates?: number[] })?.coordinates?.[1] || "",
-            lng: (data.location as { coordinates?: number[] })?.coordinates?.[0] || "",
+            lat: parseLocation(data.location)?.lat ?? "",
+            lng: parseLocation(data.location)?.lng ?? "",
             image_url: data.image_url || "",
             image_credit: data.image_credit || "",
             is_featured: data.is_featured || false,

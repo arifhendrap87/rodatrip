@@ -1,4 +1,7 @@
 import { db } from "./db"
+import { parseLocation } from "../utils/location"
+
+export { parseLocation }
 
 export interface SpotData {
   id: string
@@ -27,14 +30,11 @@ export interface SpotData {
   view_count: number
   created_at: string
   updated_at: string
-  location?: { type: "Point"; coordinates: [number, number] }
+  location?: unknown
 }
 
 export function getSpotCoordinates(spot: SpotData): { lat: number; lng: number } | null {
-  if (spot.location?.coordinates) {
-    return { lng: spot.location.coordinates[0], lat: spot.location.coordinates[1] }
-  }
-  return null
+  return parseLocation(spot.location)
 }
 
 export async function getSpots(options?: {
@@ -44,11 +44,23 @@ export async function getSpots(options?: {
   city?: string
   search?: string
   featured?: boolean
+  roadtripId?: string
   limit?: number
   offset?: number
   sort?: string
 }): Promise<{ data: SpotData[]; total: number }> {
   try {
+    let spotSlugs: string[] | undefined
+    if (options?.roadtripId) {
+      const { data: stops } = await db
+        .from("itinerary_stops")
+        .select("spot_slug")
+        .eq("itinerary_id", options.roadtripId)
+        .not("spot_slug", "is", null)
+      spotSlugs = (stops || []).map((s: any) => s.spot_slug).filter(Boolean)
+      if (spotSlugs.length === 0) return { data: [], total: 0 }
+    }
+
     let query = db.from("spots").select("*", { count: "exact" })
 
     if (options?.category) query = query.eq("category", options.category)
@@ -57,6 +69,7 @@ export async function getSpots(options?: {
     if (options?.city) query = query.eq("city", options.city)
     if (options?.search) query = query.ilike("name", `%${options.search}%`)
     if (options?.featured) query = query.eq("is_featured", true)
+    if (spotSlugs) query = query.in("slug", spotSlugs)
 
     const limit = options?.limit || 20
     const offset = options?.offset || 0

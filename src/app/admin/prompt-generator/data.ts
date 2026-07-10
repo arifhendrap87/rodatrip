@@ -132,12 +132,12 @@ Roadtrip di ${kota}, ${provinsi}
 - category: pilih dari → alam, kuliner, budaya, foto, petualangan, sejarah, hotel, restaurant
 - lat/lng: Koordinat REALISTIS sesuai lokasi di ${kota}, ${provinsi}. Gunakan Google Maps approximate.
 - province: "${provinsi}"
-- maps_embed_url: generate dari nama stop (format maps/dir/?api=1)
+- maps_embed_url: generate dari nama stop (format maps/dir/?api=1&travelmode=driving)
 - culinary_notes: STRING (bukan array), gabung dengan \\n
 - cover_image: kosongkan ""
-- nearby_hotels: ARRAY 5 OBJECT. Setiap object: { name, distance, price (kisaran harga/malam), maps_url (origin=stop, destination=hotel). DAN setiap hotel punya nearby_restaurants: ARRAY object { name, distance, price (kisaran harga/porsi), maps_url (origin=hotel, destination=resto) }
-- nearby_restaurants (top level): ARRAY 5 OBJECT. Setiap object: { name, distance, price (kisaran harga/porsi), maps_url }
-- Restoran di dalam hotel WAJIB: origin adalah nama hotel
+- nearby_hotels: ARRAY 5 OBJECT. Setiap object: { name, distance, price (kisaran harga/malam), maps_url (origin=nama stop, destination=nama hotel, &travelmode=driving). DAN setiap hotel punya nearby_restaurants: ARRAY object { name, distance, price (kisaran harga/porsi), maps_url (origin=nama hotel, destination=nama resto, &travelmode=driving) }
+- nearby_restaurants (top level): ARRAY 5 OBJECT. Setiap object: { name, distance, price (kisaran harga/porsi), maps_url (origin=nama stop, destination=nama resto, &travelmode=driving) }
+- Restoran di dalam hotel WAJIB: origin=nama hotel, destination=nama resto, &travelmode=driving
 - price: Kisaran harga real sesuai lokasi (hotel: per malam, resto: per porsi)
 - Output HANYA JSON, tanpa markdown`
 }
