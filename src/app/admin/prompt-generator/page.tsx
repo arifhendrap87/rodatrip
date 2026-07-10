@@ -33,8 +33,8 @@ export default function PromptGeneratorPage() {
   const [loadingProv, setLoadingProv] = useState(true)
   const [loadingKota, setLoadingKota] = useState(false)
 
-  const [provCode, setProvCode] = useState("32")
-  const [provinsi, setProvinsi] = useState("Jawa Barat")
+  const [provCode, setProvCode] = useState("")
+  const [provinsi, setProvinsi] = useState("")
   const [kota, setKota] = useState("Bandung")
   const [days, setDays] = useState(2)
   const [copied, setCopied] = useState(false)
