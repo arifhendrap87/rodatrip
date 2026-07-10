@@ -77,11 +77,11 @@ export default function PromptGeneratorPage() {
       })
   }, [provCode])
 
-  function handleProvinsiChange(code: string) {
-    const prov = provinsiList.find((p) => p.code === code)
+  function handleProvinsiChange(name: string) {
+    const prov = provinsiList.find((p) => p.name === name)
     if (prov) {
-      setProvCode(code)
-      setProvinsi(prov.name)
+      setProvCode(prov.code)
+      setProvinsi(name)
       setKota("")
     }
   }
@@ -118,7 +118,7 @@ export default function PromptGeneratorPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label>Provinsi</Label>
-                <Select value={provCode} onValueChange={(v) => v && handleProvinsiChange(v)} disabled={loadingProv}>
+                <Select value={provinsi} onValueChange={(v) => v && handleProvinsiChange(v)} disabled={loadingProv}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder={loadingProv ? "Memuat..." : "Pilih provinsi"} />
                   </SelectTrigger>
@@ -127,7 +127,7 @@ export default function PromptGeneratorPage() {
                       <SelectItem value="loading" disabled>Memuat...</SelectItem>
                     ) : (
                       provinsiList.map((p) => (
-                        <SelectItem key={p.code} value={p.code}>{p.name}</SelectItem>
+                        <SelectItem key={p.code} value={p.name}>{p.name}</SelectItem>
                       ))
                     )}
                   </SelectContent>
