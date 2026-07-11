@@ -826,7 +826,7 @@ ${isSpot ? spotDataList : `- Judul: ${source.title}
     "Prompt realistis untuk gambar slide 4",
     "Prompt realistis untuk gambar slide 5"
   ],
-  "caption": "Caption informatif 80-150 karakter, berisi fakta utama dari data, akhiri dengan ajakan ringan seperti 'Ada yang udah pernah? Share di komen!'. Bahasa Indonesia.",
+  "caption": "Caption informatif 300-500 karakter. Hook 1 kalimat → info detail 2-3 kalimat → tips 1 kalimat → ajakan interaksi ringan. Bahasa Indonesia.",
   "hashtags": "3-5 hashtag relevan dipisah spasi"
 }
 
@@ -835,7 +835,7 @@ ${isSpot ? spotDataList : `- Judul: ${source.title}
 - JANGAN sertakan kata "Cover:", "Info:", "Tips:", "Penutup:", "Slide", atau label lain di dalam text_overlays. Labels di deskripsi hanya sebagai panduan saja.
 - JANGAN buat text_overlays berupa pertanyaan seperti "PILIH MANA?" atau "KAMU TIM MANA?"
 - image_prompts: Bahasa Inggris, deskriptif, untuk realistic photo, SERTAKAN --ar 1:1 di akhir
-- caption: Informatif, sebut fakta utama dari data, akhiri dengan ajakan interaksi ringan
+- caption: Informatif, 300-500 karakter. Hook 1 kalimat → info detail 2-3 kalimat → tips 1 kalimat → ajakan interaksi ringan di akhir
 - hashtags: 3-5 tag relevan (#NamaTempat #Provinsi #Roadtrip #RodaTrip)
 - HANYA gunakan data yang diberikan di atas. JANGAN menyebut destinasi, lokasi, atau fakta yang TIDAK ada di DATA.
 - Output HANYA JSON, tanpa teks lain`
