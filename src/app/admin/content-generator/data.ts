@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-interface ContentSource {
+export interface ContentSource {
   type: "roadtrip" | "spot" | "blog"
   id: string
   title: string
@@ -773,4 +773,67 @@ export function getAutoTone(source: ContentSource): string {
 
 export function getPlatformSpecs() {
   return platformSpecs
+}
+
+export function generateViralPrompt(source: ContentSource, slideCount: number): string {
+  const isSpot = source.type === "spot"
+  const catEmoji = CATEGORY_EMOJI[source.category || ""] || "📍"
+
+  const spotFields = [
+    ["Nama", source.title],
+    ["Kategori", `${catEmoji} ${source.category}`],
+    ["Provinsi", source.province],
+    ["Kota", source.city],
+    ["Deskripsi", source.description],
+    ["Keunikan", source.whySpecial],
+    ["Rating", source.rating],
+    ["Harga Tiket", source.price],
+    ["Jam Buka", source.openingHours],
+    ["Durasi", source.visitDuration],
+    ["Waktu Terbaik", source.bestTime],
+    ["Tingkat Fisik", source.physicalEffort],
+    ["Tips", source.tips],
+    ["Fasilitas", source.facilities?.join(", ")],
+  ].filter(([_, v]) => v && v !== "" && v !== "—" && String(v) !== "undefined")
+
+  const spotDataList = spotFields.map(([label, value]) => `- ${label}: ${value}`).join("\n")
+
+  return `Kamu adalah social media content writer untuk "RodaTrip".
+Buatkan konten Instagram Carousel ${slideCount} slide dengan format VIRAL (text overlay pendek + ajak diskusi).
+
+## DATA
+${isSpot ? spotDataList : `- Judul: ${source.title}
+- Provinsi: ${source.province || "—"}
+- Deskripsi: ${source.description || "—"}
+- Durasi: ${source.duration || "—"}
+- Jarak: ${source.totalDistance || "—"}
+- Estimasi Biaya: ${source.estimatedCost || "—"}
+- Tips: ${source.tips || "—"}`}
+
+## FORMAT OUTPUT (HANYA JSON, tanpa teks lain)
+{
+  "text_overlays": [
+    "HEADLINE SLIDE 1 (40-80 chars, hook, engaging, bisa pake emoji)",
+    "HEADLINE SLIDE 2 (info singkat, fakta, atau lokasi)",
+    "HEADLINE SLIDE 3 (fakta menarik / statistik / tips)",
+    "HEADLINE SLIDE 4 (tips atau ajakan interaksi)",
+    "HEADLINE SLIDE 5 (CTA — ajak ke RodaTrip)"
+  ],
+  "image_prompts": [
+    "Prompt realistis untuk gambar slide 1 (B. Inggris, untuk Midjourney/DALL-E, 30-50 kata)",
+    "Prompt realistis untuk gambar slide 2",
+    "Prompt realistis untuk gambar slide 3",
+    "Prompt realistis untuk gambar slide 4",
+    "Prompt realistis untuk gambar slide 5"
+  ],
+  "caption": "Caption pendek 80-150 karakter, hook engaging, akhiri dengan ajakan diskusi/komentar. Bahasa Indonesia.",
+  "hashtags": "3-5 hashtag relevan dipisah spasi"
+}
+
+## ATURAN
+- text_overlays: SANGAT PENDEK (40-80 karakter), seperti headline viral, pakai huruf KAPITAL di bagian tertentu, engaging
+- image_prompts: Bahasa Inggris, deskriptif, untuk realistic photo, SERTAKAN --ar 1:1 di akhir
+- caption: Pendek (max 150 karakter), engaging, ajak interaksi
+- hashtags: 3-5 tag relevan (#NamaTempat #Provinsi #Roadtrip #RodaTrip)
+- Output HANYA JSON, tanpa teks lain`
 }
