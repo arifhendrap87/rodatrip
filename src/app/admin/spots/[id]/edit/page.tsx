@@ -7,6 +7,7 @@ import { api } from "@/lib/api/client"
 import { parseLocation } from "@/lib/utils/location"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -16,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { ArrowLeft, Save, Loader2, Trash2 } from "lucide-react"
+import { ArrowLeft, Save, Loader2, Trash2, Copy, Check, ImageIcon } from "lucide-react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import TiptapEditor from "@/components/ui/tiptap/tiptap-editor"
@@ -41,6 +42,9 @@ export default function EditSpotPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [generatingImage, setGeneratingImage] = useState(false)
+  const [imagePrompt, setImagePrompt] = useState("")
+  const [copiedPrompt, setCopiedPrompt] = useState(false)
   const [provinceList, setProvinceList] = useState<{ code: string; name: string }[]>([])
   const [cityList, setCityList] = useState<{ code: string; name: string }[]>([])
   const [provCode, setProvCode] = useState("")
@@ -76,6 +80,7 @@ export default function EditSpotPage() {
     estimated_time: "", ticket_price: "", road_access: "",
     distance_from_city: "", facilities: "", tags: "",
     lat: "", lng: "", image_url: "", image_credit: "",
+    prompt_gambar: "",
     is_featured: false,
     images: [],
   })
@@ -118,6 +123,7 @@ export default function EditSpotPage() {
             lng: parseLocation(data.location)?.lng ?? "",
             image_url: data.image_url || "",
             image_credit: data.image_credit || "",
+            prompt_gambar: data.prompt_gambar || "",
             is_featured: data.is_featured || false,
             images: data.images || [],
           })
@@ -158,6 +164,7 @@ export default function EditSpotPage() {
       tags: form.tags.split(",").map((t: string) => t.trim()).filter(Boolean),
       imageUrl: form.image_url,
       imageCredit: form.image_credit,
+      promptGambar: form.prompt_gambar || undefined,
       isFeatured: form.is_featured,
       images: form.images?.length > 0 ? form.images : undefined,
     }
@@ -169,6 +176,30 @@ export default function EditSpotPage() {
       toast.error("Error: " + (err as Error).message)
     }
     setSaving(false)
+  }
+
+  async function handleGenerateImage() {
+    setGeneratingImage(true)
+    setImagePrompt("")
+    try {
+      const res = await fetch("/api/ai/generate-image-prompt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "spot",
+          title: form.name,
+          category: form.category,
+          description: form.description,
+        }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json?.error?.message || "Gagal generate prompt")
+      setImagePrompt(json.data?.text || "")
+      toast.success("Prompt gambar siap!")
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Gagal generate prompt gambar")
+    }
+    setGeneratingImage(false)
   }
 
   if (loading) {
@@ -415,6 +446,37 @@ export default function EditSpotPage() {
               onChange={(v) => setForm((f: any) => ({ ...f, images: v }))}
               folder="spots"
             />
+            <div className="mt-6 pt-6 border-t border-border/50 space-y-4">
+              <Button type="button" variant="outline" size="sm"
+                onClick={handleGenerateImage} disabled={generatingImage || !form.name}
+                className="gap-1.5 bg-white">
+                {generatingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
+                {generatingImage ? "Generating..." : "🎨 Prompt Gambar"}
+              </Button>
+              {imagePrompt && (
+                <div className="p-3 rounded-xl border border-border/50 bg-white">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-medium text-muted-foreground">🎨 Prompt untuk AI Image Generator</p>
+                    <Button type="button" variant="ghost" size="sm" className="h-6 gap-1 text-xs"
+                      onClick={() => {
+                        navigator.clipboard.writeText(imagePrompt)
+                        setCopiedPrompt(true)
+                        setTimeout(() => setCopiedPrompt(false), 2000)
+                        toast.success("Prompt tersalin!")
+                      }}
+                    >
+                      {copiedPrompt ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
+                      {copiedPrompt ? "Tersalin!" : "Copy"}
+                    </Button>
+                  </div>
+                  <Textarea value={imagePrompt} readOnly rows={4} className="text-xs font-mono resize-none" />
+                </div>
+              )}
+              <div className="space-y-2">
+                <Label>AI Image Prompt (manual)</Label>
+                <Input value={form.prompt_gambar} onChange={(e) => setForm((f: any) => ({ ...f, prompt_gambar: e.target.value }))} placeholder="Prompt untuk generate gambar" />
+              </div>
+            </div>
           </CardContent>
         </Card>
 

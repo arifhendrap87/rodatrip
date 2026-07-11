@@ -220,6 +220,7 @@ export async function createItinerary(data: {
   culinaryNotes?: string
   coverImage?: string
   isPublished?: boolean
+  promptGambar?: string
   stops?: { stopNumber: number; spotSlug: string }[]
 }): Promise<{ id: string; slug: string } | null> {
   try {
@@ -239,6 +240,7 @@ export async function createItinerary(data: {
         culinary_notes: data.culinaryNotes || null,
         cover_image: data.coverImage || null,
         is_published: data.isPublished || false,
+        prompt_gambar: data.promptGambar || null,
       })
       .select("id, slug")
       .single()
@@ -280,6 +282,7 @@ export async function updateItinerary(
     culinaryNotes?: string
     coverImage?: string
     isPublished?: boolean
+    promptGambar?: string
     stops?: { stopNumber: number; spotSlug: string }[]
   }
 ): Promise<{ id: string; slug: string } | null> {
@@ -297,6 +300,7 @@ export async function updateItinerary(
     if (data.culinaryNotes !== undefined) updateData.culinary_notes = data.culinaryNotes
     if (data.coverImage !== undefined) updateData.cover_image = data.coverImage
     if (data.isPublished !== undefined) updateData.is_published = data.isPublished
+    if (data.promptGambar !== undefined) updateData.prompt_gambar = data.promptGambar
 
     const { data: row, error } = await db
       .from("itineraries")

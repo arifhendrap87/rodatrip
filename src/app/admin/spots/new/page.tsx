@@ -21,6 +21,9 @@ import {
   Save,
   Loader2,
   Sparkles,
+  Copy,
+  Check,
+  ImageIcon,
 } from "lucide-react"
 import Link from "next/link"
 import TiptapEditor from "@/components/ui/tiptap/tiptap-editor"
@@ -42,6 +45,9 @@ const CATEGORIES = [
 export default function NewSpotPage() {
   const router = useRouter()
   const [saving, setSaving] = useState(false)
+  const [generatingImage, setGeneratingImage] = useState(false)
+  const [imagePrompt, setImagePrompt] = useState("")
+  const [copiedPrompt, setCopiedPrompt] = useState(false)
   const [provinceList, setProvinceList] = useState<{ code: string; name: string }[]>([])
   const [cityList, setCityList] = useState<{ code: string; name: string }[]>([])
   const [provCode, setProvCode] = useState("32")
@@ -89,6 +95,7 @@ export default function NewSpotPage() {
     additional_cost: "", spot_important_note: "",
     facilities: "", distance_from_city: "",
     tags: "", image_url: "", is_featured: false,
+    prompt_gambar: "",
     images: [] as GalleryImage[],
   })
 
@@ -142,6 +149,7 @@ export default function NewSpotPage() {
       isFeatured: form.is_featured,
       imageUrl: form.image_url || "",
       imageCredit: "Unsplash",
+      promptGambar: form.prompt_gambar || undefined,
       images: form.images.length > 0 ? form.images.map((img, i) => ({ ...img, sort_order: i })) : undefined,
     }
 
@@ -181,6 +189,30 @@ export default function NewSpotPage() {
       toast.error("Gagal generate konten")
     }
     setGeneratingField(null)
+  }
+
+  async function handleGenerateImage() {
+    setGeneratingImage(true)
+    setImagePrompt("")
+    try {
+      const res = await fetch("/api/ai/generate-image-prompt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "spot",
+          title: form.name,
+          category: form.category,
+          description: form.description,
+        }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json?.error?.message || "Gagal generate prompt")
+      setImagePrompt(json.data?.text || "")
+      toast.success("Prompt gambar siap!")
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Gagal generate prompt gambar")
+    }
+    setGeneratingImage(false)
   }
 
   return (
@@ -565,6 +597,37 @@ export default function NewSpotPage() {
                 onChange={(v) => setForm((f: any) => ({ ...f, images: v }))}
                 folder="spots"
               />
+            </div>
+            <div className="mt-6 pt-6 border-t border-border/50 space-y-4">
+              <Button type="button" variant="outline" size="sm"
+                onClick={handleGenerateImage} disabled={generatingImage || !form.name}
+                className="gap-1.5 bg-white">
+                {generatingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
+                {generatingImage ? "Generating..." : "🎨 Prompt Gambar"}
+              </Button>
+              {imagePrompt && (
+                <div className="p-3 rounded-xl border border-border/50 bg-white">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-medium text-muted-foreground">🎨 Prompt untuk AI Image Generator</p>
+                    <Button type="button" variant="ghost" size="sm" className="h-6 gap-1 text-xs"
+                      onClick={() => {
+                        navigator.clipboard.writeText(imagePrompt)
+                        setCopiedPrompt(true)
+                        setTimeout(() => setCopiedPrompt(false), 2000)
+                        toast.success("Prompt tersalin!")
+                      }}
+                    >
+                      {copiedPrompt ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
+                      {copiedPrompt ? "Tersalin!" : "Copy"}
+                    </Button>
+                  </div>
+                  <Textarea value={imagePrompt} readOnly rows={4} className="text-xs font-mono resize-none" />
+                </div>
+              )}
+              <div className="space-y-2">
+                <Label>AI Image Prompt (manual)</Label>
+                <Input value={form.prompt_gambar} onChange={(e) => setForm((f) => ({ ...f, prompt_gambar: e.target.value }))} placeholder="Prompt untuk generate gambar" />
+              </div>
             </div>
           </CardContent>
         </Card>

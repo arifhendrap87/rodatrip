@@ -206,25 +206,7 @@ export default function EditBlogPage() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
-              <Button type="button" variant="outline" size="sm" onClick={handleGenerateImage} disabled={generatingImage || !form.title} className="gap-1.5 bg-white">
-                {generatingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
-                {generatingImage ? "Generating..." : "🎨 Prompt Gambar"}
-              </Button>
             </div>
-            {imagePrompt && (
-              <div className="mt-3 p-3 rounded-xl border border-border/50 bg-white">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs font-medium text-muted-foreground">🎨 Prompt untuk AI Image Generator</p>
-                  <Button type="button" variant="ghost" size="sm" className="h-6 gap-1 text-xs"
-                    onClick={() => { navigator.clipboard.writeText(imagePrompt); setCopiedPrompt(true); setTimeout(() => setCopiedPrompt(false), 2000); toast.success("Prompt tersalin!") }}
-                  >
-                    {copiedPrompt ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
-                    {copiedPrompt ? "Tersalin!" : "Copy"}
-                  </Button>
-                </div>
-                <Textarea value={imagePrompt} readOnly rows={4} className="text-xs font-mono resize-none" />
-              </div>
-            )}
           </CardContent>
         </Card>
 
@@ -291,7 +273,26 @@ export default function EditBlogPage() {
                 folder="blog"
               />
             </div>
-
+            <div className="mt-4 space-y-4">
+              <Button type="button" variant="outline" size="sm" onClick={handleGenerateImage} disabled={generatingImage || !form.title} className="gap-1.5 bg-white">
+                {generatingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
+                {generatingImage ? "Generating..." : "🎨 Prompt Gambar"}
+              </Button>
+              {imagePrompt && (
+                <div className="p-3 rounded-xl border border-border/50 bg-white">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-medium text-muted-foreground">🎨 Prompt untuk AI Image Generator</p>
+                    <Button type="button" variant="ghost" size="sm" className="h-6 gap-1 text-xs"
+                      onClick={() => { navigator.clipboard.writeText(imagePrompt); setCopiedPrompt(true); setTimeout(() => setCopiedPrompt(false), 2000); toast.success("Prompt tersalin!") }}
+                    >
+                      {copiedPrompt ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
+                      {copiedPrompt ? "Tersalin!" : "Copy"}
+                    </Button>
+                  </div>
+                  <Textarea value={imagePrompt} readOnly rows={4} className="text-xs font-mono resize-none" />
+                </div>
+              )}
+            </div>
             <div className="border-t pt-4 space-y-3">
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">SEO Settings</p>
               <div className="grid gap-4 sm:grid-cols-3">

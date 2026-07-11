@@ -137,6 +137,8 @@ export default function ContentGeneratorPage() {
           excerpt: p.excerpt,
           author: p.author,
         }))
+      } else if (sourceType === "roadtrip") {
+        list = (json.data?.data || []) as SourceItem[]
       } else {
         list = (json.data || []) as SourceItem[]
       }

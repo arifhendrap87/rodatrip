@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { ReadinessScore } from "@/components/ui/ReadinessScore"
-import { ArrowLeft, Save, Loader2, Plus, Trash2, ExternalLink, Copy, Check } from "lucide-react"
+import { ArrowLeft, Save, Loader2, Plus, Trash2, ExternalLink, Copy, Check, ImageIcon } from "lucide-react"
 import Link from "next/link"
 import { SpotSelect } from "@/components/admin/SpotSelect"
 import { ImageUpload } from "@/components/ui/image-upload"
@@ -27,8 +27,11 @@ export default function EditRoadtripPage() {
   const slug = params.slug as string
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [generatingImage, setGeneratingImage] = useState(false)
+  const [imagePrompt, setImagePrompt] = useState("")
+  const [copiedPrompt, setCopiedPrompt] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [form, setForm] = useState({ title: "", itineraryDuration: "", totalDistance: "", roadCondition: "", estimatedCost: "", bestDrivingTime: "", routeFacilities: "", mapsEmbedUrl: "", drivingSafetyTips: "", culinaryNotes: "", coverImage: "", isPublished: false })
+  const [form, setForm] = useState({ title: "", itineraryDuration: "", totalDistance: "", roadCondition: "", estimatedCost: "", bestDrivingTime: "", routeFacilities: "", mapsEmbedUrl: "", drivingSafetyTips: "", culinaryNotes: "", coverImage: "", isPublished: false, promptGambar: "" })
   const [stops, setStops] = useState<StopForm[]>([])
   const [fullData, setFullData] = useState<any>(null)
 
@@ -45,6 +48,7 @@ export default function EditRoadtripPage() {
           routeFacilities: Array.isArray(d.routeFacilities || d.route_facilities) ? (d.routeFacilities || d.route_facilities).join(", ") : "",
           mapsEmbedUrl: d.mapsEmbedUrl || d.maps_embed_url || "", drivingSafetyTips: d.drivingSafetyTips || d.driving_safety_tips || "",
           culinaryNotes: d.culinaryNotes || d.culinary_notes || "", coverImage: d.coverImage || d.cover_image || "", isPublished: d.isPublished || d.is_published || false,
+          promptGambar: d.promptGambar || d.prompt_gambar || "",
         })
         setStops((d.stops || []).map((s: any, i: number) => stopToForm(s, i)))
       } catch { router.push("/admin/roadtrips") }
@@ -67,11 +71,35 @@ export default function EditRoadtripPage() {
       routeFacilities: form.routeFacilities ? form.routeFacilities.split(",").map((f) => f.trim()).filter(Boolean) : undefined,
       mapsEmbedUrl: form.mapsEmbedUrl || undefined, drivingSafetyTips: form.drivingSafetyTips || undefined, culinaryNotes: form.culinaryNotes || undefined,
       coverImage: form.coverImage || undefined, isPublished: form.isPublished,
+      promptGambar: form.promptGambar || undefined,
       stops: stops.filter((s) => s.spotSlug).map((s) => ({ stopNumber: s.stopNumber, spotSlug: s.spotSlug })),
     }
     try { await api.admin.itineraries.update(slug, data as unknown as Record<string, unknown>); router.push("/admin/roadtrips") }
     catch (err) { toast.error("Error: " + (err as Error).message) }
     setSaving(false)
+  }
+
+  async function handleGenerateImage() {
+    setGeneratingImage(true)
+    setImagePrompt("")
+    try {
+      const res = await fetch("/api/ai/generate-image-prompt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "roadtrip",
+          title: form.title,
+          description: form.culinaryNotes || form.drivingSafetyTips || "",
+        }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json?.error?.message || "Gagal generate prompt")
+      setImagePrompt(json.data?.text || "")
+      toast.success("Prompt gambar siap!")
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Gagal generate prompt gambar")
+    }
+    setGeneratingImage(false)
   }
 
   function generateFacebookText(): string {
@@ -223,6 +251,37 @@ export default function EditRoadtripPage() {
             <div className="space-y-2"><Label>Fasilitas Jalur</Label><Input value={form.routeFacilities} onChange={(e) => updateField("routeFacilities", e.target.value)} /></div>
             <div className="space-y-2"><Label>Maps Embed URL</Label><Input value={form.mapsEmbedUrl} onChange={(e) => updateField("mapsEmbedUrl", e.target.value)} /></div>
             <ImageUpload value={form.coverImage} onChange={(v) => updateField("coverImage", v)} label="Cover Banner" folder="cover" placeholder="https://pub-xxx.r2.dev/prod/cover/..." />
+            <div className="pt-4 border-t border-border/50 space-y-4">
+              <Button type="button" variant="outline" size="sm"
+                onClick={handleGenerateImage} disabled={generatingImage || !form.title}
+                className="gap-1.5 bg-white">
+                {generatingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
+                {generatingImage ? "Generating..." : "🎨 Prompt Gambar"}
+              </Button>
+              {imagePrompt && (
+                <div className="p-3 rounded-xl border border-border/50 bg-white">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-medium text-muted-foreground">🎨 Prompt untuk AI Image Generator</p>
+                    <Button type="button" variant="ghost" size="sm" className="h-6 gap-1 text-xs"
+                      onClick={() => {
+                        navigator.clipboard.writeText(imagePrompt)
+                        setCopiedPrompt(true)
+                        setTimeout(() => setCopiedPrompt(false), 2000)
+                        toast.success("Prompt tersalin!")
+                      }}
+                    >
+                      {copiedPrompt ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
+                      {copiedPrompt ? "Tersalin!" : "Copy"}
+                    </Button>
+                  </div>
+                  <Textarea value={imagePrompt} readOnly rows={4} className="text-xs font-mono resize-none" />
+                </div>
+              )}
+              <div className="space-y-2">
+                <Label>AI Image Prompt (manual)</Label>
+                <Input value={form.promptGambar} onChange={(e) => updateField("promptGambar", e.target.value)} placeholder="Prompt untuk generate gambar" />
+              </div>
+            </div>
           </CardContent>
         </Card>
         <Card>

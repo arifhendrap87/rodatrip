@@ -18,6 +18,7 @@ export const createItinerarySchema = z.object({
   culinaryNotes: z.string().optional(),
   coverImage: z.string().optional(),
   isPublished: z.boolean().optional(),
+  promptGambar: z.string().optional(),
   stops: z.array(itineraryStopSchema).optional(),
 })
 
