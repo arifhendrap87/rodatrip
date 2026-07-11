@@ -813,11 +813,11 @@ ${isSpot ? spotDataList : `- Judul: ${source.title}
 ## FORMAT OUTPUT (HANYA JSON, tanpa teks lain)
 {
   "text_overlays": [
-    "SLIDE 1 COVER: hook engaging, fakta paling menarik, bikin orang penasaran (40-80 chars)",
-    "SLIDE 2 INFO: fakta, harga tiket, rating, jam buka, atau lokasi",
-    "SLIDE 3 INFO: fakta menarik atau keunikan destinasi",
-    "SLIDE 4 TIPS: tips praktis atau rekomendasi perjalanan",
-    "SLIDE 5 PENUTUP: CTA ajak ke RodaTrip"
+    "Cover — hook engaging, fakta paling menarik, bikin orang penasaran (40-80 chars)",
+    "Info — fakta, harga tiket, rating, jam buka, atau lokasi",
+    "Info — fakta menarik atau keunikan destinasi",
+    "Tips — tips praktis atau rekomendasi perjalanan",
+    "Penutup — CTA ajak ke RodaTrip"
   ],
   "image_prompts": [
     "Prompt realistis untuk gambar slide 1 (B. Inggris, untuk Midjourney/DALL-E, 30-50 kata)",
@@ -832,6 +832,7 @@ ${isSpot ? spotDataList : `- Judul: ${source.title}
 
 ## ATURAN
 - text_overlays: BERISI INFORMASI (bukan pertanyaan). Slide 1 = hook/cover menarik. Slide 2-3 = fakta/info. Slide 4 = tips. Slide 5 = CTA. Contoh: "TIKET RP 28.000", "📍 CIWIDEY - 2 JAM DARI BANDUNG", "🌡️ SUHU AIR 40°C". Pakai huruf KAPITAL di bagian penting.
+- JANGAN sertakan kata "Cover:", "Info:", "Tips:", "Penutup:", "Slide", atau label lain di dalam text_overlays. Labels di deskripsi hanya sebagai panduan saja.
 - JANGAN buat text_overlays berupa pertanyaan seperti "PILIH MANA?" atau "KAMU TIM MANA?"
 - image_prompts: Bahasa Inggris, deskriptif, untuk realistic photo, SERTAKAN --ar 1:1 di akhir
 - caption: Informatif, sebut fakta utama dari data, akhiri dengan ajakan interaksi ringan
