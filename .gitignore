@@ -40,3 +40,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 chrome-extension/
+maps-test-screenshot.png
