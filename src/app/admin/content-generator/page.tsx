@@ -728,8 +728,21 @@ export default function ContentGeneratorPage() {
                               <div className="absolute top-2 left-2 bg-black/50 text-white text-[10px] font-bold px-1.5 py-0.5 rounded z-10">
                                 {i + 1}
                               </div>
-                              <div className="absolute top-2 right-2 bg-black/30 text-white/60 text-[9px] px-1.5 py-0.5 rounded-full">
-                                IG
+                              <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
+                                <button
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(text)
+                                    setCopied(`overlay-${i}`)
+                                    setTimeout(() => setCopied(null), 2000)
+                                    toast.success("Text overlay tersalin!")
+                                  }}
+                                  className="h-5 w-5 flex items-center justify-center rounded bg-black/30 hover:bg-black/50 transition-colors"
+                                >
+                                  {copied === `overlay-${i}` ? <Check className="h-2.5 w-2.5 text-green-400" /> : <Copy className="h-2.5 w-2.5 text-white/60" />}
+                                </button>
+                                <span className="bg-black/30 text-white/60 text-[9px] px-1.5 py-0.5 rounded-full">
+                                  IG
+                                </span>
                               </div>
                               <div className="bg-gradient-to-t from-black/80 via-black/30 to-transparent p-4 pt-12">
                                 <p className="text-white font-bold text-sm leading-snug break-words drop-shadow-lg">

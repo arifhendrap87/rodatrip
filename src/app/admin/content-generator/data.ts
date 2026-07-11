@@ -839,7 +839,7 @@ ${isSpot ? spotDataList : `- Judul: ${source.title}
 
 ## ATURAN
 - Jumlah text_overlays dan image_prompts HARUS SAMA (misal 4 slide → 4 text + 4 prompt)
-- text_overlays: BERISI INFORMASI (bukan pertanyaan). Slide 1 = hook/cover. Slide tengah = info/fakta. Slide terakhir = CTA. Pakai huruf KAPITAL di bagian penting.
+- text_overlays: BERISI INFORMASI (bukan pertanyaan). Slide 1 = hook/cover. Slide tengah = info/fakta. Slide terakhir = CTA.
 - Jika data menyebut angka spesifik (contoh: "7 Persiapan", "5 Tips", "3 Destinasi"), WAJIB include SEMUA item tersebut, jangan dipotong atau dikurangi
 - Contoh: judul "7 Persiapan Wajib" → buat 1 slide per persiapan (minimal 7 slide info + 1 cover + 1 CTA = 9 slide)
 - text_overlays WAJIB menyebut NAMA DESTINASI SPESIFIK dari data, jangan deskripsi general
@@ -847,6 +847,7 @@ ${isSpot ? spotDataList : `- Judul: ${source.title}
 - Contoh SALAH: "PEGUNUNGAN HIJAU", "PANTAI EKSOTIS" (terlalu general, tidak sebut nama tempat)
 - JANGAN sertakan kata "Slide", "Cover:", "Info:", "Tips:", "Penutup:" di dalam text_overlays
 - JANGAN buat text_overlays berupa pertanyaan
+- text_overlays pakai Title Case (kapital awal kata utama), JANGAN semua UPPERCASE. Contoh benar: "Tiket Rp 28.000, View Seperti Ini"
 - image_prompts: Bahasa Inggris, deskriptif, realistic photo, WAJIB sebut NAMA DESTINASI SPESIFIK dari data, SERTAKAN --ar 1:1 di akhir
 - caption: Informatif, 300-500 karakter. Hook 1 kalimat → info detail 2-3 kalimat → tips 1 kalimat → ajakan interaksi ringan di akhir
 - hashtags: 3-5 tag relevan (#NamaTempat #Provinsi #Roadtrip #RodaTrip)
