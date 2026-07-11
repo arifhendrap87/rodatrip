@@ -68,7 +68,7 @@ export default function NewBlogPage() {
       const existingRes = await fetch("/api/admin/blog?limit=100")
       const existingJson = await existingRes.json()
       const existingTitles = (
-        existingJson.data?.data || existingJson.data || []
+        existingJson.data?.posts || []
       ).map((b: any) => b.title).filter(Boolean)
 
       const res = await fetch("/api/ai/generate-blog", {
