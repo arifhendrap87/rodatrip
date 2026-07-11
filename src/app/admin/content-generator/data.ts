@@ -799,7 +799,7 @@ export function generateViralPrompt(source: ContentSource, slideCount: number): 
   const spotDataList = spotFields.map(([label, value]) => `- ${label}: ${value}`).join("\n")
 
   return `Kamu adalah social media content writer untuk "RodaTrip".
-Buatkan konten Instagram Carousel ${slideCount} slide dengan format VIRAL (text overlay pendek + ajak diskusi).
+Buatkan konten Instagram Carousel ${slideCount} slide dengan format INFORMATIF (fakta, tips, info penting).
 
 ## DATA
 ${isSpot ? spotDataList : `- Judul: ${source.title}
@@ -813,11 +813,11 @@ ${isSpot ? spotDataList : `- Judul: ${source.title}
 ## FORMAT OUTPUT (HANYA JSON, tanpa teks lain)
 {
   "text_overlays": [
-    "HEADLINE SLIDE 1 (40-80 chars, hook, engaging, bisa pake emoji)",
-    "HEADLINE SLIDE 2 (info singkat, fakta, atau lokasi)",
-    "HEADLINE SLIDE 3 (fakta menarik / statistik / tips)",
-    "HEADLINE SLIDE 4 (tips atau ajakan interaksi)",
-    "HEADLINE SLIDE 5 (CTA — ajak ke RodaTrip)"
+    "SLIDE 1 COVER: hook engaging, fakta paling menarik, bikin orang penasaran (40-80 chars)",
+    "SLIDE 2 INFO: fakta, harga tiket, rating, jam buka, atau lokasi",
+    "SLIDE 3 INFO: fakta menarik atau keunikan destinasi",
+    "SLIDE 4 TIPS: tips praktis atau rekomendasi perjalanan",
+    "SLIDE 5 PENUTUP: CTA ajak ke RodaTrip"
   ],
   "image_prompts": [
     "Prompt realistis untuk gambar slide 1 (B. Inggris, untuk Midjourney/DALL-E, 30-50 kata)",
@@ -826,14 +826,16 @@ ${isSpot ? spotDataList : `- Judul: ${source.title}
     "Prompt realistis untuk gambar slide 4",
     "Prompt realistis untuk gambar slide 5"
   ],
-  "caption": "Caption pendek 80-150 karakter, hook engaging, akhiri dengan ajakan diskusi/komentar. Bahasa Indonesia.",
+  "caption": "Caption informatif 80-150 karakter, berisi fakta utama dari data, akhiri dengan ajakan ringan seperti 'Ada yang udah pernah? Share di komen!'. Bahasa Indonesia.",
   "hashtags": "3-5 hashtag relevan dipisah spasi"
 }
 
 ## ATURAN
-- text_overlays: SANGAT PENDEK (40-80 karakter), seperti headline viral, pakai huruf KAPITAL di bagian tertentu, engaging
+- text_overlays: BERISI INFORMASI (bukan pertanyaan). Slide 1 = hook/cover menarik. Slide 2-3 = fakta/info. Slide 4 = tips. Slide 5 = CTA. Contoh: "TIKET RP 28.000", "📍 CIWIDEY - 2 JAM DARI BANDUNG", "🌡️ SUHU AIR 40°C". Pakai huruf KAPITAL di bagian penting.
+- JANGAN buat text_overlays berupa pertanyaan seperti "PILIH MANA?" atau "KAMU TIM MANA?"
 - image_prompts: Bahasa Inggris, deskriptif, untuk realistic photo, SERTAKAN --ar 1:1 di akhir
-- caption: Pendek (max 150 karakter), engaging, ajak interaksi
+- caption: Informatif, sebut fakta utama dari data, akhiri dengan ajakan interaksi ringan
 - hashtags: 3-5 tag relevan (#NamaTempat #Provinsi #Roadtrip #RodaTrip)
+- HANYA gunakan data yang diberikan di atas. JANGAN menyebut destinasi, lokasi, atau fakta yang TIDAK ada di DATA.
 - Output HANYA JSON, tanpa teks lain`
 }

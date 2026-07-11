@@ -728,24 +728,41 @@ export default function ContentGeneratorPage() {
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                      {carouselResult.text_overlays.map((text, i) => (
-                        <div key={i} className="rounded-xl border border-border/50 overflow-hidden">
-                          <div className="aspect-square bg-gradient-to-br from-primary/5 to-primary/10 flex items-center justify-center p-4 relative">
-                            <div className="absolute top-2 left-2 bg-primary text-white text-xs font-bold px-2 py-0.5 rounded">
-                              {i + 1}
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      {carouselResult.text_overlays.map((text, i) => {
+                        const gradients = [
+                          "from-sky-400/80 via-blue-500/80 to-indigo-600/80",
+                          "from-emerald-400/80 via-teal-500/80 to-cyan-600/80",
+                          "from-orange-400/80 via-rose-500/80 to-pink-600/80",
+                          "from-violet-400/80 via-purple-500/80 to-fuchsia-600/80",
+                          "from-amber-400/80 via-yellow-500/80 to-orange-600/80",
+                        ]
+                        const bg = gradients[i % gradients.length]
+                        return (
+                          <div key={i} className="rounded-xl border border-border/50 overflow-hidden bg-white shadow-sm">
+                            {/* IG Post Mockup */}
+                            <div className={`aspect-[4/5] bg-gradient-to-br ${bg} relative flex flex-col justify-end p-0`}>
+                              <div className="absolute top-2 left-2 bg-black/50 text-white text-[10px] font-bold px-1.5 py-0.5 rounded z-10">
+                                {i + 1}
+                              </div>
+                              <div className="absolute top-2 right-2 bg-black/30 text-white/60 text-[9px] px-1.5 py-0.5 rounded-full">
+                                IG
+                              </div>
+                              <div className="bg-gradient-to-t from-black/80 via-black/30 to-transparent p-4 pt-12">
+                                <p className="text-white font-bold text-sm leading-snug break-words drop-shadow-lg">
+                                  {text}
+                                </p>
+                              </div>
                             </div>
-                            <p className="text-sm font-bold text-center leading-snug text-foreground px-2">
-                              {text}
-                            </p>
+                            {/* Prompt */}
+                            <div className="p-3 bg-muted/30 border-t border-border/30">
+                              <p className="text-[11px] text-muted-foreground font-mono leading-relaxed">
+                                🤖 {carouselResult.image_prompts[i]}
+                              </p>
+                            </div>
                           </div>
-                          <div className="p-3 bg-muted/30">
-                            <p className="text-[11px] text-muted-foreground font-mono leading-relaxed line-clamp-3">
-                              🤖 {carouselResult.image_prompts[i]}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
+                        )
+                      })}
                     </div>
 
                     <div className="rounded-xl border border-border/50 p-4 space-y-2">
