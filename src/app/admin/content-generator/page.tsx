@@ -756,9 +756,22 @@ export default function ContentGeneratorPage() {
                             </div>
                             {/* Prompt */}
                             <div className="p-3 bg-muted/30 border-t border-border/30">
-                              <p className="text-[11px] text-muted-foreground font-mono leading-relaxed">
-                                🤖 {carouselResult.image_prompts[i]}
-                              </p>
+                              <div className="flex items-start justify-between gap-2">
+                                <p className="text-[11px] text-muted-foreground font-mono leading-relaxed flex-1 min-w-0">
+                                  🤖 {carouselResult.image_prompts[i]}
+                                </p>
+                                <button
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(carouselResult.image_prompts[i])
+                                    setCopied(`prompt-${i}`)
+                                    setTimeout(() => setCopied(null), 2000)
+                                    toast.success("Prompt slide tersalin!")
+                                  }}
+                                  className="shrink-0 h-6 w-6 flex items-center justify-center rounded hover:bg-muted-foreground/10 transition-colors"
+                                >
+                                  {copied === `prompt-${i}` ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3 text-muted-foreground/60" />}
+                                </button>
+                              </div>
                             </div>
                           </div>
                         )
