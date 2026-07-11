@@ -813,28 +813,31 @@ ${isSpot ? spotDataList : `- Judul: ${source.title}
 ## FORMAT OUTPUT (HANYA JSON, tanpa teks lain)
 {
   "text_overlays": [
-    "Cover — hook engaging, fakta paling menarik, bikin orang penasaran (40-80 chars)",
-    "Info — fakta, harga tiket, rating, jam buka, atau lokasi",
-    "Info — fakta menarik atau keunikan destinasi",
-    "Tips — tips praktis atau rekomendasi perjalanan",
+    "Cover — hook engaging, gunakan JUDUL atau NAMA DESTINASI PALING MENARIK dari data",
+    "Info — gunakan NAMA DESTINASI SPESIFIK dari data + fakta singkat (harga/jam/rating)",
+    "Info — gunakan NAMA DESTINASI LAIN dari data + keunikan",
+    "Tips — tips spesifik sesuai data (bukan tips umum)",
     "Penutup — CTA ajak ke RodaTrip"
   ],
   "image_prompts": [
-    "Prompt realistis untuk gambar slide 1 (B. Inggris, untuk Midjourney/DALL-E, 30-50 kata)",
-    "Prompt realistis untuk gambar slide 2",
-    "Prompt realistis untuk gambar slide 3",
-    "Prompt realistis untuk gambar slide 4",
-    "Prompt realistis untuk gambar slide 5"
+    "Prompt realistis untuk slide 1 — gunakan NAMA DESTINASI SPESIFIK dari data (B. Inggris, 30-50 kata)",
+    "Prompt realistis untuk slide 2 — gunakan NAMA DESTINASI SPESIFIK dari data",
+    "Prompt realistis untuk slide 3 — gunakan NAMA DESTINASI SPESIFIK dari data",
+    "Prompt realistis untuk slide 4 — gunakan tema yang sesuai data",
+    "Prompt realistis untuk slide 5 — CTA visual"
   ],
   "caption": "Caption informatif 300-500 karakter. Hook 1 kalimat → info detail 2-3 kalimat → tips 1 kalimat → ajakan interaksi ringan. Bahasa Indonesia.",
   "hashtags": "3-5 hashtag relevan dipisah spasi"
 }
 
 ## ATURAN
-- text_overlays: BERISI INFORMASI (bukan pertanyaan). Slide 1 = hook/cover menarik. Slide 2-3 = fakta/info. Slide 4 = tips. Slide 5 = CTA. Contoh: "TIKET RP 28.000", "📍 CIWIDEY - 2 JAM DARI BANDUNG", "🌡️ SUHU AIR 40°C". Pakai huruf KAPITAL di bagian penting.
+- text_overlays: BERISI INFORMASI (bukan pertanyaan). Slide 1 = hook/cover. Slide 2-3 = info. Slide 4 = tips. Slide 5 = CTA. Pakai huruf KAPITAL di bagian penting.
+- text_overlays WAJIB menyebut NAMA DESTINASI SPESIFIK dari data, jangan deskripsi general
+- Contoh BENAR: "BUKIT SIKUNIR — GOLDEN HOUR JAM 5 PAGI", "KARIMUNJAWA: PASIR PUTIH & AIR KRISTAL"
+- Contoh SALAH: "PEGUNUNGAN HIJAU", "PANTAI EKSOTIS" (terlalu general, tidak sebut nama tempat)
 - JANGAN sertakan kata "Cover:", "Info:", "Tips:", "Penutup:", "Slide", atau label lain di dalam text_overlays. Labels di deskripsi hanya sebagai panduan saja.
 - JANGAN buat text_overlays berupa pertanyaan seperti "PILIH MANA?" atau "KAMU TIM MANA?"
-- image_prompts: Bahasa Inggris, deskriptif, untuk realistic photo, SERTAKAN --ar 1:1 di akhir
+- image_prompts: Bahasa Inggris, deskriptif, realistic photo, WAJIB sebut NAMA DESTINASI SPESIFIK dari data, SERTAKAN --ar 1:1 di akhir
 - caption: Informatif, 300-500 karakter. Hook 1 kalimat → info detail 2-3 kalimat → tips 1 kalimat → ajakan interaksi ringan di akhir
 - hashtags: 3-5 tag relevan (#NamaTempat #Provinsi #Roadtrip #RodaTrip)
 - HANYA gunakan data yang diberikan di atas. JANGAN menyebut destinasi, lokasi, atau fakta yang TIDAK ada di DATA.
