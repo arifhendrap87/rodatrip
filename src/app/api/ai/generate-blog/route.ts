@@ -36,7 +36,7 @@ async function callDeepSeek(prompt: string): Promise<string> {
 
 export async function POST(request: Request) {
   try {
-    const { action, topic, existingData } = await request.json()
+    const { action, topic, existingData, existingTitles } = await request.json()
 
     if (!action) return badRequest("action wajib diisi (ide / tulis / seo)")
 
@@ -44,6 +44,9 @@ export async function POST(request: Request) {
 
     switch (action) {
       case "ide":
+        const existingText = existingTitles?.length > 0
+          ? `\n\nJudul blog yang SUDAH ADA di website (JANGAN buat yang sama ATAU terlalu mirip topiknya):\n${existingTitles.map((t: string) => `- "${t}"`).join("\n")}`
+          : ""
         prompt = `Buatkan 5 ide artikel blog menarik tentang topik: "${topic || 'Tips Roadtrip'}".
 
 Format output (HANYA JSON array, tanpa teks lain):
@@ -59,7 +62,12 @@ Aturan:
 - Judul harus menarik, click-worthy, tapi tidak clickbait
 - Gunakan Bahasa Indonesia
 - Sesuaikan dengan topik "${topic}" yang diberikan
-- Kategori harus spesifik dan relevan dengan topik`
+- Kategori harus spesifik dan relevan dengan topik${existingText}
+${existingTitles?.length > 0 ? `\nAturan ANTI-DUPLIKAT:
+- JANGAN buat judul yang topiknya sama atau mirip dengan judul yang sudah ada di daftar di atas
+- Contoh: jika sudah ada "10 Cara Hemat BBM Saat Roadtrip", jangan buat "7 Cara Hemat BBM" atau "Tips Irit BBM"
+- Perhatikan kesamaan kata kunci utama: jika dua judul punya kata kunci inti yang sama (misal "Hemat BBM"), itu dianggap duplikat
+- Fokus pada ide FRESH dan sudut pandang yang benar-benar baru` : ""}`
         break
 
       case "tulis":

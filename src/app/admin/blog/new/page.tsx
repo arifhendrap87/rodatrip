@@ -65,10 +65,16 @@ export default function NewBlogPage() {
   async function handleGenerateIde() {
     setGeneratingIde(true)
     try {
+      const existingRes = await fetch("/api/admin/blog?limit=100")
+      const existingJson = await existingRes.json()
+      const existingTitles = (
+        existingJson.data?.data || existingJson.data || []
+      ).map((b: any) => b.title).filter(Boolean)
+
       const res = await fetch("/api/ai/generate-blog", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "ide", topic: aiTopic }),
+        body: JSON.stringify({ action: "ide", topic: aiTopic, existingTitles }),
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json?.error?.message || "Gagal generate ide")
