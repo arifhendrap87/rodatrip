@@ -118,7 +118,6 @@ export default function ContentGeneratorPage() {
     hashtags: string
   } | null>(null)
   const [carouselGenerating, setCarouselGenerating] = useState(false)
-  const [slideCount, setSlideCount] = useState(5)
 
   useEffect(() => {
     fetchSources()
@@ -265,7 +264,6 @@ export default function ContentGeneratorPage() {
         body: JSON.stringify({
           sourceType,
           sourceId: selectedItem.slug,
-          slideCount,
         }),
       })
       const json = await res.json()
@@ -578,21 +576,6 @@ export default function ContentGeneratorPage() {
                     </>
                   ) : (
                     <>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground shrink-0">Slide:</span>
-                        <div className="flex gap-1">
-                          {[3, 4, 5].map((n) => (
-                            <Button
-                              key={n}
-                              variant={slideCount === n ? "default" : "outline"}
-                              size="sm"
-                              onClick={() => setSlideCount(n)}
-                            >
-                              {n}
-                            </Button>
-                          ))}
-                        </div>
-                      </div>
                       <Button
                         onClick={handleGenerateCarousel}
                         disabled={carouselGenerating}
@@ -698,7 +681,7 @@ export default function ContentGeneratorPage() {
                       <div>
                         <CardTitle className="text-base">🎨 Viral Carousel</CardTitle>
                         <CardDescription>
-                          {slideCount} slide — text overlay + prompt gambar
+                          Text overlay + prompt gambar — otomatis sesuai data
                         </CardDescription>
                       </div>
                       <div className="flex items-center gap-2">

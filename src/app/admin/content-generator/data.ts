@@ -775,7 +775,7 @@ export function getPlatformSpecs() {
   return platformSpecs
 }
 
-export function generateViralPrompt(source: ContentSource, slideCount: number): string {
+export function generateViralPrompt(source: ContentSource): string {
   const isSpot = source.type === "spot"
   const catEmoji = CATEGORY_EMOJI[source.category || ""] || "📍"
 
@@ -799,7 +799,7 @@ export function generateViralPrompt(source: ContentSource, slideCount: number): 
   const spotDataList = spotFields.map(([label, value]) => `- ${label}: ${value}`).join("\n")
 
   return `Kamu adalah social media content writer untuk "RodaTrip".
-Buatkan konten Instagram Carousel ${slideCount} slide dengan format INFORMATIF (fakta, tips, info penting).
+Buatkan konten Instagram Carousel dengan format INFORMATIF (fakta, tips, info penting).
 
 ## DATA
 ${isSpot ? spotDataList : `- Judul: ${source.title}
@@ -810,36 +810,44 @@ ${isSpot ? spotDataList : `- Judul: ${source.title}
 - Estimasi Biaya: ${source.estimatedCost || "—"}
 - Tips: ${source.tips || "—"}`}
 
-## FORMAT OUTPUT (HANYA JSON, tanpa teks lain)
+## ATURAN SLIDE COUNT
+- Analisis informasi dari DATA di atas terlebih dahulu
+- Buat 1 slide untuk setiap informasi/pesan penting yang berbeda
+- INFORMASI PENTING = data bermanfaat (harga, jam, lokasi, tips spesifik, fakta unik, nama destinasi)
+- JANGAN buat slide hanya untuk mencapai jumlah tertentu
+- Minimal 3 slide, maksimal 7 slide
+- Contoh informasi penting: tiket Rp 28.000, jam buka 07.00-17.00, pakai masker karena belerang
+- Contoh bukan info penting (jangan buat slide khusus): "pemandangan indah", "udara sejuk"
+
+## FORMAT OUTPUT (HANYA JSON)
 {
   "text_overlays": [
-    "Cover — hook engaging, gunakan JUDUL atau NAMA DESTINASI PALING MENARIK dari data",
-    "Info — gunakan NAMA DESTINASI SPESIFIK dari data + fakta singkat (harga/jam/rating)",
-    "Info — gunakan NAMA DESTINASI LAIN dari data + keunikan",
-    "Tips — tips spesifik sesuai data (bukan tips umum)",
-    "Penutup — CTA ajak ke RodaTrip"
+    "Slide 1: Cover — judul/NAMA DESTINASI PALING MENARIK dari data",
+    "Slide 2: NAMA DESTINASI SPESIFIK + fakta singkat (harga/jam/rating)",
+    "Slide 3: NAMA DESTINASI LAIN atau fakta lainnya",
+    "... (dan seterusnya sesuai jumlah slide)",
+    "Slide terakhir: Penutup — CTA ajak ke RodaTrip"
   ],
   "image_prompts": [
-    "Prompt realistis untuk slide 1 — gunakan NAMA DESTINASI SPESIFIK dari data (B. Inggris, 30-50 kata)",
-    "Prompt realistis untuk slide 2 — gunakan NAMA DESTINASI SPESIFIK dari data",
-    "Prompt realistis untuk slide 3 — gunakan NAMA DESTINASI SPESIFIK dari data",
-    "Prompt realistis untuk slide 4 — gunakan tema yang sesuai data",
-    "Prompt realistis untuk slide 5 — CTA visual"
+    "Prompt realistis untuk slide 1 — NAMA DESTINASI SPESIFIK (B. Inggris, 30-50 kata)",
+    "Prompt realistis untuk slide 2 — NAMA DESTINASI SPESIFIK",
+    "... (sama jumlahnya dengan text_overlays)"
   ],
   "caption": "Caption informatif 300-500 karakter. Hook 1 kalimat → info detail 2-3 kalimat → tips 1 kalimat → ajakan interaksi ringan. Bahasa Indonesia.",
   "hashtags": "3-5 hashtag relevan dipisah spasi"
 }
 
 ## ATURAN
-- text_overlays: BERISI INFORMASI (bukan pertanyaan). Slide 1 = hook/cover. Slide 2-3 = info. Slide 4 = tips. Slide 5 = CTA. Pakai huruf KAPITAL di bagian penting.
+- Jumlah text_overlays dan image_prompts HARUS SAMA (misal 4 slide → 4 text + 4 prompt)
+- text_overlays: BERISI INFORMASI (bukan pertanyaan). Slide 1 = hook/cover. Slide tengah = info/fakta. Slide terakhir = CTA. Pakai huruf KAPITAL di bagian penting.
 - text_overlays WAJIB menyebut NAMA DESTINASI SPESIFIK dari data, jangan deskripsi general
 - Contoh BENAR: "BUKIT SIKUNIR — GOLDEN HOUR JAM 5 PAGI", "KARIMUNJAWA: PASIR PUTIH & AIR KRISTAL"
 - Contoh SALAH: "PEGUNUNGAN HIJAU", "PANTAI EKSOTIS" (terlalu general, tidak sebut nama tempat)
-- JANGAN sertakan kata "Cover:", "Info:", "Tips:", "Penutup:", "Slide", atau label lain di dalam text_overlays. Labels di deskripsi hanya sebagai panduan saja.
-- JANGAN buat text_overlays berupa pertanyaan seperti "PILIH MANA?" atau "KAMU TIM MANA?"
+- JANGAN sertakan kata "Slide", "Cover:", "Info:", "Tips:", "Penutup:" di dalam text_overlays
+- JANGAN buat text_overlays berupa pertanyaan
 - image_prompts: Bahasa Inggris, deskriptif, realistic photo, WAJIB sebut NAMA DESTINASI SPESIFIK dari data, SERTAKAN --ar 1:1 di akhir
 - caption: Informatif, 300-500 karakter. Hook 1 kalimat → info detail 2-3 kalimat → tips 1 kalimat → ajakan interaksi ringan di akhir
 - hashtags: 3-5 tag relevan (#NamaTempat #Provinsi #Roadtrip #RodaTrip)
-- HANYA gunakan data yang diberikan di atas. JANGAN menyebut destinasi, lokasi, atau fakta yang TIDAK ada di DATA.
+- HANYA gunakan data yang diberikan. JANGAN menyebut destinasi di luar DATA.
 - Output HANYA JSON, tanpa teks lain`
 }

@@ -32,7 +32,7 @@ export async function POST(request: Request) {
   if (!admin) return unauthorized()
 
   const body = await request.json()
-  const { sourceType, sourceId, slideCount = 5 } = body
+  const { sourceType, sourceId } = body
 
   if (!sourceType || !["roadtrip", "spot", "blog"].includes(sourceType)) {
     return badRequest("sourceType harus 'roadtrip', 'spot', atau 'blog'")
@@ -128,7 +128,7 @@ export async function POST(request: Request) {
     })).filter((s: any) => s.name),
   }
 
-  const prompt = generateViralPrompt(contentSource, slideCount)
+  const prompt = generateViralPrompt(contentSource)
 
   try {
     const aiText = await callDeepSeek(prompt)
