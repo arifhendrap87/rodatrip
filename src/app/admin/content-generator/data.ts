@@ -829,9 +829,10 @@ ${isSpot ? spotDataList : `- Judul: ${source.title}
     "Slide terakhir: Penutup — CTA ajak ke RodaTrip"
   ],
   "image_prompts": [
-    "Prompt realistis untuk slide 1 — NAMA DESTINASI SPESIFIK (B. Inggris, 30-50 kata)",
-    "Prompt realistis untuk slide 2 — NAMA DESTINASI SPESIFIK",
-    "... (sama jumlahnya dengan text_overlays)"
+    "Prompt untuk SLIDE 1 — harus SAMA DESTINASINYA dengan text_overlays[0], jangan destinasi lain. Realistic photo, 30-50 kata, B. Inggris",
+    "Prompt untuk SLIDE 2 — harus SAMA DESTINASINYA dengan text_overlays[1]",
+    "Prompt untuk SLIDE 3 — harus SAMA DESTINASINYA dengan text_overlays[2]",
+    "... (sama jumlah dan urutannya dengan text_overlays)"
   ],
   "caption": "Caption informatif 300-500 karakter. Hook 1 kalimat → info detail 2-3 kalimat → tips 1 kalimat → ajakan interaksi ringan. Bahasa Indonesia.",
   "hashtags": "3-5 hashtag relevan dipisah spasi"
@@ -849,6 +850,7 @@ ${isSpot ? spotDataList : `- Judul: ${source.title}
 - JANGAN buat text_overlays berupa pertanyaan
 - text_overlays pakai Title Case (kapital awal kata utama), JANGAN semua UPPERCASE. Contoh benar: "Tiket Rp 28.000, View Seperti Ini"
 - image_prompts: Bahasa Inggris, deskriptif, realistic photo, WAJIB sebut NAMA DESTINASI SPESIFIK dari data, SERTAKAN --ar 1:1 di akhir
+- text_overlays dan image_prompts HARUS sinkron per index. Contoh: text_overlays[2] tentang "Bukit Sikunir", maka image_prompts[2] WAJIB tentang "Bukit Sikunir" juga, bukan destinasi lain.
 - caption: Informatif, 300-500 karakter. Hook 1 kalimat → info detail 2-3 kalimat → tips 1 kalimat → ajakan interaksi ringan di akhir
 - hashtags: 3-5 tag relevan (#NamaTempat #Provinsi #Roadtrip #RodaTrip)
 - HANYA gunakan data yang diberikan. JANGAN menyebut destinasi di luar DATA.
