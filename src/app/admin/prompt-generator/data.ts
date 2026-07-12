@@ -142,6 +142,7 @@ Roadtrip di ${kota}, ${provinsi}
 - nearby_hotels: ARRAY 5 OBJECT. Setiap object: { name, distance, price (kisaran harga/malam), maps_url (origin=nama stop, destination=nama hotel, &travelmode=driving). DAN setiap hotel punya nearby_restaurants: ARRAY object { name, distance, price (kisaran harga/porsi), maps_url (origin=nama hotel, destination=nama resto, &travelmode=driving) }
 - nearby_restaurants (top level): ARRAY 5 OBJECT. Setiap object: { name, distance, price (kisaran harga/porsi), maps_url (origin=nama stop, destination=nama resto, &travelmode=driving) }
 - Restoran di dalam hotel WAJIB: origin=nama hotel, destination=nama resto, &travelmode=driving
+- Jangan gunakan nama stop (destinasi) sebagai nama hotel atau restoran. Nama hotel/restoran harus UNIK dan berbeda dari nama-nama stop.
 - price: Kisaran harga real sesuai lokasi (hotel: per malam, resto: per porsi)
 - Output HANYA JSON, tanpa markdown`
 }
