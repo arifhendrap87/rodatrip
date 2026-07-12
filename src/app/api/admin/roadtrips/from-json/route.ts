@@ -3,6 +3,7 @@ import { getServerAdmin } from "@/lib/api/auth"
 import { adminLimiter } from "@/lib/api/rate-limit"
 import { geminiRoadtripSchema } from "@/lib/validators/gemini-roadtrip"
 import { db } from "@/lib/services/db"
+import { findDuplicateSpot } from "@/lib/utils/detect-duplicate-spot"
 
 const PROVINCE_TO_REGION: Record<string, string> = {
   "Jawa Barat": "Jawa",
@@ -92,6 +93,7 @@ export async function POST(request: Request) {
     const stop = stops[i]
     const slug = generateSlug(stop.name)
 
+    // Cek duplicate by slug
     const { data: existing } = await db
       .from("spots")
       .select("slug")
@@ -100,6 +102,13 @@ export async function POST(request: Request) {
 
     if (existing) {
       spotResults.push({ stopNumber: i + 1, name: stop.name, slug, status: "skipped (already exists)" })
+      continue
+    }
+
+    // Cek duplicate by nama mirip + koordinat
+    const duplicate = await findDuplicateSpot(stop.name, stop.lat as number | undefined, stop.lng as number | undefined)
+    if (duplicate) {
+      spotResults.push({ stopNumber: i + 1, name: stop.name, slug: duplicate.slug, status: `skipped (similar to: ${duplicate.name})` })
       continue
     }
 
@@ -122,10 +131,10 @@ export async function POST(request: Request) {
     spotResults.push({ stopNumber: i + 1, name: stop.name, slug, status: "created" })
   }
 
-  const allSpotSlugs = stops.map((stop, i) => {
-    const slug = generateSlug(stop.name)
-    return { stopNumber: i + 1, spotSlug: slug }
-  })
+  const allSpotSlugs = spotResults.map((r) => ({
+    stopNumber: r.stopNumber,
+    spotSlug: r.slug,
+  }))
 
   const { data: existingItinerary } = await db
     .from("itineraries")

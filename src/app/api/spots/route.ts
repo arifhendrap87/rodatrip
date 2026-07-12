@@ -4,6 +4,7 @@ import { createSpotSchema } from "@/lib/validators/spot"
 import { getServerAdmin } from "@/lib/api/auth"
 import { getSpots } from "@/lib/services/spots"
 import { db } from "@/lib/services/db"
+import { findDuplicateSpot } from "@/lib/utils/detect-duplicate-spot"
 
 export async function GET(request: Request) {
   const ip = request.headers.get("x-forwarded-for") || "unknown"
@@ -50,6 +51,13 @@ export async function POST(request: Request) {
     .maybeSingle()
 
   if (existingSpot) return conflict(`Spot dengan slug "${slug}" sudah ada`)
+
+  // Cek duplicate by nama mirip + koordinat
+  const { location: bodyLoc } = parsed.data
+  const duplicate = await findDuplicateSpot(parsed.data.name, bodyLoc.lat, bodyLoc.lng, slug)
+  if (duplicate) {
+    return conflict(`Spot dengan nama "${duplicate.name}" sudah ada (jarak ${duplicate.distance} km). Gunakan spot yang sudah ada.`)
+  }
 
   // Map camelCase from validator to snake_case for DB
   const { location, ...rest } = parsed.data
