@@ -28,13 +28,21 @@ export async function POST(request: Request) {
 
     const text = data?.choices?.[0]?.message?.content || ""
 
-    // Coba parse JSON dari response
+    // Coba parse JSON dari response — handle berbagai format
     let json: Record<string, unknown> | null = null
     try {
-      const cleaned = text.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim()
-      json = JSON.parse(cleaned)
+      // Ambil blok ```json ... ``` jika ada
+      const blockMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/)
+      const toParse = blockMatch ? blockMatch[1].trim() : text.trim()
+
+      // Cari { ... } pertama dan terakhir
+      const firstBrace = toParse.indexOf("{")
+      const lastBrace = toParse.lastIndexOf("}")
+      if (firstBrace !== -1 && lastBrace > firstBrace) {
+        json = JSON.parse(toParse.substring(firstBrace, lastBrace + 1))
+      }
     } catch {
-      // JSON tidak valid — kembalikan text mentah
+      // JSON tidak valid
     }
 
     return success({ json, raw: text })

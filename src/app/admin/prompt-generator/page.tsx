@@ -122,6 +122,7 @@ export default function PromptGeneratorPage() {
 
   const durasiLabel = days <= 1 ? "1 Hari" : `${days} Hari ${days - 1} Malam`
   const stopsRange = getStopRange(days)
+  const displayText = JSON.stringify(generatedJson || generatedRaw, null, 2)
 
   return (
     <div>
@@ -274,7 +275,7 @@ export default function PromptGeneratorPage() {
                     </p>
                     <div className="flex items-center gap-2">
                       <Button variant="outline" size="sm" className="gap-1.5 text-xs"
-                        onClick={() => { navigator.clipboard.writeText(generatedRaw); toast.success("Tersalin!") }}>
+                        onClick={() => { navigator.clipboard.writeText(displayText); toast.success("Tersalin!") }}>
                         <Copy className="h-3 w-3" /> Copy JSON
                       </Button>
                       {generatedJson && (
@@ -288,7 +289,7 @@ export default function PromptGeneratorPage() {
                   </div>
                   <textarea
                     readOnly
-                    value={JSON.stringify(generatedJson || generatedRaw, null, 2)}
+                    value={displayText}
                     className="w-full h-[400px] rounded-xl border border-border/50 bg-muted/30 p-4 text-sm font-mono leading-relaxed resize-none focus:outline-none"
                   />
                   {generatedJson && (() => {
