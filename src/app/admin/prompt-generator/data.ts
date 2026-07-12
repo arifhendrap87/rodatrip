@@ -65,6 +65,7 @@ Roadtrip di ${kota}, ${provinsi}
   "driving_safety_tips": "2-3 tips keselamatan spesifik rute di ${kota}",
   "culinary_notes": "Rekomendasi kuliner khas ${kota} (string)",
   "cover_image": "",
+   "cover_image_prompt": "English prompt untuk AI image generator — gambarkan suasana roadtrip secara keseluruhan (pemandangan, kendaraan, jalan, cuaca), untuk Midjourney/DALL-E, realistic photo, --ar 16:9",
    "stops": [
     {
       "name": "Nama Destinasi 1",
@@ -85,6 +86,7 @@ Roadtrip di ${kota}, ${provinsi}
       "road_access": "Deskripsi akses jalan",
       "rating": 4.5,
       "image_url": "",
+      "image_prompt": "English prompt untuk AI image generator — gambarkan destinasi ini secara visual (subjek, lingkungan, pencahayaan, suasana), untuk Midjourney/DALL-E, realistic photo, --ar 4:5",
       "tips": "Tips untuk pengunjung",
       "facilities": ["Parkir", "Toilet", "Mushola"],
       "nearby_hotels": [
@@ -139,6 +141,8 @@ Roadtrip di ${kota}, ${provinsi}
 - maps_embed_url: generate dari nama stop (format maps/dir/?api=1&travelmode=driving)
 - culinary_notes: STRING (bukan array), gabung dengan \\n
 - cover_image: kosongkan ""
+- cover_image_prompt: Bahasa Inggris, untuk AI image generator (Midjourney/DALL-E), gambarkan suasana roadtrip secara keseluruhan (jalan, kendaraan, pemandangan), realistic photo, --ar 16:9
+- image_prompt (per stop): Bahasa Inggris, untuk AI image generator (Midjourney/DALL-E), gambarkan destinasi secara visual (subjek utama, lingkungan, pencahayaan, suasana, gaya), realistic photo, --ar 4:5
 - nearby_hotels: ARRAY 5 OBJECT. Setiap object: { name, distance, price (kisaran harga/malam), maps_url (origin=nama stop, destination=nama hotel, &travelmode=driving). DAN setiap hotel punya nearby_restaurants: ARRAY object { name, distance, price (kisaran harga/porsi), maps_url (origin=nama hotel, destination=nama resto, &travelmode=driving) }
 - nearby_restaurants (top level): ARRAY 5 OBJECT. Setiap object: { name, distance, price (kisaran harga/porsi), maps_url (origin=nama stop, destination=nama resto, &travelmode=driving) }
 - Restoran di dalam hotel WAJIB: origin=nama hotel, destination=nama resto, &travelmode=driving
