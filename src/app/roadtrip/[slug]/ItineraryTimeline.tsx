@@ -5,6 +5,8 @@ import Link from "next/link"
 import type { ItineraryStop } from "@/types"
 import { NearbyPlaces } from "@/components/roadtrip/NearbyPlaces"
 import { SPOT_CATEGORY_DISPLAY } from "@/lib/constants"
+import { Copy } from "lucide-react"
+import { toast } from "sonner"
 
 function fixMapsUrl(url?: string): string {
   if (!url || !url.includes("maps/")) return url || ""
@@ -104,6 +106,17 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
               {stop.imageUrl && (
                 <div className="mt-3 rounded-xl overflow-hidden border border-border/30 bg-muted">
                   <img src={stop.imageUrl} alt={stop.name} className="w-full aspect-[16/7] object-cover" loading="lazy" />
+                </div>
+              )}
+              {stop.imagePrompt && (
+                <div className="mt-2">
+                  <button
+                    onClick={() => { navigator.clipboard.writeText(stop.imagePrompt!); toast.success("Prompt gambar tersalin!") }}
+                    className="text-xs text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
+                  >
+                    <Copy className="h-3 w-3" />
+                    Copy Prompt Gambar
+                  </button>
                 </div>
               )}
 

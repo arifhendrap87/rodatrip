@@ -165,6 +165,7 @@ export async function POST(request: Request) {
       culinary_notes: itineraryFields.culinary_notes || null,
       cover_image: itineraryFields.cover_image || null,
       prompt_gambar: null,
+      cover_image_prompt: itineraryFields.cover_image_prompt || null,
       is_published: false,
     })
     .select("id, slug")

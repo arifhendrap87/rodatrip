@@ -7,6 +7,8 @@ import type { Itinerary, ItineraryStop } from "@/types"
 import { ItineraryTimeline } from "./ItineraryTimeline"
 import { parseEmbedUrl } from "@/lib/embed"
 import { Breadcrumb } from "@/components/ui/Breadcrumb"
+import { Copy } from "lucide-react"
+import { toast } from "sonner"
 
 interface RoadtripDetailClientProps {
   itinerary: Itinerary
@@ -68,11 +70,20 @@ export function RoadtripDetailClient({ itinerary }: RoadtripDetailClientProps) {
   return (
     <div className="min-h-screen">
       <section className={`relative overflow-hidden pt-28 pb-20 sm:pt-36 sm:pb-28 ${itinerary.coverImage ? 'text-white' : ''}`}>
-        {showCover ? (
-          <>
-            <img src={itinerary.coverImage} alt={`${itinerary.title} — Foto sampul roadtrip`} className="absolute inset-0 w-full h-full object-cover" onError={() => setCoverError(true)} />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-          </>
+          {showCover ? (
+            <>
+              <img src={itinerary.coverImage} alt={`${itinerary.title} — Foto sampul roadtrip`} className="absolute inset-0 w-full h-full object-cover" onError={() => setCoverError(true)} />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              {itinerary.coverImagePrompt && (
+                <button
+                  onClick={() => { navigator.clipboard.writeText(itinerary.coverImagePrompt!); toast.success("Prompt cover tersalin!") }}
+                  className="absolute top-24 right-4 z-20 bg-black/40 hover:bg-black/60 text-white/80 text-xs px-2.5 py-1.5 rounded-full transition-colors flex items-center gap-1"
+                >
+                  <Copy className="h-3 w-3" />
+                  Copy Prompt Gambar
+                </button>
+              )}
+            </>
         ) : (
           <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.08] via-accent/[0.03] to-background pointer-events-none">
             <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-primary/5 blur-3xl" />

@@ -92,6 +92,7 @@ export interface Itinerary {
   drivingSafetyTips?: string
   culinaryNotes?: string
   coverImage?: string
+  coverImagePrompt?: string
   stops: ItineraryStop[]
   isPublished?: boolean
   createdAt: string
@@ -123,6 +124,7 @@ export interface ItineraryStop {
   roadAccess?: string
   rating?: number
   imageUrl?: string
+  imagePrompt?: string
   province?: string
   tips?: string
   lat?: number

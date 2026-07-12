@@ -15,6 +15,7 @@ export interface ItineraryRow {
   driving_safety_tips: string | null
   culinary_notes: string | null
   cover_image: string | null
+  cover_image_prompt: string | null
   is_published: boolean
   created_at: string
   updated_at: string
@@ -35,6 +36,7 @@ interface SpotJoin {
   road_access: string | null
   rating: number | null
   image_url: string | null
+  image_prompt: string | null
   visit_duration: string | null
   best_visit_hour: string | null
   additional_cost: string | null
@@ -71,6 +73,7 @@ function rowToItinerary(row: ItineraryRow, stops: ItineraryStopRow[]): Itinerary
     drivingSafetyTips: row.driving_safety_tips || undefined,
     culinaryNotes: row.culinary_notes || undefined,
     coverImage: row.cover_image || undefined,
+    coverImagePrompt: row.cover_image_prompt || undefined,
     isPublished: row.is_published,
     stops: stops.map(stopToItineraryStop).sort((a, b) => a.stopNumber - b.stopNumber),
     createdAt: row.created_at,
@@ -100,6 +103,7 @@ function stopToItineraryStop(row: ItineraryStopRow): ItineraryStop {
     roadAccess: s?.road_access || undefined,
     rating: s?.rating ?? undefined,
     imageUrl: s?.image_url || undefined,
+    imagePrompt: s?.image_prompt || undefined,
     province: s?.province || undefined,
     tips: s?.tips || undefined,
     lat: loc?.[1] ?? undefined,
@@ -132,7 +136,7 @@ async function getStopsForItinerary(itineraryId: string): Promise<ItineraryStopR
   if (slugs.length > 0) {
     const { data: spotRows } = await db
       .from("spots")
-      .select("id, slug, name, category, province, description, ticket_price, parking_fee, facilities, opening_hours, road_access, rating, image_url, visit_duration, best_visit_hour, additional_cost, spot_important_note, physical_effort, tips, location, images, nearby_hotels_jsonb, nearby_restaurants_jsonb")
+      .select("id, slug, name, category, province, description, ticket_price, parking_fee, facilities, opening_hours, road_access, rating, image_url, image_prompt, visit_duration, best_visit_hour, additional_cost, spot_important_note, physical_effort, tips, location, images, nearby_hotels_jsonb, nearby_restaurants_jsonb")
       .in("slug", slugs)
 
     const spotMap = new Map<string, SpotJoin>()

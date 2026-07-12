@@ -38,6 +38,7 @@ const geminiStopSchema = z.object({
   road_access: z.string().optional(),
   rating: z.number().optional(),
   image_url: z.string().optional(),
+  image_prompt: z.string().optional(),
   tips: z.string().optional(),
   facilities: z.array(z.string()).optional(),
   nearby_hotels: z.array(geminiNearbyHotelSchema).optional(),
@@ -58,6 +59,7 @@ export const geminiRoadtripSchema = z.object({
   driving_safety_tips: z.string().optional(),
   culinary_notes: z.string().optional(),
   cover_image: z.string().optional(),
+  cover_image_prompt: z.string().optional(),
   stops: z.array(geminiStopSchema).min(1),
 })
 

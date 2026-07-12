@@ -15,6 +15,7 @@ export interface SpotData {
   rating: number
   image_url: string
   image_credit: string
+  image_prompt?: string
   tags: string[]
   tips: string
   best_time: string
