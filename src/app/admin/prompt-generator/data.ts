@@ -43,7 +43,9 @@ Roadtrip di ${kota}, ${provinsi}
 
 ## KRITERIA
 - ${stopsRange} destinasi (stops) searah secara geografis di ${kota}, ${provinsi}
+- Pilih destinasi UNGGULAN / WISATA ANDALAN dengan RATING TERTINGGI di ${kota}, ${provinsi}
 - Nama tempat WAJIB BENAR-BENAR ADA dan merupakan destinasi wisata sungguhan di ${provinsi}
+- Jangan pilih destinasi yang kurang populer atau rating rendah
 - Bahasa Indonesia natural dan engaging
 - Durasi: ${durasi}
 
