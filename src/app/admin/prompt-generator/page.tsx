@@ -122,7 +122,9 @@ export default function PromptGeneratorPage() {
 
   const durasiLabel = days <= 1 ? "1 Hari" : `${days} Hari ${days - 1} Malam`
   const stopsRange = getStopRange(days)
-  const displayText = JSON.stringify(generatedJson || generatedRaw, null, 2)
+  const displayText = generatedJson
+    ? JSON.stringify(generatedJson, null, 2)
+    : generatedRaw
 
   return (
     <div>
