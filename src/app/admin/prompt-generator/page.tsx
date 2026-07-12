@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Copy, Sparkles, Check, FileDown, Loader2 } from "lucide-react"
 import { generatePrompt } from "./data"
+import { toast } from "sonner"
 import {
   Select,
   SelectContent,
@@ -38,6 +39,10 @@ export default function PromptGeneratorPage() {
   const [kota, setKota] = useState("Bandung")
   const [days, setDays] = useState(2)
   const [copied, setCopied] = useState(false)
+  const [generating, setGenerating] = useState(false)
+  const [generatedJson, setGeneratedJson] = useState<Record<string, unknown> | null>(null)
+  const [generatedRaw, setGeneratedRaw] = useState("")
+  const [generatedError, setGeneratedError] = useState("")
 
   // Fetch provinces on mount
   useEffect(() => {
@@ -92,6 +97,27 @@ export default function PromptGeneratorPage() {
     navigator.clipboard.writeText(prompt)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  async function handleGenerate() {
+    setGenerating(true)
+    setGeneratedJson(null)
+    setGeneratedRaw("")
+    setGeneratedError("")
+    try {
+      const res = await fetch("/api/ai/generate-roadtrip", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json?.error?.message || "Gagal generate")
+      if (json.data?.json) setGeneratedJson(json.data.json)
+      setGeneratedRaw(json.data?.raw || "")
+    } catch (err) {
+      setGeneratedError(err instanceof Error ? err.message : "Gagal generate")
+    }
+    setGenerating(false)
   }
 
   const durasiLabel = days <= 1 ? "1 Hari" : `${days} Hari ${days - 1} Malam`
@@ -205,20 +231,82 @@ export default function PromptGeneratorPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle>Generated Prompt</CardTitle>
-                  <CardDescription>Copy paste ke Gemini</CardDescription>
+                  <CardDescription>Generate langsung dengan DeepSeek atau copy ke Gemini</CardDescription>
                 </div>
-                <Button onClick={handleCopy} variant="outline" size="sm" className="gap-1.5">
-                  {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                  {copied ? "Tersalin!" : "Copy"}
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button onClick={handleGenerate} variant="default" size="sm" className="gap-1.5" disabled={generating}>
+                    {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                    {generating ? "Generating..." : "✨ Generate dengan DeepSeek"}
+                  </Button>
+                  <Button onClick={handleCopy} variant="outline" size="sm" className="gap-1.5">
+                    {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                    {copied ? "Tersalin!" : "Copy"}
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
               <textarea
                 readOnly
                 value={prompt}
-                className="w-full h-[500px] rounded-xl border border-border/50 bg-muted/30 p-4 text-sm font-mono leading-relaxed resize-none focus:outline-none"
+                className="w-full h-[300px] rounded-xl border border-border/50 bg-muted/30 p-4 text-sm font-mono leading-relaxed resize-none focus:outline-none"
               />
+
+              {/* DeepSeek Result */}
+              {generating && (
+                <div className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-6 text-center text-sm text-muted-foreground">
+                  <Loader2 className="h-5 w-5 animate-spin mx-auto mb-2" />
+                  DeepSeek sedang menulis roadtrip...
+                </div>
+              )}
+
+              {generatedError && (
+                <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+                  {generatedError}
+                </div>
+              )}
+
+              {generatedRaw && (
+                <div className="mt-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold">
+                      {generatedJson ? "✅ JSON Berhasil di-Generate" : "⚠️ Hasil Mentah (JSON tidak valid)"}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <Button variant="outline" size="sm" className="gap-1.5 text-xs"
+                        onClick={() => { navigator.clipboard.writeText(generatedRaw); toast.success("Tersalin!") }}>
+                        <Copy className="h-3 w-3" /> Copy JSON
+                      </Button>
+                      {generatedJson && (
+                        <Link href={`/admin/roadtrips/import?json=${encodeURIComponent(JSON.stringify(generatedJson))}`}>
+                          <Button size="sm" className="gap-1.5 text-xs">
+                            <FileDown className="h-3 w-3" /> Import JSON
+                          </Button>
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                  <textarea
+                    readOnly
+                    value={JSON.stringify(generatedJson || generatedRaw, null, 2)}
+                    className="w-full h-[400px] rounded-xl border border-border/50 bg-muted/30 p-4 text-sm font-mono leading-relaxed resize-none focus:outline-none"
+                  />
+                  {generatedJson && (() => {
+                    const stops = (generatedJson as any).stops || []
+                    return (
+                      <div className="text-xs text-muted-foreground space-y-1">
+                        <p>📌 {stops.length} destinasi</p>
+                        <p>⏱️ {(generatedJson as any).itinerary_duration || "-"}</p>
+                        <p>📏 {(generatedJson as any).total_distance || "-"}</p>
+                        {stops.map((s: any, i: number) => (
+                          <p key={i} className="ml-2">• {s.name} ({s.category})</p>
+                        ))}
+                      </div>
+                    )
+                  })()}
+                </div>
+              )}
+
               <div className="mt-4 flex items-center justify-between rounded-xl border border-primary/20 bg-primary/5 p-3">
                 <div>
                   <p className="text-sm font-medium text-primary">Sudah dapat hasil JSON dari Gemini?</p>
