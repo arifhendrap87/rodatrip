@@ -84,6 +84,8 @@ export default function EditSpotPage() {
     image_prompt: "",
     is_featured: false,
     images: [],
+    nearbyHotels: [] as any[],
+    nearbyRestaurants: [] as any[],
   })
 
   useEffect(() => {
@@ -128,6 +130,8 @@ export default function EditSpotPage() {
     image_prompt: (data as any).image_prompt || "",
             is_featured: data.is_featured || false,
             images: data.images || [],
+            nearbyHotels: (data as any).nearby_hotels_jsonb || (data as any).nearby_hotels || [],
+            nearbyRestaurants: (data as any).nearby_restaurants_jsonb || (data as any).nearby_restaurants || [],
           })
         }
         setLoading(false)
@@ -169,6 +173,8 @@ export default function EditSpotPage() {
       promptGambar: form.prompt_gambar || undefined,
       imagePrompt: form.image_prompt || undefined,
       isFeatured: form.is_featured,
+      nearbyHotels: form.nearbyHotels?.length > 0 ? form.nearbyHotels : undefined,
+      nearbyRestaurants: form.nearbyRestaurants?.length > 0 ? form.nearbyRestaurants : undefined,
       images: form.images?.length > 0 ? form.images : undefined,
     }
 
@@ -468,6 +474,92 @@ export default function EditSpotPage() {
                 </div>
                 <Textarea value={form.image_prompt || form.prompt_gambar} onChange={(e) => setForm((f: any) => ({ ...f, image_prompt: e.target.value, prompt_gambar: e.target.value }))} placeholder="Prompt untuk generate gambar" rows={3} className="text-xs font-mono" />
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>🏨 Hotel & 🍜 Kuliner Terdekat</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Hotels */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold">Hotel & Penginapan</p>
+                <Button type="button" variant="outline" size="sm" onClick={() => setForm((f: any) => ({ ...f, nearbyHotels: [...(f.nearbyHotels || []), { name: "", distance: "", price: "", maps_url: "", nearby_restaurants: [] }] }))}>
+                  + Tambah Hotel
+                </Button>
+              </div>
+              {(form.nearbyHotels || []).map((h: any, i: number) => (
+                <div key={i} className="rounded-xl border border-blue-100 bg-blue-50/50 p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 grid gap-2 sm:grid-cols-2">
+                      <Input value={h.name} onChange={(e) => { const n = [...form.nearbyHotels]; n[i] = { ...n[i], name: e.target.value }; setForm((f: any) => ({ ...f, nearbyHotels: n })) }} placeholder="Nama hotel" className="h-8 text-sm" />
+                      <Input value={h.distance || ""} onChange={(e) => { const n = [...form.nearbyHotels]; n[i] = { ...n[i], distance: e.target.value }; setForm((f: any) => ({ ...f, nearbyHotels: n })) }} placeholder="Jarak (contoh: 500 m)" className="h-8 text-sm" />
+                      <Input value={h.price || ""} onChange={(e) => { const n = [...form.nearbyHotels]; n[i] = { ...n[i], price: e.target.value }; setForm((f: any) => ({ ...f, nearbyHotels: n })) }} placeholder="Harga (contoh: Rp 350rb/malam)" className="h-8 text-sm" />
+                      <Input value={h.maps_url || ""} onChange={(e) => { const n = [...form.nearbyHotels]; n[i] = { ...n[i], maps_url: e.target.value }; setForm((f: any) => ({ ...f, nearbyHotels: n })) }} placeholder="Maps URL (opsional)" className="h-8 text-sm" />
+                    </div>
+                    <Button type="button" variant="ghost" size="icon" className="text-destructive shrink-0 h-8 w-8" onClick={() => setForm((f: any) => ({ ...f, nearbyHotels: f.nearbyHotels.filter((_: any, j: number) => j !== i) }))}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  {/* Nested restaurants inside hotel */}
+                  <div className="ml-4 border-l-2 border-blue-200 pl-4 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-medium text-blue-600">Restoran di hotel ini</p>
+                      <Button type="button" variant="ghost" size="sm" className="h-6 text-xs"
+                        onClick={() => {
+                          const n = [...form.nearbyHotels]
+                          n[i] = { ...n[i], nearby_restaurants: [...(n[i].nearby_restaurants || []), { name: "", distance: "", price: "", maps_url: "" }] }
+                          setForm((f: any) => ({ ...f, nearbyHotels: n }))
+                        }}>
+                        + Tambah Resto
+                      </Button>
+                    </div>
+                    {(h.nearby_restaurants || []).map((r: any, j: number) => (
+                      <div key={j} className="flex items-start gap-2">
+                        <div className="flex-1 grid gap-1 sm:grid-cols-4">
+                          <Input value={r.name} onChange={(e) => { const n = [...form.nearbyHotels]; n[i].nearby_restaurants[j] = { ...n[i].nearby_restaurants[j], name: e.target.value }; setForm((f: any) => ({ ...f, nearbyHotels: n })) }} placeholder="Nama resto" className="h-7 text-xs" />
+                          <Input value={r.distance || ""} onChange={(e) => { const n = [...form.nearbyHotels]; n[i].nearby_restaurants[j] = { ...n[i].nearby_restaurants[j], distance: e.target.value }; setForm((f: any) => ({ ...f, nearbyHotels: n })) }} placeholder="Jarak" className="h-7 text-xs" />
+                          <Input value={r.price || ""} onChange={(e) => { const n = [...form.nearbyHotels]; n[i].nearby_restaurants[j] = { ...n[i].nearby_restaurants[j], price: e.target.value }; setForm((f: any) => ({ ...f, nearbyHotels: n })) }} placeholder="Harga" className="h-7 text-xs" />
+                          <Input value={r.maps_url || ""} onChange={(e) => { const n = [...form.nearbyHotels]; n[i].nearby_restaurants[j] = { ...n[i].nearby_restaurants[j], maps_url: e.target.value }; setForm((f: any) => ({ ...f, nearbyHotels: n })) }} placeholder="Maps URL" className="h-7 text-xs" />
+                        </div>
+                        <Button type="button" variant="ghost" size="icon" className="text-destructive shrink-0 h-7 w-7" onClick={() => {
+                          const n = [...form.nearbyHotels]
+                          n[i].nearby_restaurants = n[i].nearby_restaurants.filter((_: any, k: number) => k !== j)
+                          setForm((f: any) => ({ ...f, nearbyHotels: n }))
+                        }}>
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Standalone Restaurants */}
+            <div className="border-t border-border/30 pt-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold">Kuliner Terdekat (non-hotel)</p>
+                <Button type="button" variant="outline" size="sm" onClick={() => setForm((f: any) => ({ ...f, nearbyRestaurants: [...(f.nearbyRestaurants || []), { name: "", distance: "", price: "", maps_url: "" }] }))}>
+                  + Tambah Resto
+                </Button>
+              </div>
+              {(form.nearbyRestaurants || []).map((r: any, i: number) => (
+                <div key={i} className="flex items-start gap-2 rounded-xl border border-orange-100 bg-orange-50/50 p-3">
+                  <div className="flex-1 grid gap-2 sm:grid-cols-4">
+                    <Input value={r.name} onChange={(e) => { const n = [...form.nearbyRestaurants]; n[i] = { ...n[i], name: e.target.value }; setForm((f: any) => ({ ...f, nearbyRestaurants: n })) }} placeholder="Nama resto" className="h-8 text-sm" />
+                    <Input value={r.distance || ""} onChange={(e) => { const n = [...form.nearbyRestaurants]; n[i] = { ...n[i], distance: e.target.value }; setForm((f: any) => ({ ...f, nearbyRestaurants: n })) }} placeholder="Jarak" className="h-8 text-sm" />
+                    <Input value={r.price || ""} onChange={(e) => { const n = [...form.nearbyRestaurants]; n[i] = { ...n[i], price: e.target.value }; setForm((f: any) => ({ ...f, nearbyRestaurants: n })) }} placeholder="Harga" className="h-8 text-sm" />
+                    <Input value={r.maps_url || ""} onChange={(e) => { const n = [...form.nearbyRestaurants]; n[i] = { ...n[i], maps_url: e.target.value }; setForm((f: any) => ({ ...f, nearbyRestaurants: n })) }} placeholder="Maps URL" className="h-8 text-sm" />
+                  </div>
+                  <Button type="button" variant="ghost" size="icon" className="text-destructive shrink-0 h-8 w-8" onClick={() => setForm((f: any) => ({ ...f, nearbyRestaurants: f.nearbyRestaurants.filter((_: any, j: number) => j !== i) }))}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
