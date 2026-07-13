@@ -3,7 +3,6 @@
 
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -24,9 +23,6 @@ import {
   FileText,
   MapPin,
   Route,
-  MessageCircle,
-  Camera,
-  Music2,
   Info,
   Code,
   ChevronDown,
@@ -39,25 +35,6 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 import Link from "next/link"
-
-const PLATFORMS = [
-  { value: "facebook", label: "Facebook", icon: MessageCircle },
-  { value: "instagram", label: "Instagram", icon: Camera },
-  { value: "tiktok", label: "TikTok", icon: Music2 },
-]
-
-const TONES = [
-  { value: "promo", label: "Promo" },
-  { value: "edukasi", label: "Edukasi" },
-  { value: "inspirasi", label: "Inspirasi" },
-  { value: "storytelling", label: "Storytelling" },
-]
-
-const PLATFORM_BADGES: Record<string, { label: string; className: string }> = {
-  facebook: { label: "f", className: "bg-[#1877F2] text-white min-w-[18px]" },
-  instagram: { label: "IG", className: "bg-gradient-to-br from-[#833AB4] via-[#FD1D1D] to-[#FCAF45] text-white min-w-[22px]" },
-  tiktok: { label: "TT", className: "bg-black text-white min-w-[22px]" },
-}
 
 const PLATFORM_SPECS: Record<string, { maxChars: string; style: string; structure: string }> = {
   facebook: { maxChars: "1.000-2.000", style: "Storytelling, personal, emoji", structure: "Hook → Detail → Tips → CTA" },
@@ -76,41 +53,17 @@ interface SourceItem {
   author?: string
 }
 
-interface GenerateResult {
-  caption: string
-  hashtags: string
-  skrip_tiktok: string
-  visual_prompt: string
-}
-
-interface DraftPayload {
-  title: string
-  platform: string
-  tone: string
-  content_type: string
-  source_id: string
-  source_title: string
-  caption: string
-  hashtags: string
-  skrip_tiktok: string
-}
-
 export default function ContentGeneratorPage() {
   const [sourceType, setSourceType] = useState<"blog" | "roadtrip" | "spot">("spot")
   const [sources, setSources] = useState<SourceItem[]>([])
   const [loadingSources, setLoadingSources] = useState(false)
   const [search, setSearch] = useState("")
-  const [contentStatus, setContentStatus] = useState<Record<string, Record<string, { tone: string; updatedAt: string }>>>({})
 
   const [selectedItem, setSelectedItem] = useState<SourceItem | null>(null)
 
-  const [generating, setGenerating] = useState(false)
-  const [results, setResults] = useState<Record<string, GenerateResult> | null>(null)
   const [copied, setCopied] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
-  const [savedPlatforms, setSavedPlatforms] = useState<Record<string, boolean>>({})
 
-  const [mode, setMode] = useState<"caption" | "carousel">("caption")
   const [carouselResult, setCarouselResult] = useState<{
     text_overlays: string[]
     image_prompts: string[]
@@ -122,10 +75,6 @@ export default function ContentGeneratorPage() {
   useEffect(() => {
     fetchSources()
   }, [sourceType])
-
-  useEffect(() => {
-    if (sources.length > 0) fetchStatus()
-  }, [sources])
 
   async function fetchSources() {
     setLoadingSources(true)
@@ -164,14 +113,6 @@ export default function ContentGeneratorPage() {
     setLoadingSources(false)
   }
 
-  async function fetchStatus() {
-    try {
-      const res = await fetch(`/api/admin/content-generator/status?content_type=${sourceType}`)
-      const json = await res.json()
-      if (res.ok) setContentStatus(json.data.status || {})
-    } catch {}
-  }
-
   const filteredSources = sources.filter((s) => {
     if (!search) return true
     const q = search.toLowerCase()
@@ -180,76 +121,9 @@ export default function ContentGeneratorPage() {
     return title.includes(q) || prov.includes(q)
   })
 
-  function getPlatformStatus(slug: string): Record<string, boolean> {
-    const itemStatus = contentStatus[slug] || {}
-    const result: Record<string, boolean> = {}
-    for (const p of PLATFORMS) {
-      result[p.value] = !!itemStatus[p.value]
-    }
-    return result
-  }
-
   async function handleSelectItem(item: SourceItem) {
     setSelectedItem(item)
-    setResults(null)
-  }
-
-  async function handleGenerate() {
-    if (!selectedItem) return
-    const slug = selectedItem.slug
-    setGenerating(true)
-    setResults(null)
-    setSavedPlatforms({})
-    try {
-      const res = await fetch("/api/admin/content-generator/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sourceType,
-          sourceId: slug,
-        }),
-      })
-      const json = await res.json()
-      if (!res.ok) throw new Error(json?.error?.message || "Gagal generate")
-      setResults(json.data.results)
-      setSavedPlatforms({})
-      toast.success("Konten berhasil digenerate untuk semua platform!")
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Gagal generate konten")
-    }
-    setGenerating(false)
-  }
-
-  async function handleSave(platform: string, result: GenerateResult) {
-    if (!selectedItem) return
-    const slug = selectedItem.slug
-    const title = selectedItem.title || selectedItem.name || slug
-    setSaving(true)
-    try {
-      const res = await fetch("/api/admin/content-generator/drafts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: `${title} — ${platform}`,
-          platform,
-          tone: "auto",
-          content_type: sourceType,
-          source_id: slug,
-          source_title: title,
-          caption: result.caption,
-          hashtags: result.hashtags || "",
-          skrip_tiktok: result.skrip_tiktok || "",
-        }),
-      })
-      const body = await res.json()
-      if (!res.ok) throw new Error(body?.error?.message || "Gagal simpan")
-      setSavedPlatforms((prev) => ({ ...prev, [platform]: true }))
-      await fetchStatus()
-      toast.success("Draft tersimpan!")
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Gagal menyimpan draft")
-    }
-    setSaving(false)
+    setCarouselResult(null)
   }
 
   async function handleSaveCarousel(conceptTitle?: string) {
@@ -308,36 +182,6 @@ export default function ContentGeneratorPage() {
     setCopied(key)
     setTimeout(() => setCopied(null), 2000)
     toast.success("Tersalin!")
-  }
-
-  const [showStructure, setShowStructure] = useState(true)
-
-  function cleanCaption(text: string): string {
-    return text
-      .replace(/^━+.*$/gm, "")
-      .replace(/^───.*$/gm, "")
-      .replace(/^╔[═╗║]+$|^╠[═╣║]+$|^╚[═╝║]+$/gm, "")
-      .replace(/^║.*$/gm, "")
-      .replace(/^📊.*$|^🎨.*$|^📋.*$/gm, "")
-      .replace(/^💡 Tips publikasi:.*$/gm, "")
-      .replace(/^🎬 Transisi:.*$/gm, "")
-      .replace(/^🎵 MUSIK:.*$/gm, "")
-      .replace(/^⏱️ DURASI:.*$/gm, "")
-      .replace(/^🎬 Caption editor:.*$/gm, "")
-      .replace(/^💬 Caption:.*$/gm, "")
-      .replace(/^🎬 Visual:.*$/gm, "")
-      .replace(/^🔊 VO:.*$/gm, "")
-      .replace(/^📝 Caption editor:.*$/gm, "")
-      .replace(/^Transisi:.*$/gm, "")
-      .replace(/\n{3,}/g, "\n\n")
-      .trim()
-  }
-
-  function getResultText(platform: string, tone: string, result: GenerateResult): string {
-    if (platform === "tiktok") return result.skrip_tiktok || result.caption
-    let text = result.caption
-    if (result.hashtags && platform === "instagram") text += "\n\n" + result.hashtags
-    return showStructure ? text : cleanCaption(text)
   }
 
   return (
@@ -417,7 +261,6 @@ export default function ContentGeneratorPage() {
                 ) : (
                   filteredSources.map((item) => {
                     const slug = item.slug
-                    const status = getPlatformStatus(slug)
                     const isSelected = selectedItem?.slug === slug
                     const title = item.title || item.name || slug
 
@@ -449,54 +292,11 @@ export default function ContentGeneratorPage() {
                               <p className="text-xs text-muted-foreground/70 mt-1 line-clamp-1">{item.excerpt}</p>
                             )}
                           </div>
-                          <div className="flex items-center gap-1 shrink-0 mt-0.5">
-                            {PLATFORMS.map((p) => {
-                              const hasContent = status[p.value]
-                              const badge = PLATFORM_BADGES[p.value]
-                              return (
-                                <div
-                                  key={p.value}
-                                  className={`flex items-center gap-0.5 rounded px-1 py-0.5 text-[10px] font-bold leading-none ${
-                                    hasContent ? badge.className : "bg-muted text-muted-foreground/40"
-                                  }`}
-                                  title={`${p.label}: ${hasContent ? "Sudah ada" : "Kosong"}`}
-                                >
-                                  <span>{badge.label}</span>
-                                  {hasContent && <span>●</span>}
-                                </div>
-                              )
-                            })}
-                          </div>
                         </div>
                       </button>
                     )
                   })
                 )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Status summary */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-medium text-muted-foreground">Status per Platform</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-4 text-xs">
-                {PLATFORMS.map((p) => {
-                  const totalWithContent = filteredSources.filter(
-                    (s) => !!contentStatus[s.slug]?.[p.value]
-                  ).length
-                  const badge = PLATFORM_BADGES[p.value]
-                  return (
-                    <div key={p.value} className="flex items-center gap-1.5">
-                      <span className={`inline-flex items-center justify-center rounded px-1 py-0.5 text-[10px] font-bold leading-none ${badge.className}`}>
-                        {badge.label}
-                      </span>
-                      <span className="text-muted-foreground">{totalWithContent}/{filteredSources.length}</span>
-                    </div>
-                  )
-                })}
               </div>
             </CardContent>
           </Card>
@@ -522,147 +322,38 @@ export default function ContentGeneratorPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <CardTitle className="text-base">{selectedItem.title || selectedItem.name || selectedItem.slug}</CardTitle>
-                      <CardDescription>Generate konten untuk semua platform sekaligus</CardDescription>
+                      <CardDescription>Generate Viral Carousel — text overlay + prompt gambar</CardDescription>
                     </div>
                     <div className="hidden sm:flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">✨ AI DeepSeek — otomatis</span>
+                      <Link href="/admin/content-generator/drafts">
+                        <Button variant="outline" size="sm" className="gap-1.5">
+                          <Eye className="h-4 w-4" /> Lihat Konsep
+                        </Button>
+                      </Link>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {/* Mode selector */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground shrink-0">Mode:</span>
-                    <div className="flex gap-1">
-                      <Button
-                        variant={mode === "caption" ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => { setMode("caption"); setResults(null); setCarouselResult(null) }}
-                        className="gap-1.5"
-                      >
-                        <FileText className="h-4 w-4" />
-                        Caption
-                      </Button>
-                      <Button
-                        variant={mode === "carousel" ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => { setMode("carousel"); setCarouselResult(null) }}
-                        className="gap-1.5"
-                      >
-                        <Layout className="h-4 w-4" />
-                        Viral Carousel
-                      </Button>
-                    </div>
-                  </div>
-
-                  {mode === "caption" ? (
-                    <>
-                      <div className="flex sm:hidden items-center">
-                        <span className="text-xs text-muted-foreground">✨ AI DeepSeek — generate untuk FB, IG, TT sekaligus</span>
-                      </div>
-                      <div className="hidden sm:block text-xs text-muted-foreground">
-                        ✨ AI DeepSeek — generate caption Facebook + Instagram + TikTok sekaligus
-                      </div>
-                      <Button
-                        onClick={handleGenerate}
-                        disabled={generating}
-                        className="w-full gap-2"
-                        size="lg"
-                      >
-                        {generating ? (
-                          <Loader2 className="h-5 w-5 animate-spin" />
-                        ) : (
-                          <Sparkles className="h-5 w-5" />
-                        )}
-                        {generating
-                          ? "Generate Caption..."
-                          : "✨ Generate Caption (Semua Platform)"}
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button
-                        onClick={handleGenerateCarousel}
-                        disabled={carouselGenerating}
-                        className="w-full gap-2"
-                        size="lg"
-                      >
-                        {carouselGenerating ? (
-                          <Loader2 className="h-5 w-5 animate-spin" />
-                        ) : (
-                          <Layout className="h-5 w-5" />
-                        )}
-                        {carouselGenerating
-                          ? "Generate Carousel..."
-                          : "🎨 Generate Viral Carousel"}
-                      </Button>
-                    </>
-                  )}
+                  <Button
+                    onClick={handleGenerateCarousel}
+                    disabled={carouselGenerating}
+                    className="w-full gap-2"
+                    size="lg"
+                  >
+                    {carouselGenerating ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <Layout className="h-5 w-5" />
+                    )}
+                    {carouselGenerating
+                      ? "Generate Carousel..."
+                      : "🎨 Generate Viral Carousel"}
+                  </Button>
                 </CardContent>
               </Card>
 
-              {/* Results: Caption Mode */}
-              {mode === "caption" && results ? (
-                <div className="space-y-4">
-                  {Object.entries(results).map(([platform, toneResult]) => {
-                    const label = platform === "facebook" ? "Facebook" : platform === "instagram" ? "Instagram" : "TikTok"
-                    const fullText = toneResult.caption || toneResult.skrip_tiktok
-                      ? `📝 CAPTION (${label})\n${toneResult.caption}${toneResult.hashtags ? `\n\n🏷️ HASHTAG\n${toneResult.hashtags}` : ""}${toneResult.skrip_tiktok ? `\n\n🎬 SKRIP TIKTOK\n${toneResult.skrip_tiktok}` : ""}${toneResult.visual_prompt ? `\n\n${toneResult.visual_prompt}` : ""}`
-                      : ""
-                    if (!fullText) return null
-                    const copyKey = `caption-${platform}`
-                    return (
-                      <Card key={platform}>
-                        <CardHeader>
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <CardTitle className="capitalize text-base">{label}</CardTitle>
-                              <CardDescription>{platform === "tiktok" ? "Skrip + Visual" : "Caption + Visual"}</CardDescription>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Button variant="outline" size="sm" className="gap-1.5"
-                                onClick={() => handleCopy(fullText, copyKey)}>
-                                {copied === copyKey ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                                {copied === copyKey ? "Tersalin!" : "Copy All"}
-                              </Button>
-                              {!savedPlatforms[platform] ? (
-                                <Button variant="default" size="sm" className="gap-1.5"
-                                  onClick={() => handleSave(platform, toneResult)} disabled={saving}>
-                                  {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                                  Simpan
-                                </Button>
-                              ) : (
-                                <Badge variant="secondary" className="gap-1 text-xs">
-                                  <Check className="h-3 w-3 text-green-500" /> Tersimpan
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <Textarea value={fullText} readOnly className="min-h-[300px] font-mono text-sm leading-relaxed resize-y whitespace-pre" />
-                        </CardContent>
-                      </Card>
-                    )
-                  })}
-                </div>
-              ) : mode === "caption" && generating ? (
-                <Card>
-                  <CardContent className="flex items-center justify-center py-16">
-                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                  </CardContent>
-                </Card>
-              ) : mode === "caption" ? (
-                <Card>
-                  <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                    <Sparkles className="h-8 w-8 text-muted-foreground/30 mb-3" />
-                    <p className="text-sm text-muted-foreground">Klik Generate untuk membuat konten semua platform</p>
-                  </CardContent>
-                </Card>
-              ) : null}
-
               {/* Results: Carousel Mode */}
-              {mode === "carousel" && carouselResult ? (
+              {carouselResult ? (
                 <Card>
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -711,48 +402,24 @@ export default function ContentGeneratorPage() {
                         const bg = gradients[i % gradients.length]
                         return (
                           <div key={i} className="rounded-xl border border-border/50 overflow-hidden bg-white shadow-sm">
-                            {/* IG Post Mockup */}
                             <div className={`aspect-[4/5] bg-gradient-to-br ${bg} relative flex flex-col justify-end p-0`}>
-                              <div className="absolute top-2 left-2 bg-black/50 text-white text-[10px] font-bold px-1.5 py-0.5 rounded z-10">
-                                {i + 1}
-                              </div>
+                              <div className="absolute top-2 left-2 bg-black/50 text-white text-[10px] font-bold px-1.5 py-0.5 rounded z-10">{i + 1}</div>
                               <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
-                                <button
-                                  onClick={() => {
-                                    navigator.clipboard.writeText(text)
-                                    setCopied(`overlay-${i}`)
-                                    setTimeout(() => setCopied(null), 2000)
-                                    toast.success("Text overlay tersalin!")
-                                  }}
-                                  className="h-5 w-5 flex items-center justify-center rounded bg-black/30 hover:bg-black/50 transition-colors"
-                                >
+                                <button onClick={() => { navigator.clipboard.writeText(text); setCopied(`overlay-${i}`); setTimeout(() => setCopied(null), 2000); toast.success("Text overlay tersalin!") }}
+                                  className="h-5 w-5 flex items-center justify-center rounded bg-black/30 hover:bg-black/50 transition-colors">
                                   {copied === `overlay-${i}` ? <Check className="h-2.5 w-2.5 text-green-400" /> : <Copy className="h-2.5 w-2.5 text-white/60" />}
                                 </button>
-                                <span className="bg-black/30 text-white/60 text-[9px] px-1.5 py-0.5 rounded-full">
-                                  IG
-                                </span>
+                                <span className="bg-black/30 text-white/60 text-[9px] px-1.5 py-0.5 rounded-full">IG</span>
                               </div>
                               <div className="bg-gradient-to-t from-black/80 via-black/30 to-transparent p-4 pt-12">
-                                <p className="text-white font-bold text-sm leading-snug break-words drop-shadow-lg">
-                                  {text}
-                                </p>
+                                <p className="text-white font-bold text-sm leading-snug break-words drop-shadow-lg">{text}</p>
                               </div>
                             </div>
-                            {/* Prompt */}
                             <div className="p-3 bg-muted/30 border-t border-border/30">
                               <div className="flex items-start justify-between gap-2">
-                                <p className="text-[11px] text-muted-foreground font-mono leading-relaxed flex-1 min-w-0">
-                                  🤖 {carouselResult.image_prompts[i]}
-                                </p>
-                                <button
-                                  onClick={() => {
-                                    navigator.clipboard.writeText(carouselResult.image_prompts[i])
-                                    setCopied(`prompt-${i}`)
-                                    setTimeout(() => setCopied(null), 2000)
-                                    toast.success("Prompt slide tersalin!")
-                                  }}
-                                  className="shrink-0 h-6 w-6 flex items-center justify-center rounded hover:bg-muted-foreground/10 transition-colors"
-                                >
+                                <p className="text-[11px] text-muted-foreground font-mono leading-relaxed flex-1 min-w-0">🤖 {carouselResult.image_prompts[i]}</p>
+                                <button onClick={() => { navigator.clipboard.writeText(carouselResult.image_prompts[i]); setCopied(`prompt-${i}`); setTimeout(() => setCopied(null), 2000); toast.success("Prompt slide tersalin!") }}
+                                  className="shrink-0 h-6 w-6 flex items-center justify-center rounded hover:bg-muted-foreground/10 transition-colors">
                                   {copied === `prompt-${i}` ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3 text-muted-foreground/60" />}
                                 </button>
                               </div>
@@ -771,44 +438,36 @@ export default function ContentGeneratorPage() {
                           <p className="text-sm text-muted-foreground">{carouselResult.hashtags}</p>
                         </>
                       )}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="gap-1.5 mt-2"
-                        onClick={() => {
-                          const text = `${carouselResult.caption}\n\n${carouselResult.hashtags}`
-                          navigator.clipboard.writeText(text)
-                          toast.success("Caption + hashtag tersalin!")
-                        }}
-                      >
-                        {copied === "caption" ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                        Copy Caption + Hashtag
-                      </Button>
-                      <Button variant="default" size="sm" className="gap-1.5 mt-2"
-                        disabled={saving}
-                        onClick={() => handleSaveCarousel(`${selectedItem?.title || selectedItem?.name || "Carousel"} — Konsep Carousel`)}>
-                        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                        Simpan sebagai Konsep
-                      </Button>
+                      <div className="flex items-center gap-2 mt-2">
+                        <Button variant="outline" size="sm" className="gap-1.5"
+                          onClick={() => { const text = `${carouselResult.caption}\n\n${carouselResult.hashtags}`; navigator.clipboard.writeText(text); toast.success("Caption + hashtag tersalin!") }}>
+                          {copied === "caption" ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                          Copy Caption + Hashtag
+                        </Button>
+                        <Button variant="default" size="sm" className="gap-1.5"
+                          disabled={saving}
+                          onClick={() => handleSaveCarousel(`${selectedItem?.title || selectedItem?.name || "Carousel"} — Konsep Carousel`)}>
+                          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                          Simpan sebagai Konsep
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
-              ) : mode === "carousel" && carouselGenerating ? (
+              ) : carouselGenerating ? (
                 <Card>
                   <CardContent className="flex items-center justify-center py-16">
                     <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                   </CardContent>
                 </Card>
-              ) : mode === "carousel" ? (
+              ) : (
                 <Card>
                   <CardContent className="flex flex-col items-center justify-center py-12 text-center">
                     <Layout className="h-8 w-8 text-muted-foreground/30 mb-3" />
-                    <p className="text-sm text-muted-foreground">
-                      Pilih jumlah slide, lalu klik Generate Viral Carousel
-                    </p>
+                    <p className="text-sm text-muted-foreground">Pilih konten, lalu klik Generate Viral Carousel</p>
                   </CardContent>
                 </Card>
-              ) : null}
+              )}
             </>
           )}
         </div>
