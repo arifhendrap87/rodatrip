@@ -31,7 +31,7 @@ export default function EditRoadtripPage() {
   const [imagePrompt, setImagePrompt] = useState("")
   const [copiedPrompt, setCopiedPrompt] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [form, setForm] = useState({ title: "", itineraryDuration: "", totalDistance: "", roadCondition: "", estimatedCost: "", bestDrivingTime: "", routeFacilities: "", mapsEmbedUrl: "", drivingSafetyTips: "", culinaryNotes: "", coverImage: "", isPublished: false, promptGambar: "" })
+  const [form, setForm] = useState({ title: "", itineraryDuration: "", totalDistance: "", roadCondition: "", estimatedCost: "", bestDrivingTime: "", routeFacilities: "", mapsEmbedUrl: "", drivingSafetyTips: "", culinaryNotes: "", coverImage: "", isPublished: false, promptGambar: "", coverImagePrompt: "" })
   const [stops, setStops] = useState<StopForm[]>([])
   const [fullData, setFullData] = useState<any>(null)
 
@@ -49,6 +49,7 @@ export default function EditRoadtripPage() {
           mapsEmbedUrl: d.mapsEmbedUrl || d.maps_embed_url || "", drivingSafetyTips: d.drivingSafetyTips || d.driving_safety_tips || "",
           culinaryNotes: d.culinaryNotes || d.culinary_notes || "", coverImage: d.coverImage || d.cover_image || "", isPublished: d.isPublished || d.is_published || false,
           promptGambar: d.promptGambar || d.prompt_gambar || "",
+          coverImagePrompt: d.coverImagePrompt || d.cover_image_prompt || "",
         })
         setStops((d.stops || []).map((s: any, i: number) => stopToForm(s, i)))
       } catch { router.push("/admin/roadtrips") }
@@ -72,6 +73,7 @@ export default function EditRoadtripPage() {
       mapsEmbedUrl: form.mapsEmbedUrl || undefined, drivingSafetyTips: form.drivingSafetyTips || undefined, culinaryNotes: form.culinaryNotes || undefined,
       coverImage: form.coverImage || undefined, isPublished: form.isPublished,
       promptGambar: form.promptGambar || undefined,
+      coverImagePrompt: form.coverImagePrompt || undefined,
       stops: stops.filter((s) => s.spotSlug).map((s) => ({ stopNumber: s.stopNumber, spotSlug: s.spotSlug })),
     }
     try { await api.admin.itineraries.update(slug, data as unknown as Record<string, unknown>); router.push("/admin/roadtrips") }
@@ -279,7 +281,7 @@ export default function EditRoadtripPage() {
               )}
               <div className="space-y-2">
                 <Label>AI Image Prompt (manual)</Label>
-                <Input value={form.promptGambar} onChange={(e) => updateField("promptGambar", e.target.value)} placeholder="Prompt untuk generate gambar" />
+                <Textarea value={form.coverImagePrompt || form.promptGambar} onChange={(e) => updateField("coverImagePrompt", e.target.value)} placeholder="Prompt untuk generate gambar (cover image)" rows={3} className="text-xs font-mono" />
               </div>
             </div>
           </CardContent>
