@@ -26,6 +26,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ExternalLink,
+  Layout,
 } from "lucide-react"
 import { toast } from "sonner"
 import Link from "next/link"
@@ -60,6 +61,9 @@ interface Draft {
   caption: string
   hashtags: string
   skrip_tiktok: string
+  concept_type: string
+  text_overlays: string[]
+  image_prompts: string[]
   status: string
   scheduled_at: string | null
   created_at: string
@@ -72,6 +76,7 @@ export default function DraftsPage() {
   const [search, setSearch] = useState("")
   const [platformFilter, setPlatformFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
+  const [conceptFilter, setConceptFilter] = useState("all")
   const [offset, setOffset] = useState(0)
   const [total, setTotal] = useState(0)
   const [copied, setCopied] = useState<string | null>(null)
@@ -81,8 +86,9 @@ export default function DraftsPage() {
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
+    setOffset(0)
     fetchDrafts()
-  }, [platformFilter, statusFilter, offset])
+  }, [platformFilter, statusFilter, conceptFilter, search])
 
   async function fetchDrafts() {
     setLoading(true)
@@ -92,6 +98,7 @@ export default function DraftsPage() {
       params.set("offset", String(offset))
       if (platformFilter !== "all") params.set("platform", platformFilter)
       if (statusFilter !== "all") params.set("status", statusFilter)
+      if (conceptFilter !== "all") params.set("concept_type", conceptFilter)
       if (search) params.set("search", search)
 
       const res = await fetch(`/api/admin/content-generator/drafts?${params}`)
@@ -218,6 +225,16 @@ export default function DraftsPage() {
                 <SelectItem value="archived">Archived</SelectItem>
               </SelectContent>
             </Select>
+            <Select value={conceptFilter} onValueChange={(v) => v && (setConceptFilter(v), setOffset(0))}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Tipe" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Tipe</SelectItem>
+                <SelectItem value="caption">Caption</SelectItem>
+                <SelectItem value="carousel">Carousel</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </CardContent>
       </Card>
@@ -239,9 +256,11 @@ export default function DraftsPage() {
         <>
           <div className="space-y-3">
             {drafts.map((draft) => {
-              const PlatformIcon = PLATFORM_ICONS[draft.platform] || FileText
+              const isCarousel = draft.concept_type === "carousel"
+              const PlatformIcon = isCarousel ? Layout : (PLATFORM_ICONS[draft.platform] || FileText)
               const displayText = getDisplayText(draft)
               const previewText = displayText.slice(0, 200) + (displayText.length > 200 ? "..." : "")
+              const slideCount = draft.text_overlays?.length || 0
 
               return (
                 <Card key={draft.id}>
@@ -258,10 +277,18 @@ export default function DraftsPage() {
                           }`}>
                             {draft.status}
                           </span>
+                          {isCarousel && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-purple-100 text-purple-700">
+                              🎠 Carousel
+                            </span>
+                          )}
                         </div>
                         <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2">
-                          <span>{PLATFORM_LABELS[draft.platform] || draft.platform}</span>
-                          <span>{TONE_LABELS[draft.tone] || draft.tone}</span>
+                          {isCarousel ? (
+                            <span>🎠 {slideCount} slide</span>
+                          ) : (
+                            <span>{PLATFORM_LABELS[draft.platform] || draft.platform}</span>
+                          )}
                           <span className="capitalize">{draft.content_type}</span>
                           <span>{new Date(draft.updated_at).toLocaleDateString("id-ID")}</span>
                         </div>
