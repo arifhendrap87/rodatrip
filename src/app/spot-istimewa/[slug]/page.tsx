@@ -109,6 +109,7 @@ export default async function SpotDetailPage({ params }: { params: Promise<{ slu
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <span className="inline-flex items-center gap-1 rounded-full bg-white/20 backdrop-blur-sm px-3 py-1 text-xs font-medium text-white"><span>{cat.icon}</span><span>{cat.label}</span></span>
             <span className="inline-flex items-center gap-1 rounded-full bg-white/20 backdrop-blur-sm px-3 py-1 text-xs font-medium text-white">📍 {spot.province}</span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-white/20 backdrop-blur-sm px-3 py-1 text-xs font-medium text-white">⭐ {spot.rating}</span>
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold font-heading text-white leading-tight">{spot.name}</h1>
         </div>
@@ -207,12 +208,49 @@ export default async function SpotDetailPage({ params }: { params: Promise<{ slu
                 )
               })()}
 
+              {(spot as any).images && (spot as any).images.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-bold font-heading flex items-center gap-2"><span>📸</span><span>Galeri Foto</span></h3>
+                  <div className="mt-3 grid grid-cols-3 gap-2">
+                    {((spot as any).images as Array<{url:string;alt?:string}>).slice(0, 5).map((img: {url:string;alt?:string}, i: number) => (
+                      <a key={i} href={img.url} target="_blank" rel="noopener noreferrer"
+                        className={`relative aspect-[4/3] rounded-xl overflow-hidden border border-border/30 bg-muted hover:opacity-90 transition-opacity ${i === 0 ? 'col-span-2 row-span-2' : ''}`}>
+                        <img src={img.url} alt={img.alt || ""} className="w-full h-full object-cover" loading="lazy" />
+                        {i === 4 && (spot as any).images.length > 5 && (
+                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl">
+                            <span className="text-white font-bold text-lg">+{(spot as any).images.length - 5}</span>
+                          </div>
+                        )}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {(spot as any).spot_important_note && (
                 <div className="rounded-2xl bg-red-50 border border-red-100 p-4 flex items-start gap-3">
                   <span className="text-lg shrink-0 mt-0.5">⚠️</span>
                   <div>
                     <p className="text-sm font-semibold text-red-800">Catatan Penting Pengendara</p>
                     <p className="text-sm text-red-600 mt-1">{(spot as any).spot_important_note}</p>
+                  </div>
+                </div>
+              )}
+
+              {spot.tips && (
+                <div className="rounded-2xl bg-gradient-to-br from-primary/[0.05] to-accent/[0.05] border border-border/50 p-6">
+                  <h3 className="text-lg font-bold font-heading flex items-center gap-2"><span>💡</span><span>Tips</span></h3>
+                  <p className="mt-3 text-muted-foreground leading-relaxed">{spot.tips}</p>
+                </div>
+              )}
+
+              {spot.tags?.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-bold font-heading">Tags</h3>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {spot.tags.map((tag: string) => (
+                      <span key={tag} className="inline-flex items-center rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground">#{tag}</span>
+                    ))}
                   </div>
                 </div>
               )}
@@ -255,23 +293,6 @@ export default async function SpotDetailPage({ params }: { params: Promise<{ slu
                   </div>
                 )
               })()}
-
-              {spot.tips && (
-                <div className="rounded-2xl bg-gradient-to-br from-primary/[0.05] to-accent/[0.05] border border-border/50 p-6">
-                  <h3 className="text-lg font-bold font-heading flex items-center gap-2"><span>💡</span><span>Tips</span></h3>
-                  <p className="mt-3 text-muted-foreground leading-relaxed">{spot.tips}</p>
-                </div>
-              )}
-              {spot.tags?.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-bold font-heading">Tags</h3>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {spot.tags.map((tag: string) => (
-                      <span key={tag} className="inline-flex items-center rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground">#{tag}</span>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
 
             <div className="space-y-6">

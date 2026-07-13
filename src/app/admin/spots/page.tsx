@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Search, Edit, Trash2, Eye, ExternalLink, Sparkles } from "lucide-react"
+import { Plus, Search, Edit, Trash2, Eye, ExternalLink, Sparkles, ImageIcon, Camera, Loader2 } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select"
 import { useDebounce } from "@/hooks/useDebounce"
 import { toast } from "sonner"
+import { ImagePicker } from "@/components/admin/ImagePicker"
 
 function spotScore(spot: any): number {
   const parsed = parseLocation(spot.location)
@@ -78,6 +79,8 @@ export default function SpotsPage() {
   const initialFetchDone = useRef(false)
   const [selectedSlugs, setSelectedSlugs] = useState<Set<string>>(new Set())
   const [batchLoading, setBatchLoading] = useState(false)
+  const [pickerSpot, setPickerSpot] = useState<string | null>(null)
+  const [updatingImage, setUpdatingImage] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     fetch("/api/wilayah/provinces")
@@ -309,6 +312,46 @@ Tambah Spot
                     <input type="checkbox" checked={selectedSlugs.has(spot.slug)}
                       onChange={() => toggleSelect(spot.slug)}
                       className="shrink-0 rounded border-gray-300" />
+                    <div className="relative w-12 h-12 shrink-0 rounded-lg overflow-hidden bg-muted border group">
+                      {spot.image_url ? (
+                        <img src={spot.image_url} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                          <ImageIcon className="h-5 w-5" />
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setPickerSpot(spot.slug)}
+                        className="absolute inset-0 bg-black/0 hover:bg-black/30 transition-colors flex items-center justify-center"
+                      >
+                        {updatingImage.has(spot.slug) ? (
+                          <Loader2 className="h-4 w-4 animate-spin text-white" />
+                        ) : (
+                          <Camera className={`h-4 w-4 text-white transition-opacity ${spot.image_url ? 'opacity-0 group-hover:opacity-100' : 'opacity-60'}`} />
+                        )}
+                      </button>
+                      {spot.image_url && (
+                        <button
+                          type="button"
+                          onClick={async (e) => {
+                            e.stopPropagation()
+                            setUpdatingImage(prev => new Set(prev).add(spot.slug))
+                            try {
+                              await api.spots.update(spot.slug, { imageUrl: '' })
+                              setSpots(prev => prev.map(s => s.slug === spot.slug ? { ...s, image_url: '' } : s))
+                              toast.success("Gambar dihapus")
+                            } catch {
+                              toast.error("Gagal menghapus gambar")
+                            }
+                            setUpdatingImage(prev => { const n = new Set(prev); n.delete(spot.slug); return n })
+                          }}
+                          className="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Trash2 className="h-2.5 w-2.5" />
+                        </button>
+                      )}
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <h3 className="font-medium truncate">{spot.name}</h3>
@@ -389,6 +432,25 @@ Tambah Spot
           </Button>
         </div>
       )}
+
+      <ImagePicker
+        open={pickerSpot !== null}
+        onClose={() => setPickerSpot(null)}
+        onSelect={async (urls) => {
+          const url = urls[0]
+          if (!url || !pickerSpot) return
+          setUpdatingImage(prev => new Set(prev).add(pickerSpot))
+          try {
+            await api.spots.update(pickerSpot, { imageUrl: url })
+            setSpots(prev => prev.map(s => s.slug === pickerSpot ? { ...s, image_url: url } : s))
+            toast.success("Gambar diperbarui")
+          } catch {
+            toast.error("Gagal menyimpan gambar")
+          }
+          setUpdatingImage(prev => { const n = new Set(prev); n.delete(pickerSpot!); return n })
+          setPickerSpot(null)
+        }}
+      />
     </div>
   )
 }

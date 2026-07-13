@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Search, Edit, Trash2, Eye, ExternalLink, FileText, ChevronDown } from "lucide-react"
+import { Plus, Search, Edit, Trash2, Eye, ExternalLink, FileText, ChevronDown, ImageIcon, Camera, Loader2 } from "lucide-react"
 import { useDebounce } from "@/hooks/useDebounce"
 import { toast } from "sonner"
+import { ImagePicker } from "@/components/admin/ImagePicker"
 
 interface BlogPost {
   id: string
@@ -89,6 +90,8 @@ export default function BlogAdminPage() {
   const [total, setTotal] = useState(0)
   const [selectedSlugs, setSelectedSlugs] = useState<Set<string>>(new Set())
   const [batchLoading, setBatchLoading] = useState(false)
+  const [pickerSlug, setPickerSlug] = useState<string | null>(null)
+  const [updatingImage, setUpdatingImage] = useState<Set<string>>(new Set())
   const debouncedSearch = useDebounce(search, 300)
 
   function buildParams(pageOffset = 0) {
@@ -256,6 +259,50 @@ export default function BlogAdminPage() {
                   <input type="checkbox" checked={selectedSlugs.has(post.slug)}
                     onChange={() => toggleSelect(post.slug)}
                     className="mt-1 shrink-0 rounded border-gray-300" />
+                  <div className="relative w-12 h-12 shrink-0 rounded-lg overflow-hidden bg-muted border group mt-0.5">
+                    {post.image_url ? (
+                      <img src={post.image_url} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                        <ImageIcon className="h-5 w-5" />
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setPickerSlug(post.slug)}
+                      className="absolute inset-0 bg-black/0 hover:bg-black/30 transition-colors flex items-center justify-center"
+                    >
+                      {updatingImage.has(post.slug) ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-white" />
+                      ) : (
+                        <Camera className={`h-4 w-4 text-white transition-opacity ${post.image_url ? 'opacity-0 group-hover:opacity-100' : 'opacity-60'}`} />
+                      )}
+                    </button>
+                    {post.image_url && (
+                      <button
+                        type="button"
+                        onClick={async (e) => {
+                          e.stopPropagation()
+                          setUpdatingImage(prev => new Set(prev).add(post.slug))
+                          try {
+                            await fetch(`/api/admin/blog/${post.slug}`, {
+                              method: "PUT",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ image_url: '' }),
+                            })
+                            setPosts(prev => prev.map(p => p.slug === post.slug ? { ...p, image_url: '' } : p))
+                            toast.success("Gambar dihapus")
+                          } catch {
+                            toast.error("Gagal menghapus gambar")
+                          }
+                          setUpdatingImage(prev => { const n = new Set(prev); n.delete(post.slug); return n })
+                        }}
+                        className="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Trash2 className="h-2.5 w-2.5" />
+                      </button>
+                    )}
+                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <h3 className="font-medium truncate">{post.title || "(tanpa judul)"}</h3>
@@ -344,6 +391,29 @@ export default function BlogAdminPage() {
           </Button>
         </div>
       )}
+
+      <ImagePicker
+        open={pickerSlug !== null}
+        onClose={() => setPickerSlug(null)}
+        onSelect={async (urls) => {
+          const url = urls[0]
+          if (!url || !pickerSlug) return
+          setUpdatingImage(prev => new Set(prev).add(pickerSlug))
+          try {
+            await fetch(`/api/admin/blog/${pickerSlug}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ image_url: url }),
+            })
+            setPosts(prev => prev.map(p => p.slug === pickerSlug ? { ...p, image_url: url } : p))
+            toast.success("Gambar diperbarui")
+          } catch {
+            toast.error("Gagal menyimpan gambar")
+          }
+          setUpdatingImage(prev => { const n = new Set(prev); n.delete(pickerSlug!); return n })
+          setPickerSlug(null)
+        }}
+      />
     </div>
   )
 }

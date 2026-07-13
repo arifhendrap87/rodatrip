@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { ReadinessScore } from "@/components/ui/ReadinessScore"
-import { ArrowLeft, Save, Loader2, Plus, Trash2, ExternalLink, Copy, Check, ImageIcon } from "lucide-react"
+import { ArrowLeft, Save, Loader2, Plus, Trash2, ExternalLink, Copy, Check, ImageIcon, Eye } from "lucide-react"
 import Link from "next/link"
 import { SpotSelect } from "@/components/admin/SpotSelect"
 import { ImageUpload } from "@/components/ui/image-upload"
@@ -312,6 +312,12 @@ export default function EditRoadtripPage() {
         <div className="flex items-center gap-3">
           <Button type="submit" disabled={saving}>{saving ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</> : <><Save className="mr-2 h-4 w-4" /> Update</>}</Button>
           <Link href="/admin/roadtrips"><Button variant="outline">Cancel</Button></Link>
+          <Link href={`/admin/roadtrips/preview/${slug}`} target="_blank">
+            <Button type="button" variant="outline">
+              <Eye className="mr-2 h-4 w-4" />
+              Preview
+            </Button>
+          </Link>
           <div className="flex-1" />
           <Button type="button" variant="outline" onClick={handleCopy}>
             {copied ? <Check className="mr-2 h-4 w-4 text-green-500" /> : <Copy className="mr-2 h-4 w-4" />}

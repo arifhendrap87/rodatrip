@@ -8,9 +8,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Search, Edit, Trash2, ExternalLink, EyeOff, FileDown } from "lucide-react"
+import { Plus, Search, Edit, Trash2, ExternalLink, EyeOff, FileDown, ImageIcon, Camera, Loader2, Eye } from "lucide-react"
 import { useDebounce } from "@/hooks/useDebounce"
 import { toast } from "sonner"
+import { ImagePicker } from "@/components/admin/ImagePicker"
 
 const SORT_OPTIONS = [
   { value: "terbaru", label: "Terbaru" },
@@ -60,6 +61,8 @@ export default function RoadtripsPage() {
   const [total, setTotal] = useState(0)
   const [selectedSlugs, setSelectedSlugs] = useState<Set<string>>(new Set())
   const [batchLoading, setBatchLoading] = useState(false)
+  const [pickerSlug, setPickerSlug] = useState<string | null>(null)
+  const [updatingImage, setUpdatingImage] = useState<Set<string>>(new Set())
 
   async function fetchRoadtrips(pageOffset = 0) {
     setLoading(true)
@@ -234,6 +237,46 @@ export default function RoadtripsPage() {
                   <input type="checkbox" checked={selectedSlugs.has(rt.slug)}
                     onChange={() => toggleSelect(rt.slug)}
                     className="shrink-0 rounded border-gray-300" />
+                  <div className="relative w-12 h-12 shrink-0 rounded-lg overflow-hidden bg-muted border group">
+                    {rt.coverImage ? (
+                      <img src={rt.coverImage} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                        <ImageIcon className="h-5 w-5" />
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setPickerSlug(rt.slug)}
+                      className="absolute inset-0 bg-black/0 hover:bg-black/30 transition-colors flex items-center justify-center"
+                    >
+                      {updatingImage.has(rt.slug) ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-white" />
+                      ) : (
+                        <Camera className={`h-4 w-4 text-white transition-opacity ${rt.coverImage ? 'opacity-0 group-hover:opacity-100' : 'opacity-60'}`} />
+                      )}
+                    </button>
+                    {rt.coverImage && (
+                      <button
+                        type="button"
+                        onClick={async (e) => {
+                          e.stopPropagation()
+                          setUpdatingImage(prev => new Set(prev).add(rt.slug))
+                          try {
+                            await api.admin.itineraries.update(rt.slug, { coverImage: '' })
+                            setRoadtrips(prev => prev.map(r => r.slug === rt.slug ? { ...r, coverImage: '' } : r))
+                            toast.success("Cover dihapus")
+                          } catch {
+                            toast.error("Gagal menghapus cover")
+                          }
+                          setUpdatingImage(prev => { const n = new Set(prev); n.delete(rt.slug); return n })
+                        }}
+                        className="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Trash2 className="h-2.5 w-2.5" />
+                      </button>
+                    )}
+                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <h3 className="font-medium truncate">{rt.title}</h3>
@@ -274,6 +317,13 @@ export default function RoadtripsPage() {
                   </div>
 
                   <div className="flex items-center gap-1">
+                    <Link
+                      href={`/admin/roadtrips/preview/${rt.slug}`}
+                      target="_blank"
+                      className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Link>
                     <Link
                       href={`/roadtrip/${rt.slug}`}
                       target="_blank"
@@ -318,6 +368,25 @@ export default function RoadtripsPage() {
           </Button>
         </div>
       )}
+
+      <ImagePicker
+        open={pickerSlug !== null}
+        onClose={() => setPickerSlug(null)}
+        onSelect={async (urls) => {
+          const url = urls[0]
+          if (!url || !pickerSlug) return
+          setUpdatingImage(prev => new Set(prev).add(pickerSlug))
+          try {
+            await api.admin.itineraries.update(pickerSlug, { coverImage: url })
+            setRoadtrips(prev => prev.map(r => r.slug === pickerSlug ? { ...r, coverImage: url } : r))
+            toast.success("Cover diperbarui")
+          } catch {
+            toast.error("Gagal menyimpan cover")
+          }
+          setUpdatingImage(prev => { const n = new Set(prev); n.delete(pickerSlug!); return n })
+          setPickerSlug(null)
+        }}
+      />
     </div>
   )
 }
