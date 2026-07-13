@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 export const SPOT_CATEGORIES = ["alam", "kuliner", "budaya", "foto", "petualangan", "sejarah", "hotel", "restaurant"] as const
-export const REGIONS = ["Jawa", "Sumatera", "Bali & Nusa Tenggara", "Sulawesi", "Kalimantan"] as const
+export const REGIONS = ["Jawa", "Sumatera", "Bali & Nusa Tenggara", "Sulawesi", "Kalimantan", "Maluku", "Papua"] as const
 
 export const geoPointSchema = z.object({
   lat: z.number().min(-90).max(90),
