@@ -96,6 +96,7 @@ export default function NewSpotPage() {
     facilities: "", distance_from_city: "",
     tags: "", image_url: "", is_featured: false,
     prompt_gambar: "",
+    image_prompt: "",
     images: [] as GalleryImage[],
   })
 
@@ -150,6 +151,7 @@ export default function NewSpotPage() {
       imageUrl: form.image_url || "",
       imageCredit: "Unsplash",
       promptGambar: form.prompt_gambar || undefined,
+      imagePrompt: form.image_prompt || undefined,
       images: form.images.length > 0 ? form.images.map((img, i) => ({ ...img, sort_order: i })) : undefined,
     }
 
@@ -626,7 +628,7 @@ export default function NewSpotPage() {
               )}
               <div className="space-y-2">
                 <Label>AI Image Prompt (manual)</Label>
-                <Input value={form.prompt_gambar} onChange={(e) => setForm((f) => ({ ...f, prompt_gambar: e.target.value }))} placeholder="Prompt untuk generate gambar" />
+                <Input value={form.image_prompt || form.prompt_gambar} onChange={(e) => setForm((f) => ({ ...f, image_prompt: e.target.value, prompt_gambar: e.target.value }))} placeholder="Prompt untuk generate gambar" />
               </div>
             </div>
           </CardContent>

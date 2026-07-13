@@ -81,6 +81,7 @@ export default function EditSpotPage() {
     distance_from_city: "", facilities: "", tags: "",
     lat: "", lng: "", image_url: "", image_credit: "",
     prompt_gambar: "",
+    image_prompt: "",
     is_featured: false,
     images: [],
   })
@@ -121,9 +122,10 @@ export default function EditSpotPage() {
             tags: ((data.tags as string[]) || []).join(", "),
             lat: parseLocation(data.location)?.lat ?? "",
             lng: parseLocation(data.location)?.lng ?? "",
-            image_url: data.image_url || "",
-            image_credit: data.image_credit || "",
-            prompt_gambar: data.prompt_gambar || "",
+    image_url: data.image_url || "",
+    image_credit: data.image_credit || "",
+    prompt_gambar: data.prompt_gambar || "",
+    image_prompt: (data as any).image_prompt || "",
             is_featured: data.is_featured || false,
             images: data.images || [],
           })
@@ -165,6 +167,7 @@ export default function EditSpotPage() {
       imageUrl: form.image_url,
       imageCredit: form.image_credit,
       promptGambar: form.prompt_gambar || undefined,
+      imagePrompt: form.image_prompt || undefined,
       isFeatured: form.is_featured,
       images: form.images?.length > 0 ? form.images : undefined,
     }
@@ -474,7 +477,7 @@ export default function EditSpotPage() {
               )}
               <div className="space-y-2">
                 <Label>AI Image Prompt (manual)</Label>
-                <Input value={form.prompt_gambar} onChange={(e) => setForm((f: any) => ({ ...f, prompt_gambar: e.target.value }))} placeholder="Prompt untuk generate gambar" />
+                <Input value={form.image_prompt || form.prompt_gambar} onChange={(e) => setForm((f: any) => ({ ...f, image_prompt: e.target.value, prompt_gambar: e.target.value }))} placeholder="Prompt untuk generate gambar" />
               </div>
             </div>
           </CardContent>
