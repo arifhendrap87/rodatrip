@@ -628,7 +628,7 @@ export default function NewSpotPage() {
               )}
               <div className="space-y-2">
                 <Label>AI Image Prompt (manual)</Label>
-                <Input value={form.image_prompt || form.prompt_gambar} onChange={(e) => setForm((f) => ({ ...f, image_prompt: e.target.value, prompt_gambar: e.target.value }))} placeholder="Prompt untuk generate gambar" />
+                <Textarea value={form.image_prompt || form.prompt_gambar} onChange={(e) => setForm((f) => ({ ...f, image_prompt: e.target.value, prompt_gambar: e.target.value }))} placeholder="Prompt untuk generate gambar" rows={3} className="text-xs font-mono" />
               </div>
             </div>
           </CardContent>
