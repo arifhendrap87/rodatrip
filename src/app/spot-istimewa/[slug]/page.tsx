@@ -170,7 +170,7 @@ export default async function SpotDetailPage({ params }: { params: Promise<{ slu
                                   <span className="flex-1">🍜 {r.name}{r.distance ? ` (${r.distance})` : ''}{r.price ? ` — ${r.price}` : ''}</span>
                                   {r.maps_url && (
                                     <a href={cleanMapsUrl(r.maps_url)} target="_blank" rel="noopener noreferrer"
-                                      className="shrink-0 text-blue-400 hover:text-blue-600">📍</a>
+                                      className="shrink-0 text-blue-400 hover:text-blue-600">📍 Petunjuk Arah</a>
                                   )}
                                 </div>
                               ))}
