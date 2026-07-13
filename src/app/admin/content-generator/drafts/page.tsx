@@ -135,6 +135,16 @@ export default function DraftsPage() {
     }
   }
 
+  async function handleStatusChange(id: string, status: string) {
+    setSaving(true)
+    try {
+      const res = await fetch("/api/admin/content-generator/drafts", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, status }) })
+      if (res.ok) { setDrafts((prev) => prev.map((d) => d.id === id ? { ...d, status } : d)); toast.success(`Status diubah ke ${status}`) }
+      else { const j = await res.json(); throw new Error(j?.error?.message || "Gagal") }
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Gagal mengubah status") }
+    setSaving(false)
+  }
+
   function handleCopy(text: string, id: string) {
     navigator.clipboard.writeText(text)
     setCopied(id)
@@ -350,6 +360,22 @@ export default function DraftsPage() {
                                 onClick={() => { setPreviewId(draft.id); setEditOverlays(draft.text_overlays || []); setEditPrompts(draft.image_prompts || []); setEditCaption(draft.caption); setEditHashtags(draft.hashtags || "") }}>
                                 <Layout className="h-3 w-3" /> Preview
                               </Button>
+                              {draft.status !== "published" && (
+                                <Button variant="ghost" size="sm" className="h-8 text-xs gap-1 text-green-600" disabled={saving}
+                                  onClick={() => handleStatusChange(draft.id, "published")}>📤 Publish</Button>
+                              )}
+                              {draft.status === "published" && (
+                                <Button variant="ghost" size="sm" className="h-8 text-xs gap-1" disabled={saving}
+                                  onClick={() => handleStatusChange(draft.id, "draft")}>↩️ Draft</Button>
+                              )}
+                              {draft.status !== "archived" && (
+                                <Button variant="ghost" size="sm" className="h-8 text-xs gap-1 text-orange-600" disabled={saving}
+                                  onClick={() => handleStatusChange(draft.id, "archived")}>📦 Archive</Button>
+                              )}
+                              {draft.status === "archived" && (
+                                <Button variant="ghost" size="sm" className="h-8 text-xs gap-1" disabled={saving}
+                                  onClick={() => handleStatusChange(draft.id, "draft")}>↩️ Draft</Button>
+                              )}
                               <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(draft.id)} title="Hapus">
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -362,6 +388,22 @@ export default function DraftsPage() {
                               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => startEdit(draft)} title="Edit caption">
                                 <FileText className="h-4 w-4" />
                               </Button>
+                              {draft.status !== "published" && (
+                                <Button variant="ghost" size="sm" className="h-8 text-xs gap-1 text-green-600" disabled={saving}
+                                  onClick={() => handleStatusChange(draft.id, "published")}>📤 Publish</Button>
+                              )}
+                              {draft.status === "published" && (
+                                <Button variant="ghost" size="sm" className="h-8 text-xs gap-1" disabled={saving}
+                                  onClick={() => handleStatusChange(draft.id, "draft")}>↩️ Draft</Button>
+                              )}
+                              {draft.status !== "archived" && (
+                                <Button variant="ghost" size="sm" className="h-8 text-xs gap-1 text-orange-600" disabled={saving}
+                                  onClick={() => handleStatusChange(draft.id, "archived")}>📦 Archive</Button>
+                              )}
+                              {draft.status === "archived" && (
+                                <Button variant="ghost" size="sm" className="h-8 text-xs gap-1" disabled={saving}
+                                  onClick={() => handleStatusChange(draft.id, "draft")}>↩️ Draft</Button>
+                              )}
                               <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(draft.id)} title="Hapus">
                                 <Trash2 className="h-4 w-4" />
                               </Button>
