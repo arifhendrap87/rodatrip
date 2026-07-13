@@ -306,7 +306,7 @@ export default function EditBlogPage() {
                 </div>
                 <div className="space-y-2">
                   <Label>AI Image Prompt</Label>
-                  <Input value={form.prompt_gambar} onChange={(e) => setForm((f) => ({ ...f, prompt_gambar: e.target.value }))} placeholder="Prompt gambar" />
+                  <Textarea value={form.prompt_gambar} onChange={(e) => setForm((f) => ({ ...f, prompt_gambar: e.target.value }))} placeholder="Prompt gambar" rows={3} className="text-xs font-mono" />
                 </div>
               </div>
             </div>
