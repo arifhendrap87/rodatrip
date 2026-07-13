@@ -8,6 +8,16 @@ import { Breadcrumb } from "@/components/ui/Breadcrumb"
 import { SpotCard } from "@/components/spot/SpotCard"
 import { SpotHeroImage } from "@/components/spot/SpotHeroImage"
 import { CopyPromptButton } from "@/components/spot/CopyPromptButton"
+
+function cleanMapsUrl(url: string): string {
+  if (!url) return url
+  // Markdown link: [text](url) → extract url
+  const md = url.match(/\]\(([^)]+)\)/)
+  if (md) return md[1]
+  // Already a plain URL
+  if (url.startsWith("http")) return url
+  return url
+}
 import { getSpots, getSpotBySlug, getSpotCoordinates } from "@/lib/services/spots"
 import { getItinerariesBySpotSlug } from "@/lib/services/itineraries"
 import type { SpotData } from "@/lib/services/spots"
@@ -149,7 +159,7 @@ export default async function SpotDetailPage({ params }: { params: Promise<{ slu
                               {h.price && <p className="text-xs text-muted-foreground">💰 {h.price}</p>}
                             </div>
                             {h.maps_url && (
-                              <a href={h.maps_url.startsWith("http") ? h.maps_url.match(/\[?https?:\/\/[^\]]*\]?/)?.[0]?.replace(/[\[\]]/g,"") || h.maps_url : h.maps_url} target="_blank" rel="noopener noreferrer"
+                              <a href={cleanMapsUrl(h.maps_url)} target="_blank" rel="noopener noreferrer"
                                 className="shrink-0 text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-0.5">📍 Petunjuk Arah</a>
                             )}
                           </div>
@@ -159,7 +169,7 @@ export default async function SpotDetailPage({ params }: { params: Promise<{ slu
                                 <div key={j} className="flex items-start justify-between gap-2 text-xs text-blue-600">
                                   <span className="flex-1">🍜 {r.name}{r.distance ? ` (${r.distance})` : ''}{r.price ? ` — ${r.price}` : ''}</span>
                                   {r.maps_url && (
-                                    <a href={r.maps_url.startsWith("http") ? r.maps_url.match(/\[?https?:\/\/[^\]]*\]?/)?.[0]?.replace(/[\[\]]/g,"") || r.maps_url : r.maps_url} target="_blank" rel="noopener noreferrer"
+                                    <a href={cleanMapsUrl(r.maps_url)} target="_blank" rel="noopener noreferrer"
                                       className="shrink-0 text-blue-400 hover:text-blue-600">📍</a>
                                   )}
                                 </div>
@@ -187,7 +197,7 @@ export default async function SpotDetailPage({ params }: { params: Promise<{ slu
                             <p className="text-xs text-muted-foreground">📍 {r.distance}{r.price ? ` — ${r.price}` : ''}</p>
                           </div>
                           {r.maps_url && (
-                            <a href={r.maps_url.startsWith("http") ? r.maps_url.match(/\[?https?:\/\/[^\]]*\]?/)?.[0]?.replace(/[\[\]]/g,"") || r.maps_url : r.maps_url} target="_blank" rel="noopener noreferrer"
+                            <a href={cleanMapsUrl(r.maps_url)} target="_blank" rel="noopener noreferrer"
                               className="shrink-0 text-xs text-orange-600 hover:text-orange-800 font-medium">📍 Petunjuk Arah</a>
                           )}
                         </div>
