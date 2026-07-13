@@ -22,6 +22,12 @@ export interface SpotData {
   opening_hours: string
   estimated_time: string
   ticket_price: string
+  parking_fee?: string
+  additional_cost?: string
+  physical_effort?: string
+  visit_duration?: string
+  best_visit_hour?: string
+  spot_important_note?: string
   road_access: string
   facilities: string[]
   distance_from_city: string

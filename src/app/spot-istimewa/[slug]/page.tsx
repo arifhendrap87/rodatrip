@@ -56,8 +56,11 @@ export default async function SpotDetailPage({ params }: { params: Promise<{ slu
 
   const infoGrid = [
     { icon: "🕐", label: "Jam Buka", value: spot.opening_hours },
-    { icon: "⏱️", label: "Estimasi Waktu", value: spot.estimated_time },
+    { icon: "⏱️", label: "Estimasi Waktu", value: spot.visit_duration || spot.estimated_time },
     { icon: "💰", label: "Harga Tiket", value: spot.ticket_price },
+    { icon: "🅿️", label: "Biaya Parkir", value: spot.parking_fee },
+    { icon: "💸", label: "Biaya Tambahan", value: spot.additional_cost },
+    { icon: "🏃", label: "Tingkat Fisik", value: spot.physical_effort },
     { icon: "🚗", label: "Akses Jalan", value: spot.road_access },
     { icon: "📏", label: "Jarak dari Kota", value: spot.distance_from_city },
   ].filter((i) => i.value)
@@ -126,6 +129,80 @@ export default async function SpotDetailPage({ params }: { params: Promise<{ slu
                     {spot.facilities.map((f: string) => (
                       <span key={f} className="inline-flex items-center rounded-full border border-border/50 bg-muted/50 px-3.5 py-1.5 text-sm font-medium text-foreground">{f}</span>
                     ))}
+                  </div>
+                </div>
+              )}
+
+              {(() => {
+                const nh = (spot as any).nearby_hotels_jsonb as Array<{name:string;distance?:string;price?:string;maps_url?:string;nearby_restaurants?:Array<{name:string;distance?:string;price?:string;maps_url?:string}>}>
+                if (!nh || nh.length === 0) return null
+                return (
+                  <div>
+                    <h3 className="text-lg font-bold font-heading flex items-center gap-2"><span>🏨</span><span>Hotel & Penginapan Terdekat</span></h3>
+                    <div className="mt-3 space-y-3">
+                      {nh.map((h, i) => (
+                        <div key={i} className="rounded-2xl border border-blue-100 bg-blue-50/50 p-4">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold">{h.name}</p>
+                              {h.distance && <p className="text-xs text-muted-foreground mt-0.5">📍 {h.distance}</p>}
+                              {h.price && <p className="text-xs text-muted-foreground">💰 {h.price}</p>}
+                            </div>
+                            {h.maps_url && (
+                              <a href={h.maps_url.startsWith("http") ? h.maps_url.match(/\[?https?:\/\/[^\]]*\]?/)?.[0]?.replace(/[\[\]]/g,"") || h.maps_url : h.maps_url} target="_blank" rel="noopener noreferrer"
+                                className="shrink-0 text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-0.5">📍 Petunjuk Arah</a>
+                            )}
+                          </div>
+                          {h.nearby_restaurants && h.nearby_restaurants.length > 0 && (
+                            <div className="mt-2 ml-3 border-l-2 border-blue-100 pl-3 space-y-1">
+                              {h.nearby_restaurants.map((r, j) => (
+                                <div key={j} className="flex items-start justify-between gap-2 text-xs text-blue-600">
+                                  <span className="flex-1">🍜 {r.name}{r.distance ? ` (${r.distance})` : ''}{r.price ? ` — ${r.price}` : ''}</span>
+                                  {r.maps_url && (
+                                    <a href={r.maps_url.startsWith("http") ? r.maps_url.match(/\[?https?:\/\/[^\]]*\]?/)?.[0]?.replace(/[\[\]]/g,"") || r.maps_url : r.maps_url} target="_blank" rel="noopener noreferrer"
+                                      className="shrink-0 text-blue-400 hover:text-blue-600">📍</a>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })()}
+
+              {(() => {
+                const nr = (spot as any).nearby_restaurants_jsonb as Array<{name:string;distance?:string;price?:string;maps_url?:string}>
+                if (!nr || nr.length === 0) return null
+                return (
+                  <div>
+                    <h3 className="text-lg font-bold font-heading flex items-center gap-2"><span>🍜</span><span>Kuliner Terdekat</span></h3>
+                    <div className="mt-3 space-y-2">
+                      {nr.map((r, i) => (
+                        <div key={i} className="flex items-start justify-between gap-2 rounded-2xl border border-orange-100 bg-orange-50/50 p-3">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium">{r.name}</p>
+                            <p className="text-xs text-muted-foreground">📍 {r.distance}{r.price ? ` — ${r.price}` : ''}</p>
+                          </div>
+                          {r.maps_url && (
+                            <a href={r.maps_url.startsWith("http") ? r.maps_url.match(/\[?https?:\/\/[^\]]*\]?/)?.[0]?.replace(/[\[\]]/g,"") || r.maps_url : r.maps_url} target="_blank" rel="noopener noreferrer"
+                              className="shrink-0 text-xs text-orange-600 hover:text-orange-800 font-medium">📍 Petunjuk Arah</a>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })()}
+
+              {(spot as any).spot_important_note && (
+                <div className="rounded-2xl bg-red-50 border border-red-100 p-4 flex items-start gap-3">
+                  <span className="text-lg shrink-0 mt-0.5">⚠️</span>
+                  <div>
+                    <p className="text-sm font-semibold text-red-800">Catatan Penting Pengendara</p>
+                    <p className="text-sm text-red-600 mt-1">{(spot as any).spot_important_note}</p>
                   </div>
                 </div>
               )}
@@ -207,10 +284,10 @@ export default async function SpotDetailPage({ params }: { params: Promise<{ slu
                     <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-lg">🗺️</span>
                     <div><p className="text-xs text-muted-foreground">Region</p><p className="text-sm font-medium">{spot.region}</p></div>
                   </div>
-                  {spot.best_time && (
+                  {spot.best_time || spot.best_visit_hour && (
                     <div className="flex items-center gap-3">
                       <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-lg">⏰</span>
-                      <div><p className="text-xs text-muted-foreground">Waktu Terbaik</p><p className="text-sm font-medium">{spot.best_time}</p></div>
+                      <div><p className="text-xs text-muted-foreground">Waktu Terbaik</p><p className="text-sm font-medium">{spot.best_time || spot.best_visit_hour}</p></div>
                     </div>
                   )}
                   {spot.why_special && (
