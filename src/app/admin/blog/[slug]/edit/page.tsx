@@ -93,7 +93,7 @@ export default function EditBlogPage() {
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json?.error?.message || "Gagal generate prompt")
-      setImagePrompt(json.data?.text || "")
+      setForm((f: any) => ({ ...f, prompt_gambar: json.data?.text || "" }))
       toast.success("Prompt gambar siap!")
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Gagal generate prompt gambar")
@@ -278,20 +278,6 @@ export default function EditBlogPage() {
                 {generatingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
                 {generatingImage ? "Generating..." : "🎨 Prompt Gambar"}
               </Button>
-              {imagePrompt && (
-                <div className="p-3 rounded-xl border border-border/50 bg-white">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-xs font-medium text-muted-foreground">🎨 Prompt untuk AI Image Generator</p>
-                    <Button type="button" variant="ghost" size="sm" className="h-6 gap-1 text-xs"
-                      onClick={() => { navigator.clipboard.writeText(imagePrompt); setCopiedPrompt(true); setTimeout(() => setCopiedPrompt(false), 2000); toast.success("Prompt tersalin!") }}
-                    >
-                      {copiedPrompt ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
-                      {copiedPrompt ? "Tersalin!" : "Copy"}
-                    </Button>
-                  </div>
-                  <Textarea value={imagePrompt} readOnly rows={4} className="text-xs font-mono resize-none" />
-                </div>
-              )}
             </div>
             <div className="border-t pt-4 space-y-3">
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">SEO Settings</p>
