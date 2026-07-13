@@ -78,9 +78,7 @@ export default function DraftsPage() {
   const [drafts, setDrafts] = useState<Draft[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
-  const [platformFilter, setPlatformFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
-  const [conceptFilter, setConceptFilter] = useState("all")
   const [offset, setOffset] = useState(0)
   const [total, setTotal] = useState(0)
   const [copied, setCopied] = useState<string | null>(null)
@@ -96,7 +94,7 @@ export default function DraftsPage() {
   useEffect(() => {
     setOffset(0)
     fetchDrafts()
-  }, [platformFilter, statusFilter, conceptFilter, search])
+  }, [statusFilter, search])
 
   async function fetchDrafts() {
     setLoading(true)
@@ -104,9 +102,7 @@ export default function DraftsPage() {
       const params = new URLSearchParams()
       params.set("limit", String(limit))
       params.set("offset", String(offset))
-      if (platformFilter !== "all") params.set("platform", platformFilter)
       if (statusFilter !== "all") params.set("status", statusFilter)
-      if (conceptFilter !== "all") params.set("concept_type", conceptFilter)
       if (search) params.set("search", search)
 
       const res = await fetch(`/api/admin/content-generator/drafts?${params}`)
@@ -214,17 +210,6 @@ export default function DraftsPage() {
                 className="pl-9"
               />
             </div>
-            <Select value={platformFilter} onValueChange={(v) => v && (setPlatformFilter(v), setOffset(0))}>
-              <SelectTrigger className="w-36">
-                <SelectValue placeholder="Platform" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Platform</SelectItem>
-                <SelectItem value="facebook">Facebook</SelectItem>
-                <SelectItem value="instagram">Instagram</SelectItem>
-                <SelectItem value="tiktok">TikTok</SelectItem>
-              </SelectContent>
-            </Select>
             <Select value={statusFilter} onValueChange={(v) => v && (setStatusFilter(v), setOffset(0))}>
               <SelectTrigger className="w-36">
                 <SelectValue placeholder="Status" />
@@ -234,16 +219,6 @@ export default function DraftsPage() {
                 <SelectItem value="draft">Draft</SelectItem>
                 <SelectItem value="published">Published</SelectItem>
                 <SelectItem value="archived">Archived</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={conceptFilter} onValueChange={(v) => v && (setConceptFilter(v), setOffset(0))}>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Tipe" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Tipe</SelectItem>
-                <SelectItem value="caption">Caption</SelectItem>
-                <SelectItem value="carousel">Carousel</SelectItem>
               </SelectContent>
             </Select>
           </div>
