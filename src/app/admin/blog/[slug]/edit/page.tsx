@@ -291,7 +291,15 @@ export default function EditBlogPage() {
                   <Input value={form.meta_description} onChange={(e) => setForm((f) => ({ ...f, meta_description: e.target.value }))} placeholder="Auto dari excerpt" />
                 </div>
                 <div className="space-y-2">
-                  <Label>AI Image Prompt</Label>
+                  <div className="flex items-center justify-between">
+                    <Label>AI Image Prompt</Label>
+                    <button type="button"
+                      onClick={() => { navigator.clipboard.writeText(form.prompt_gambar); toast.success("Prompt tersalin!") }}
+                      className="text-xs text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
+                    >
+                      <Copy className="h-3 w-3" /> Copy
+                    </button>
+                  </div>
                   <Textarea value={form.prompt_gambar} onChange={(e) => setForm((f) => ({ ...f, prompt_gambar: e.target.value }))} placeholder="Prompt gambar" rows={3} className="text-xs font-mono" />
                 </div>
               </div>

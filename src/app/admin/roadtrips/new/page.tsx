@@ -127,7 +127,15 @@ export default function NewRoadtripPage() {
                 {generatingImage ? "Generating..." : "🎨 Prompt Gambar"}
               </Button>
               <div className="space-y-2">
-                <Label>AI Image Prompt (manual)</Label>
+                <div className="flex items-center justify-between">
+                  <Label>AI Image Prompt (manual)</Label>
+                  <button type="button"
+                    onClick={() => { navigator.clipboard.writeText(form.promptGambar); toast.success("Prompt tersalin!") }}
+                    className="text-xs text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
+                  >
+                    <Copy className="h-3 w-3" /> Copy
+                  </button>
+                </div>
                 <Textarea value={form.promptGambar} onChange={(e) => updateField("promptGambar", e.target.value)} placeholder="Prompt untuk generate gambar" rows={3} className="text-xs font-mono" />
               </div>
             </div>
