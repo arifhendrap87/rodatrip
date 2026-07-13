@@ -163,6 +163,9 @@ export default function DraftsPage() {
   }
 
   function getDisplayText(draft: Draft): string {
+    if (draft.concept_type === "carousel") {
+      return `🎠 ${draft.text_overlays?.length || 0} slide\n${draft.caption}\n${draft.hashtags ? `🏷️ ${draft.hashtags}` : ""}`
+    }
     if (draft.platform === "tiktok") return draft.skrip_tiktok || draft.caption
     let text = draft.caption
     if (draft.hashtags && draft.platform === "instagram") text += "\n\n" + draft.hashtags
