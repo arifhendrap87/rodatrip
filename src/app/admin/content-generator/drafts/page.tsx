@@ -90,6 +90,8 @@ export default function DraftsPage() {
   const [editOverlays, setEditOverlays] = useState<string[]>([])
   const [editPrompts, setEditPrompts] = useState<string[]>([])
   const [editHashtags, setEditHashtags] = useState("")
+  const [scheduleId, setScheduleId] = useState<string | null>(null)
+  const [scheduleDate, setScheduleDate] = useState("")
 
   useEffect(() => {
     setOffset(0)
@@ -376,6 +378,27 @@ export default function DraftsPage() {
                                 <Button variant="ghost" size="sm" className="h-8 text-xs gap-1" disabled={saving}
                                   onClick={() => handleStatusChange(draft.id, "draft")}>↩️ Draft</Button>
                               )}
+                              {scheduleId === draft.id ? (
+                                <div className="flex items-center gap-1">
+                                  <input type="date" value={scheduleDate} onChange={(e) => setScheduleDate(e.target.value)}
+                                    className="h-8 w-36 px-2 text-xs rounded border border-input bg-background" />
+                                  <Button size="sm" className="h-8 text-xs" disabled={!scheduleDate || saving}
+                                    onClick={async () => {
+                                      setSaving(true)
+                                      try {
+                                        const res = await fetch("/api/admin/content-generator/drafts", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: draft.id, scheduled_at: scheduleDate }) })
+                                        if (res.ok) { setDrafts((prev) => prev.map((d) => d.id === draft.id ? { ...d, scheduled_at: scheduleDate } : d)); setScheduleId(null); toast.success("Terjadwal!") }
+                                      } catch { toast.error("Gagal") }
+                                      setSaving(false)
+                                    }}>Simpan</Button>
+                                  <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={() => setScheduleId(null)}>✕</Button>
+                                </div>
+                              ) : (
+                                <Button variant="ghost" size="sm" className="h-8 text-xs gap-1" disabled={saving}
+                                  onClick={() => { setScheduleId(draft.id); setScheduleDate(draft.scheduled_at ? draft.scheduled_at.substring(0, 10) : new Date().toISOString().substring(0, 10)) }}>
+                                  📅 Jadwalkan
+                                </Button>
+                              )}
                               <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(draft.id)} title="Hapus">
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -404,9 +427,27 @@ export default function DraftsPage() {
                                 <Button variant="ghost" size="sm" className="h-8 text-xs gap-1" disabled={saving}
                                   onClick={() => handleStatusChange(draft.id, "draft")}>↩️ Draft</Button>
                               )}
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(draft.id)} title="Hapus">
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
+                              {scheduleId === draft.id ? (
+                                <div className="flex items-center gap-1">
+                                  <input type="date" value={scheduleDate} onChange={(e) => setScheduleDate(e.target.value)}
+                                    className="h-8 w-36 px-2 text-xs rounded border border-input bg-background" />
+                                  <Button size="sm" className="h-8 text-xs" disabled={!scheduleDate || saving}
+                                    onClick={async () => {
+                                      setSaving(true)
+                                      try {
+                                        const res = await fetch("/api/admin/content-generator/drafts", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: draft.id, scheduled_at: scheduleDate }) })
+                                        if (res.ok) { setDrafts((prev) => prev.map((d) => d.id === draft.id ? { ...d, scheduled_at: scheduleDate } : d)); setScheduleId(null); toast.success("Terjadwal!") }
+                                      } catch { toast.error("Gagal") }
+                                      setSaving(false)
+                                    }}>Simpan</Button>
+                                  <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={() => setScheduleId(null)}>✕</Button>
+                                </div>
+                              ) : (
+                                <Button variant="ghost" size="sm" className="h-8 text-xs gap-1" disabled={saving}
+                                  onClick={() => { setScheduleId(draft.id); setScheduleDate(draft.scheduled_at ? draft.scheduled_at.substring(0, 10) : new Date().toISOString().substring(0, 10)) }}>
+                                  📅 Jadwalkan
+                                </Button>
+                              )}
                             </>
                           )}
                         </div>

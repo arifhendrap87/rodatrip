@@ -12,12 +12,16 @@ export async function GET(request: Request) {
   const contentType = searchParams.get("content_type")
   const search = searchParams.get("search")
   const conceptType = searchParams.get("concept_type")
+  const scheduled = searchParams.get("scheduled")
+  const scheduledFrom = searchParams.get("scheduled_from")
+  const scheduledTo = searchParams.get("scheduled_to")
   const limit = Math.min(parseInt(searchParams.get("limit") || "50"), 100)
   const offset = parseInt(searchParams.get("offset") || "0")
 
   let query = db
     .from("content_drafts")
     .select("*", { count: "exact" })
+    .order("scheduled_at", { ascending: false })
     .order("updated_at", { ascending: false })
 
   if (conceptType) query = query.eq("concept_type", conceptType)
@@ -25,6 +29,9 @@ export async function GET(request: Request) {
   if (status) query = query.eq("status", status)
   if (contentType) query = query.eq("content_type", contentType)
   if (search) query = query.ilike("title", `%${search}%`)
+  if (scheduled === "true") query = query.not("scheduled_at", "is", null)
+  if (scheduledFrom) query = query.gte("scheduled_at", scheduledFrom)
+  if (scheduledTo) query = query.lte("scheduled_at", scheduledTo)
 
   query = query.range(offset, offset + limit - 1)
 
