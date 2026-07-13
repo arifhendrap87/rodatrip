@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!spot) return {}
   const metaDesc = spot.description || `${spot.name} — ${spot.category} di ${spot.province}. Temukan spot istimewa ini di ${SITE_NAME}.`
   return {
-    title: `${spot.name} — Spot Istimewa — ${SITE_NAME}`,
+    title: `${spot.name} — Spot Istimewa`,
     description: metaDesc,
     alternates: { canonical: `${SITE_URL}/spot-istimewa/${slug}` },
     robots: { index: true, follow: true },

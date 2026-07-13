@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     : [{ url: `${SITE_URL}/og-default.png`, width: 1200, height: 630 }]
 
   return {
-    title: `${itinerary.title} — Roadtrip ${SITE_NAME}`,
+    title: `${itinerary.title} — Roadtrip`,
     description: metaDesc,
     alternates: { canonical: `${SITE_URL}/roadtrip/${slug}` },
     robots: { index: true, follow: true },

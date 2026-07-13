@@ -19,7 +19,7 @@ export function Breadcrumb({ items, light }: { items: Crumb[]; light?: boolean }
       "@type": "ListItem",
       position: i + 1,
       name: item.label,
-      item: item.href ? `${process.env.NEXT_PUBLIC_APP_URL || "https://gaskuy-roadtrip.vercel.app"}${item.href}` : undefined,
+      item: item.href ? `${process.env.NEXT_PUBLIC_APP_URL || "https://rodatrip.vercel.app"}${item.href}` : undefined,
     })),
   }
 
