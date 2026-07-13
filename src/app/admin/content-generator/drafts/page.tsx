@@ -369,19 +369,17 @@ export default function DraftsPage() {
                       </div>
                       {editingId !== draft.id && (
                         <div className="flex items-center gap-1 shrink-0">
-                          {isCarousel && previewId !== draft.id && (
-                            <Button variant="ghost" size="sm" className="h-8 text-xs gap-1"
-                              onClick={() => {
-                                setPreviewId(draft.id)
-                                setEditOverlays(draft.text_overlays || [])
-                                setEditPrompts(draft.image_prompts || [])
-                                setEditCaption(draft.caption)
-                                setEditHashtags(draft.hashtags || "")
-                              }}>
-                              <Layout className="h-3 w-3" /> Preview
-                            </Button>
-                          )}
-                          {isCarousel && previewId === draft.id ? null : (
+                          {isCarousel && previewId === draft.id ? null : isCarousel ? (
+                            <>
+                              <Button variant="ghost" size="sm" className="h-8 text-xs gap-1"
+                                onClick={() => { setPreviewId(draft.id); setEditOverlays(draft.text_overlays || []); setEditPrompts(draft.image_prompts || []); setEditCaption(draft.caption); setEditHashtags(draft.hashtags || "") }}>
+                                <Layout className="h-3 w-3" /> Preview
+                              </Button>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(draft.id)} title="Hapus">
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </>
+                          ) : (
                             <>
                               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleCopy(displayText, draft.id)} title="Copy">
                                 {copied === draft.id ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
