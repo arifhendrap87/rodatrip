@@ -287,6 +287,7 @@ export async function updateItinerary(
     coverImage?: string
     isPublished?: boolean
     promptGambar?: string
+    coverImagePrompt?: string
     stops?: { stopNumber: number; spotSlug: string }[]
   }
 ): Promise<{ id: string; slug: string } | null> {
@@ -305,6 +306,7 @@ export async function updateItinerary(
     if (data.coverImage !== undefined) updateData.cover_image = data.coverImage
     if (data.isPublished !== undefined) updateData.is_published = data.isPublished
     if (data.promptGambar !== undefined) updateData.prompt_gambar = data.promptGambar
+    if (data.coverImagePrompt !== undefined) updateData.cover_image_prompt = data.coverImagePrompt
 
     const { data: row, error } = await db
       .from("itineraries")

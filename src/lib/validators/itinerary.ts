@@ -19,6 +19,7 @@ export const createItinerarySchema = z.object({
   coverImage: z.string().optional(),
   isPublished: z.boolean().optional(),
   promptGambar: z.string().optional(),
+  coverImagePrompt: z.string().optional(),
   stops: z.array(itineraryStopSchema).optional(),
 })
 

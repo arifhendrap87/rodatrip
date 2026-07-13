@@ -52,6 +52,7 @@ export const createSpotSchema = z.object({
   nearbyHotels: z.array(nearbyPlaceSchema).optional(),
   nearbyRestaurants: z.array(nearbyPlaceSchema).optional(),
   promptGambar: z.string().optional(),
+  imagePrompt: z.string().optional(),
   images: z.array(z.object({
     url: z.string().min(1),
     alt: z.string().optional(),
