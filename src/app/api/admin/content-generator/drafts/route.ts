@@ -11,6 +11,7 @@ export async function GET(request: Request) {
   const status = searchParams.get("status")
   const contentType = searchParams.get("content_type")
   const search = searchParams.get("search")
+  const conceptType = searchParams.get("concept_type")
   const limit = Math.min(parseInt(searchParams.get("limit") || "50"), 100)
   const offset = parseInt(searchParams.get("offset") || "0")
 
@@ -19,6 +20,7 @@ export async function GET(request: Request) {
     .select("*", { count: "exact" })
     .order("updated_at", { ascending: false })
 
+  if (conceptType) query = query.eq("concept_type", conceptType)
   if (platform) query = query.eq("platform", platform)
   if (status) query = query.eq("status", status)
   if (contentType) query = query.eq("content_type", contentType)
@@ -46,19 +48,21 @@ export async function POST(request: Request) {
   if (!admin) return unauthorized()
 
   const body = await request.json()
-  const { title, platform, tone, content_type, source_id, source_title, caption, hashtags, skrip_tiktok, scheduled_at } = body
+  const { title, platform, tone, content_type, source_id, source_title, caption, hashtags, skrip_tiktok, concept_type, text_overlays, image_prompts, source_type, scheduled_at } = body
 
-  if (!title || !platform || !tone || !content_type) {
-    return badRequest("title, platform, tone, content_type wajib diisi")
+  const isCarousel = concept_type === "carousel"
+
+  if (!title || (!isCarousel && (!platform || !tone))) {
+    return badRequest("title wajib diisi. Untuk caption: platform dan tone juga wajib.")
   }
 
   const validPlatforms = ["facebook", "instagram", "tiktok"]
-  if (!validPlatforms.includes(platform)) {
+  if (platform && !validPlatforms.includes(platform)) {
     return badRequest("platform harus facebook, instagram, atau tiktok")
   }
 
   const validTones = ["promo", "edukasi", "inspirasi", "storytelling"]
-  if (!validTones.includes(tone)) {
+  if (tone && !validTones.includes(tone)) {
     return badRequest("tone harus promo, edukasi, inspirasi, atau storytelling")
   }
 
@@ -66,14 +70,18 @@ export async function POST(request: Request) {
     .from("content_drafts")
     .insert({
       title,
-      platform,
-      tone,
-      content_type,
+      platform: platform || null,
+      tone: tone || null,
+      content_type: content_type || "roadtrip",
+      concept_type: concept_type || "caption",
       source_id: source_id || null,
       source_title: source_title || null,
+      source_type: source_type || "",
       caption: caption || "",
       hashtags: hashtags || "",
       skrip_tiktok: skrip_tiktok || "",
+      text_overlays: text_overlays || [],
+      image_prompts: image_prompts || [],
       scheduled_at: scheduled_at || null,
       created_by: admin.id,
     })
@@ -94,7 +102,7 @@ export async function PUT(request: Request) {
 
   if (!id) return badRequest("id wajib diisi")
 
-  const allowedFields = ["title", "caption", "hashtags", "skrip_tiktok", "status", "scheduled_at"]
+  const allowedFields = ["title", "caption", "hashtags", "skrip_tiktok", "text_overlays", "image_prompts", "status", "scheduled_at"]
 
   const updates: Record<string, unknown> = {}
   for (const key of allowedFields) {

@@ -35,6 +35,7 @@ import {
   Star,
   Layout,
   ImageIcon,
+  Eye,
 } from "lucide-react"
 import { toast } from "sonner"
 import Link from "next/link"
@@ -103,7 +104,6 @@ export default function ContentGeneratorPage() {
 
   const [selectedItem, setSelectedItem] = useState<SourceItem | null>(null)
 
-  const [selectedPlatform, setSelectedPlatform] = useState("facebook")
   const [generating, setGenerating] = useState(false)
   const [results, setResults] = useState<Record<string, GenerateResult> | null>(null)
   const [copied, setCopied] = useState<string | null>(null)
@@ -207,14 +207,13 @@ export default function ContentGeneratorPage() {
         body: JSON.stringify({
           sourceType,
           sourceId: slug,
-          platforms: [selectedPlatform],
         }),
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json?.error?.message || "Gagal generate")
       setResults(json.data.results)
       setSavedPlatforms({})
-      toast.success("Konten berhasil digenerate!")
+      toast.success("Konten berhasil digenerate untuk semua platform!")
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Gagal generate konten")
     }
@@ -249,6 +248,34 @@ export default function ContentGeneratorPage() {
       toast.success("Draft tersimpan!")
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Gagal menyimpan draft")
+    }
+    setSaving(false)
+  }
+
+  async function handleSaveCarousel(conceptTitle?: string) {
+    if (!selectedItem || !carouselResult) return
+    setSaving(true)
+    try {
+      const res = await fetch("/api/admin/content-generator/drafts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: conceptTitle || `${selectedItem.title || selectedItem.name || selectedItem.slug} — Carousel`,
+          concept_type: "carousel",
+          content_type: sourceType,
+          source_id: selectedItem.slug,
+          source_title: selectedItem.title || selectedItem.name || selectedItem.slug,
+          caption: carouselResult.caption,
+          hashtags: carouselResult.hashtags || "",
+          text_overlays: carouselResult.text_overlays,
+          image_prompts: carouselResult.image_prompts,
+        }),
+      })
+      const body = await res.json()
+      if (!res.ok) throw new Error(body?.error?.message || "Gagal simpan")
+      toast.success("Konsep carousel tersimpan!")
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Gagal menyimpan konsep")
     }
     setSaving(false)
   }
@@ -495,7 +522,7 @@ export default function ContentGeneratorPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <CardTitle className="text-base">{selectedItem.title || selectedItem.name || selectedItem.slug}</CardTitle>
-                      <CardDescription>Pilih platform, tone, dan metode generate</CardDescription>
+                      <CardDescription>Generate konten untuk semua platform sekaligus</CardDescription>
                     </div>
                     <div className="hidden sm:flex items-center gap-2">
                       <span className="text-xs text-muted-foreground">✨ AI DeepSeek — otomatis</span>
@@ -530,34 +557,12 @@ export default function ContentGeneratorPage() {
 
                   {mode === "caption" ? (
                     <>
-                      {/* Platform selector */}
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground shrink-0">Platform:</span>
-                        <div className="flex gap-1">
-                          {PLATFORMS.map((p) => {
-                            const Icon = p.icon
-                            const isSelected = selectedPlatform === p.value
-                            return (
-                              <Button
-                                key={p.value}
-                                variant={isSelected ? "default" : "outline"}
-                                size="sm"
-                                onClick={() => { setSelectedPlatform(p.value); setResults(null) }}
-                                className="gap-1.5"
-                              >
-                                <Icon className="h-4 w-4" />
-                                {p.label}
-                              </Button>
-                            )
-                          })}
-                        </div>
-                      </div>
-
-                      {/* Mobile: tone + method */}
                       <div className="flex sm:hidden items-center">
-                        <span className="text-xs text-muted-foreground">✨ AI DeepSeek — otomatis</span>
+                        <span className="text-xs text-muted-foreground">✨ AI DeepSeek — generate untuk FB, IG, TT sekaligus</span>
                       </div>
-
+                      <div className="hidden sm:block text-xs text-muted-foreground">
+                        ✨ AI DeepSeek — generate caption Facebook + Instagram + TikTok sekaligus
+                      </div>
                       <Button
                         onClick={handleGenerate}
                         disabled={generating}
@@ -570,8 +575,8 @@ export default function ContentGeneratorPage() {
                           <Sparkles className="h-5 w-5" />
                         )}
                         {generating
-                          ? `Generate ${selectedPlatform}...`
-                          : `✨ Generate ${selectedPlatform}`}
+                          ? "Generate Caption..."
+                          : "✨ Generate Caption (Semua Platform)"}
                       </Button>
                     </>
                   ) : (
@@ -598,64 +603,49 @@ export default function ContentGeneratorPage() {
 
               {/* Results: Caption Mode */}
               {mode === "caption" && results ? (
-                (() => {
-                  const platform = selectedPlatform
-                  const toneResult = results[platform]
-                  if (!toneResult) return null
-
-                  const fullText = `📝 CAPTION\n${toneResult.caption}${toneResult.hashtags ? `\n\n🏷️ HASHTAG\n${toneResult.hashtags}` : ""}${toneResult.skrip_tiktok ? `\n\n🎬 SKRIP TIKTOK\n${toneResult.skrip_tiktok}` : ""}${toneResult.visual_prompt ? `\n\n${toneResult.visual_prompt}` : ""}`
-                  const copyKey = `${platform}`
-
-                  return (
-                    <Card>
-                      <CardHeader>
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <CardTitle className="capitalize text-base">{platform}</CardTitle>
-                            <CardDescription>
-                              {platform === "tiktok" ? "Skrip + Visual" : "Caption + Visual"}
-                            </CardDescription>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="gap-1.5"
-                              onClick={() => handleCopy(fullText, copyKey)}
-                            >
-                              {copied === copyKey ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                              {copied === copyKey ? "Tersalin!" : "Copy All"}
-                            </Button>
-                            {!savedPlatforms[platform] ? (
-                              <Button
-                                variant="default"
-                                size="sm"
-                                className="gap-1.5"
-                                onClick={() => handleSave(platform, toneResult)}
-                                disabled={saving}
-                              >
-                                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                                Simpan
+                <div className="space-y-4">
+                  {Object.entries(results).map(([platform, toneResult]) => {
+                    const label = platform === "facebook" ? "Facebook" : platform === "instagram" ? "Instagram" : "TikTok"
+                    const fullText = toneResult.caption || toneResult.skrip_tiktok
+                      ? `📝 CAPTION (${label})\n${toneResult.caption}${toneResult.hashtags ? `\n\n🏷️ HASHTAG\n${toneResult.hashtags}` : ""}${toneResult.skrip_tiktok ? `\n\n🎬 SKRIP TIKTOK\n${toneResult.skrip_tiktok}` : ""}${toneResult.visual_prompt ? `\n\n${toneResult.visual_prompt}` : ""}`
+                      : ""
+                    if (!fullText) return null
+                    const copyKey = `caption-${platform}`
+                    return (
+                      <Card key={platform}>
+                        <CardHeader>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <CardTitle className="capitalize text-base">{label}</CardTitle>
+                              <CardDescription>{platform === "tiktok" ? "Skrip + Visual" : "Caption + Visual"}</CardDescription>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button variant="outline" size="sm" className="gap-1.5"
+                                onClick={() => handleCopy(fullText, copyKey)}>
+                                {copied === copyKey ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                                {copied === copyKey ? "Tersalin!" : "Copy All"}
                               </Button>
-                            ) : (
-                              <Badge variant="secondary" className="gap-1 text-xs">
-                                <Check className="h-3 w-3 text-green-500" />
-                                Tersimpan
-                              </Badge>
-                            )}
+                              {!savedPlatforms[platform] ? (
+                                <Button variant="default" size="sm" className="gap-1.5"
+                                  onClick={() => handleSave(platform, toneResult)} disabled={saving}>
+                                  {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                                  Simpan
+                                </Button>
+                              ) : (
+                                <Badge variant="secondary" className="gap-1 text-xs">
+                                  <Check className="h-3 w-3 text-green-500" /> Tersimpan
+                                </Badge>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <Textarea
-                          value={fullText}
-                          readOnly
-                          className="min-h-[450px] font-mono text-sm leading-relaxed resize-y whitespace-pre"
-                        />
-                      </CardContent>
-                    </Card>
-                  )
-                })()
+                        </CardHeader>
+                        <CardContent>
+                          <Textarea value={fullText} readOnly className="min-h-[300px] font-mono text-sm leading-relaxed resize-y whitespace-pre" />
+                        </CardContent>
+                      </Card>
+                    )
+                  })}
+                </div>
               ) : mode === "caption" && generating ? (
                 <Card>
                   <CardContent className="flex items-center justify-center py-16">
@@ -666,9 +656,7 @@ export default function ContentGeneratorPage() {
                 <Card>
                   <CardContent className="flex flex-col items-center justify-center py-12 text-center">
                     <Sparkles className="h-8 w-8 text-muted-foreground/30 mb-3" />
-                    <p className="text-sm text-muted-foreground">
-                      Klik Generate untuk membuat konten
-                    </p>
+                    <p className="text-sm text-muted-foreground">Klik Generate untuk membuat konten semua platform</p>
                   </CardContent>
                 </Card>
               ) : null}
@@ -795,6 +783,12 @@ export default function ContentGeneratorPage() {
                       >
                         {copied === "caption" ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
                         Copy Caption + Hashtag
+                      </Button>
+                      <Button variant="default" size="sm" className="gap-1.5 mt-2"
+                        disabled={saving}
+                        onClick={() => handleSaveCarousel(`${selectedItem?.title || selectedItem?.name || "Carousel"} — Konsep Carousel`)}>
+                        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                        Simpan sebagai Konsep
                       </Button>
                     </div>
                   </CardContent>

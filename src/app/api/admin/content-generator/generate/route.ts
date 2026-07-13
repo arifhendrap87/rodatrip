@@ -18,11 +18,10 @@ export async function POST(request: Request) {
   if (!sourceId) {
     return badRequest("sourceId wajib diisi")
   }
-  if (!platforms || !Array.isArray(platforms) || platforms.length === 0) {
-    return badRequest("platforms wajib diisi (array)")
-  }
 
-  const invalidPlatforms = platforms.filter((p: string) => !PLATFORMS.includes(p as any))
+  const targetPlatforms = platforms && Array.isArray(platforms) && platforms.length > 0 ? platforms : PLATFORMS
+
+  const invalidPlatforms = targetPlatforms.filter((p: string) => !PLATFORMS.includes(p as any))
   if (invalidPlatforms.length > 0) {
     return badRequest(`Platform tidak valid: ${invalidPlatforms.join(", ")}`)
   }
@@ -118,7 +117,7 @@ export async function POST(request: Request) {
 
   const results: Record<string, { caption: string; hashtags: string; skrip_tiktok: string; visual_prompt: string }> = {}
 
-  for (const platform of platforms) {
+  for (const platform of targetPlatforms) {
     const tone = getAutoTone(contentSource)
     const prompt = generateAIPrompt(contentSource, platform, tone)
     try {
