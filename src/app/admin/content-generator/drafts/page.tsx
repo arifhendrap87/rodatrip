@@ -27,6 +27,10 @@ import {
   ChevronRight,
   ExternalLink,
   Layout,
+  ChevronDown,
+  ChevronUp,
+  Save,
+  Loader2,
 } from "lucide-react"
 import { toast } from "sonner"
 import Link from "next/link"
@@ -84,6 +88,10 @@ export default function DraftsPage() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editCaption, setEditCaption] = useState("")
   const [saving, setSaving] = useState(false)
+  const [previewId, setPreviewId] = useState<string | null>(null)
+  const [editOverlays, setEditOverlays] = useState<string[]>([])
+  const [editPrompts, setEditPrompts] = useState<string[]>([])
+  const [editHashtags, setEditHashtags] = useState("")
 
   useEffect(() => {
     setOffset(0)
@@ -311,39 +319,81 @@ export default function DraftsPage() {
                               </Button>
                             </div>
                           </div>
+                        ) : isCarousel && previewId === draft.id ? (
+                          <div className="space-y-4 mt-3">
+                            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                              {(editOverlays.length > 0 ? editOverlays : draft.text_overlays || []).map((text, i) => {
+                                const prompts = editPrompts.length > 0 ? editPrompts : draft.image_prompts || []
+                                const gradients = ["from-sky-400/80 via-blue-500/80 to-indigo-600/80","from-emerald-400/80 via-teal-500/80 to-cyan-600/80","from-orange-400/80 via-rose-500/80 to-pink-600/80","from-violet-400/80 via-purple-500/80 to-fuchsia-600/80","from-amber-400/80 via-yellow-500/80 to-orange-600/80"]
+                                return (
+                                  <div key={i} className="rounded-xl border border-border/50 overflow-hidden bg-white shadow-sm">
+                                    <div className={`aspect-[4/5] bg-gradient-to-br ${gradients[i % gradients.length]} relative flex flex-col justify-end p-0`}>
+                                      <div className="absolute top-2 left-2 bg-black/50 text-white text-[10px] font-bold px-1.5 py-0.5 rounded z-10">{i + 1}</div>
+                                      <div className="bg-gradient-to-t from-black/80 via-black/30 to-transparent p-4 pt-12">
+                                        <p className="text-white font-bold text-sm leading-snug break-words drop-shadow-lg">{text}</p>
+                                      </div>
+                                    </div>
+                                    <div className="p-3 bg-muted/30 space-y-2">
+                                      <Textarea value={editOverlays[i] ?? text} onChange={(e) => { const n = [...editOverlays]; n[i] = e.target.value; setEditOverlays(n); }} placeholder="Text overlay" rows={2} className="text-xs font-mono min-h-[40px]" />
+                                      <Textarea value={editPrompts[i] ?? prompts[i]} onChange={(e) => { const n = [...editPrompts]; n[i] = e.target.value; setEditPrompts(n); }} placeholder="Image prompt" rows={2} className="text-xs font-mono min-h-[40px]" />
+                                    </div>
+                                  </div>
+                                )
+                              })}
+                            </div>
+                            <div className="rounded-xl border border-border/50 p-4 space-y-3">
+                              <p className="text-xs font-semibold text-muted-foreground uppercase">💬 Caption</p>
+                              <Textarea value={editCaption} onChange={(e) => setEditCaption(e.target.value)} rows={3} className="text-sm font-mono" />
+                              <p className="text-xs font-semibold text-muted-foreground uppercase">🏷️ Hashtag</p>
+                              <Input value={editHashtags} onChange={(e) => setEditHashtags(e.target.value)} className="text-sm" />
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button size="sm" onClick={async () => {
+                                setSaving(true)
+                                try {
+                                  const res = await fetch("/api/admin/content-generator/drafts", { method: "PUT", headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ id: draft.id, text_overlays: editOverlays, image_prompts: editPrompts, caption: editCaption, hashtags: editHashtags }) })
+                                  if (res.ok) { setDrafts((prev) => prev.map((d) => d.id === draft.id ? { ...d, text_overlays: editOverlays, image_prompts: editPrompts, caption: editCaption, hashtags: editHashtags } : d)); setPreviewId(null); toast.success("Konsep diperbarui") }
+                                  else { const j = await res.json(); throw new Error(j?.error?.message || "Gagal") }
+                                } catch (e) { toast.error(e instanceof Error ? e.message : "Gagal menyimpan") }
+                                setSaving(false)
+                              }} disabled={saving}>
+                                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Simpan
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => { setPreviewId(null) }}>Tutup</Button>
+                            </div>
+                          </div>
                         ) : (
                           <p className="text-sm text-muted-foreground whitespace-pre-line">{previewText}</p>
                         )}
                       </div>
                       {editingId !== draft.id && (
                         <div className="flex items-center gap-1 shrink-0">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => handleCopy(displayText, draft.id)}
-                            title="Copy caption"
-                          >
-                            {copied === draft.id ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => startEdit(draft)}
-                            title="Edit caption"
-                          >
-                            <FileText className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-destructive"
-                            onClick={() => handleDelete(draft.id)}
-                            title="Hapus"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          {isCarousel && previewId !== draft.id && (
+                            <Button variant="ghost" size="sm" className="h-8 text-xs gap-1"
+                              onClick={() => {
+                                setPreviewId(draft.id)
+                                setEditOverlays(draft.text_overlays || [])
+                                setEditPrompts(draft.image_prompts || [])
+                                setEditCaption(draft.caption)
+                                setEditHashtags(draft.hashtags || "")
+                              }}>
+                              <Layout className="h-3 w-3" /> Preview
+                            </Button>
+                          )}
+                          {isCarousel && previewId === draft.id ? null : (
+                            <>
+                              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleCopy(displayText, draft.id)} title="Copy">
+                                {copied === draft.id ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                              </Button>
+                              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => startEdit(draft)} title="Edit caption">
+                                <FileText className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(draft.id)} title="Hapus">
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </>
+                          )}
                         </div>
                       )}
                     </div>
