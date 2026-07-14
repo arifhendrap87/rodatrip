@@ -5,9 +5,14 @@ import { fileURLToPath } from "url"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-const PROJECT_REF = "qpzormleecheuzmilhjo"
-const PASSWORD = "Gaskuy2024!"
+const PROJECT_REF = process.env.SUPABASE_PROJECT_REF
+const PASSWORD = process.env.SUPABASE_DB_PASSWORD
 const MIGRATION_FILE = path.join(__dirname, "..", "supabase", "migrations", "000_combined.sql")
+
+if (!PROJECT_REF || !PASSWORD) {
+  console.error("SUPABASE_PROJECT_REF and SUPABASE_DB_PASSWORD must be set in environment")
+  process.exit(1)
+}
 
 async function main() {
   console.log(`Connecting to db.${PROJECT_REF}.supabase.co ...`)

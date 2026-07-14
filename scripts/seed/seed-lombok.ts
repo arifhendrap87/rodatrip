@@ -130,10 +130,10 @@ async function main() {
 
     // Update new columns via raw SQL (bypass schema cache)
     const projectRef = (process.env.NEXT_PUBLIC_SUPABASE_URL || "").match(/https:\/\/(.+)\.supabase\.co/)?.[1]
-    if (projectRef && (stop.parking_fee || stop.visit_duration || stop.best_visit_hour || stop.additional_cost || stop.spot_important_note || stop.physical_effort)) {
+    if (projectRef && process.env.SUPABASE_DB_PASSWORD && (stop.parking_fee || stop.visit_duration || stop.best_visit_hour || stop.additional_cost || stop.spot_important_note || stop.physical_effort)) {
       try {
         const { Client } = await import("pg")
-        const pc = new Client({ host: `db.${projectRef}.supabase.co`, port: 5432, database: "postgres", user: "postgres", password: process.env.SUPABASE_DB_PASSWORD || "Gaskuy2024!", ssl: { rejectUnauthorized: false } })
+        const pc = new Client({ host: `db.${projectRef}.supabase.co`, port: 5432, database: "postgres", user: "postgres", password: process.env.SUPABASE_DB_PASSWORD, ssl: { rejectUnauthorized: false } })
         await pc.connect()
         await pc.query("UPDATE spots SET parking_fee = $1, visit_duration = $2, best_visit_hour = $3, additional_cost = $4, spot_important_note = $5, physical_effort = $6 WHERE slug = $7", [
           stop.parking_fee || null, stop.visit_duration || null, stop.best_visit_hour || null,
