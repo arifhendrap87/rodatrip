@@ -72,6 +72,7 @@ export default function SpotsPage() {
   const [roadtripFilter, setRoadtripFilter] = useState("all")
   const [roadtripList, setRoadtripList] = useState<{ id: string; title: string }[]>([])
   const [loadingRoadtrips, setLoadingRoadtrips] = useState(true)
+  const [statusFilter, setStatusFilter] = useState("all")
   const [sort, setSort] = useState("terbaru")
   const [offset, setOffset] = useState(0)
   const [hasMore, setHasMore] = useState(false)
@@ -98,7 +99,7 @@ export default function SpotsPage() {
     setOffset(0)
     setSpots([])
     fetchSpots(0)
-  }, [debouncedSearch, categoryFilter, provinceFilter, roadtripFilter, sort])
+  }, [debouncedSearch, categoryFilter, provinceFilter, roadtripFilter, statusFilter, sort])
 
   async function fetchSpots(pageOffset = 0) {
     setLoading(true)
@@ -113,12 +114,16 @@ export default function SpotsPage() {
     const data = res.data as any[]
     const pagination = (res as any).pagination
 
+    let filtered = data || []
+    if (statusFilter === "published") filtered = filtered.filter((s: any) => s.is_published !== false)
+    else if (statusFilter === "draft") filtered = filtered.filter((s: any) => s.is_published === false)
+
     if (pageOffset === 0) {
-      setSpots(data || [])
+      setSpots(filtered)
     } else {
-      setSpots((prev) => [...prev, ...(data || [])])
+      setSpots((prev) => [...prev, ...filtered])
     }
-    setTotal(pagination?.total || data?.length || 0)
+    setTotal(pagination?.total || filtered.length || 0)
     setHasMore((pagination?.offset || 0) + (pagination?.limit || 20) < (pagination?.total || 0))
     setOffset(pageOffset)
     setLoading(false)
@@ -251,6 +256,12 @@ export default function SpotsPage() {
                 )}
               </SelectContent>
             </Select>
+            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
+              className="h-9 rounded-lg border border-input bg-background px-3 text-sm text-muted-foreground">
+              <option value="all">Semua Status</option>
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+            </select>
             <div className="flex items-center gap-2 text-sm">
               <span className="text-muted-foreground hidden sm:inline">Urut:</span>
               <select value={sort} onChange={(e) => setSort(e.target.value)}
@@ -371,6 +382,19 @@ Tambah Spot
                             Featured
                           </Badge>
                         )}
+                        <button
+                          onClick={async () => {
+                            const publish = spot.is_published === false
+                            try {
+                              await api.spots.update(spot.slug, { isPublished: publish })
+                              setSpots(prev => prev.map(s => s.slug === spot.slug ? { ...s, is_published: publish } : s))
+                              toast.success(publish ? "Dipublikasi" : "Diunpublikasi")
+                            } catch { toast.error("Gagal") }
+                          }}
+                          className="text-xs text-muted-foreground hover:text-primary shrink-0"
+                        >
+                          {spot.is_published === false ? "Publish" : "Unpublish"}
+                        </button>
                       </div>
                       <div className="flex items-center gap-2 mt-1">
                         {cat && (
@@ -414,20 +438,6 @@ Tambah Spot
                       >
                         <Eye className="h-4 w-4" />
                       </Link>
-                      <button
-                        onClick={async () => {
-                          const publish = spot.is_published === false
-                          try {
-                            await api.spots.update(spot.slug, { isPublished: publish })
-                            setSpots(prev => prev.map(s => s.slug === spot.slug ? { ...s, is_published: publish } : s))
-                            toast.success(publish ? "Dipublikasi" : "Diunpublikasi")
-                          } catch { toast.error("Gagal") }
-                        }}
-                        className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted text-xs font-medium"
-                        title={spot.is_published === false ? "Publish" : "Unpublish"}
-                      >
-                        {spot.is_published === false ? "📝" : "🔴"}
-                      </button>
                       {spot.is_published !== false && (
                         <Link
                           href={`/spot-istimewa/${spot.slug}`}

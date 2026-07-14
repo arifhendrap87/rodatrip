@@ -235,7 +235,6 @@ export default function BlogAdminPage() {
       ) : posts.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center gap-4 py-12">
-            <FileText className="h-12 w-12 text-muted-foreground/40" />
             <p className="text-lg font-medium text-muted-foreground">Belum ada blog</p>
             <Link href="/admin/blog/new">
               <Button variant="outline"><Plus className="mr-2 h-4 w-4" /> Tulis Blog Baru</Button>
@@ -255,11 +254,11 @@ export default function BlogAdminPage() {
                 </div>
               )}
               {posts.map((post) => (
-                <div key={post.slug} className="flex items-start gap-3 p-4 hover:bg-muted/50 transition-colors">
+                <div key={post.slug} className="flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors">
                   <input type="checkbox" checked={selectedSlugs.has(post.slug)}
                     onChange={() => toggleSelect(post.slug)}
-                    className="mt-1 shrink-0 rounded border-gray-300" />
-                  <div className="relative w-12 h-12 shrink-0 rounded-lg overflow-hidden bg-muted border group mt-0.5">
+                    className="shrink-0 rounded border-gray-300" />
+                  <div className="relative w-12 h-12 shrink-0 rounded-lg overflow-hidden bg-muted border group">
                     {post.image_url ? (
                       <img src={post.image_url} alt="" className="w-full h-full object-cover" />
                     ) : (
@@ -330,15 +329,10 @@ export default function BlogAdminPage() {
                     })()}
 
                     {/* Checklist */}
-                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1">
-                      <span className={`text-[11px] ${post.title ? "text-green-600" : "text-red-400"}`}>{post.title ? "✅" : "❌"} Judul</span>
-                      <span className={`text-[11px] ${post.content ? "text-green-600" : "text-red-400"}`}>{post.content ? "✅" : "❌"} Konten</span>
-                      <span className={`text-[11px] ${post.image_url ? "text-green-600" : "text-red-400"}`}>{post.image_url ? "✅" : "❌"} Gambar</span>
-                      <span className={`text-[11px] ${post.seo_title ? "text-green-600" : "text-red-400"}`}>{post.seo_title ? "✅" : "❌"} SEO</span>
-                      <span className={`text-[11px] ${post.meta_description ? "text-green-600" : "text-red-400"}`}>{post.meta_description ? "✅" : "❌"} Meta Desc</span>
-                      <span className={`text-[11px] ${(post.tags || []).length > 0 ? "text-green-600" : "text-red-400"}`}>{(post.tags || []).length > 0 ? "✅" : "❌"} Tags</span>
-                      <span className={`text-[11px] ${post.category ? "text-green-600" : "text-red-400"}`}>{post.category ? "✅" : "❌"} Kategori</span>
-                      <span className={`text-[11px] ${post.is_published ? "text-green-600" : "text-red-400"}`}>{post.is_published ? "✅" : "❌"} Publish</span>
+                    <div className="mt-1">
+                      <span className="text-[11px] text-muted-foreground">
+                        {post.title ? "✅" : "❌"} Judul · {post.content ? "✅" : "❌"} Konten · {post.image_url ? "✅" : "❌"} Gambar · {post.seo_title ? "✅" : "❌"} SEO · {post.meta_description ? "✅" : "❌"} Meta Desc · {(post.tags || []).length > 0 ? "✅" : "❌"} Tags · {post.category ? "✅" : "❌"} Kategori · {post.is_published ? "✅" : "❌"} Publish
+                      </span>
                     </div>
 
                     <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
@@ -349,7 +343,7 @@ export default function BlogAdminPage() {
                       <span>{post.published_at ? new Date(post.published_at).toLocaleDateString("id-ID") : "Belum dipublish"}</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 shrink-0 pt-1">
+                  <div className="flex items-center gap-1 shrink-0">
                     <Link href={`/admin/blog/preview/${post.slug}`} target="_blank"
                       className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted">
                       <Eye className="h-4 w-4" />
