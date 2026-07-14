@@ -47,6 +47,9 @@ Roadtrip di ${kota}, ${provinsi}
 - Subtitle/tema dibuat BERDASARKAN destinasi yang dipilih, BUKAN sebaliknya
 - Jangan korbankan destinasi bagus hanya untuk mencocokkan tema
 - Jangan pilih destinasi pinggiran/random yang kurang populer
+- WAJIB: rekomendasi kuliner (culinary_notes & nama tempat di nearby_restaurants) adalah tempat MAKAN PALING TERKENAL dan TERFAVORIT di daerah tersebut, BUKAN nama generik/placeholder seperti "RM A", "Warung B", "Kedai C"
+- Nama restoran/warung/rumah makan di nearby_restaurants & hotel WAJIB BENAR-BENAR ADA dan merupakan tempat kuliner sungguhan yang hits — contoh: "Sate Maranggi Hj. Yeti", "Batagor Kingsley"
+- culinary_notes: sebutkan minimal 3 makanan khas daerah + rekomendasi tempat makan paling hits
 - Nama tempat WAJIB BENAR-BENAR ADA dan merupakan destinasi wisata sungguhan di ${provinsi}
 - Bahasa Indonesia natural dan engaging
 - Durasi: ${durasi}
@@ -146,7 +149,7 @@ Roadtrip di ${kota}, ${provinsi}
 - nearby_hotels: ARRAY 5 OBJECT. Setiap object: { name, distance, price (kisaran harga/malam), maps_url (origin=nama stop, destination=nama hotel, &travelmode=driving). DAN setiap hotel punya nearby_restaurants: ARRAY object { name, distance, price (kisaran harga/porsi), maps_url (origin=nama hotel, destination=nama resto, &travelmode=driving) }
 - nearby_restaurants (top level): ARRAY 5 OBJECT. Setiap object: { name, distance, price (kisaran harga/porsi), maps_url (origin=nama stop, destination=nama resto, &travelmode=driving) }
 - Restoran di dalam hotel WAJIB: origin=nama hotel, destination=nama resto, &travelmode=driving
-- Jangan gunakan nama stop (destinasi) sebagai nama hotel atau restoran. Nama hotel/restoran harus UNIK dan berbeda dari nama-nama stop.
+- Jangan gunakan nama stop (destinasi) sebagai nama hotel atau restoran. Nama restoran WAJIB nama tempat kuliner sungguhan yang terkenal di daerah itu (bukan placeholder seperti "RM A", "Warung B", "Kedai C")
 - price: Kisaran harga real sesuai lokasi (hotel: per malam, resto: per porsi)
 - Output HANYA JSON, tanpa markdown`
 }
