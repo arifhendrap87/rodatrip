@@ -26,7 +26,28 @@ export function ImagePicker({ open, onClose, onSelect, multi = false }: ImagePic
   const [uploading, setUploading] = useState(false)
   const [search, setSearch] = useState("")
   const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [dragOver, setDragOver] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    setDragOver(true)
+  }
+
+  function handleDragLeave(e: React.DragEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    setDragOver(false)
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    setDragOver(false)
+    const file = e.dataTransfer.files?.[0]
+    if (file) handleUpload(file)
+  }
 
   useEffect(() => {
     if (!open) return
@@ -120,9 +141,21 @@ export function ImagePicker({ open, onClose, onSelect, multi = false }: ImagePic
 
         <div
           onClick={() => fileRef.current?.click()}
-          className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border/30 bg-muted/10 p-4 mb-4 hover:bg-muted/20 transition-colors"
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className={`flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed p-4 mb-4 transition-colors ${
+            dragOver
+              ? "border-primary bg-primary/5"
+              : "border-border/30 bg-muted/10 hover:bg-muted/20"
+          }`}
         >
-          {uploading ? (
+          {dragOver ? (
+            <>
+              <Upload className="h-5 w-5 text-primary" />
+              <span className="text-sm text-primary font-medium">Lepaskan untuk upload</span>
+            </>
+          ) : uploading ? (
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           ) : (
             <>
