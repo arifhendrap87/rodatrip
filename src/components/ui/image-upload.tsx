@@ -19,7 +19,30 @@ export function ImageUpload({ value, onChange, label, folder = "spots", placehol
   const [uploading, setUploading] = useState(false)
   const [preview, setPreview] = useState(value)
   const [pickerOpen, setPickerOpen] = useState(false)
+  const [dragOver, setDragOver] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    setDragOver(true)
+  }
+
+  function handleDragLeave(e: React.DragEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    setDragOver(false)
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    setDragOver(false)
+    const file = e.dataTransfer.files?.[0]
+    if (!file) return
+    setPreview(URL.createObjectURL(file))
+    uploadFile(file)
+  }
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -63,7 +86,17 @@ export function ImageUpload({ value, onChange, label, folder = "spots", placehol
       {label && <Label>{label}</Label>}
 
       {(preview || value) ? (
-        <div className="relative rounded-xl overflow-hidden border border-border/50 bg-muted/20">
+        <div
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className="relative rounded-xl overflow-hidden border border-border/50 bg-muted/20"
+        >
+          {dragOver && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/40 border-2 border-dashed border-white rounded-xl">
+              <p className="text-sm font-semibold text-white">Lepaskan untuk mengganti gambar</p>
+            </div>
+          )}
           <div className="aspect-[16/9] max-h-64 relative">
             <img
               src={preview || value}
@@ -95,14 +128,26 @@ export function ImageUpload({ value, onChange, label, folder = "spots", placehol
       ) : (
         <div
           onClick={() => inputRef.current?.click()}
-          className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border/50 bg-muted/20 p-8 hover:bg-muted/40 transition-colors"
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-8 transition-colors ${
+            dragOver
+              ? "border-primary bg-primary/5"
+              : "border-border/50 bg-muted/20 hover:bg-muted/40"
+          }`}
         >
-          {uploading ? (
+          {dragOver ? (
+            <>
+              <Upload className="h-8 w-8 text-primary" />
+              <p className="text-sm font-medium text-primary">Lepaskan untuk upload</p>
+            </>
+          ) : uploading ? (
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           ) : (
             <>
               <Upload className="h-8 w-8 text-muted-foreground" />
-              <p className="text-sm font-medium text-muted-foreground">Klik untuk upload gambar</p>
+              <p className="text-sm font-medium text-muted-foreground">Klik atau drag file untuk upload</p>
               <p className="text-xs text-muted-foreground">JPG, PNG, WebP, AVIF — maks 5MB</p>
               <Button type="button" variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); setPickerOpen(true) }} className="mt-2">
                 <ImageIcon className="h-3 w-3 mr-1" /> Pilih dari Media
