@@ -338,7 +338,20 @@ export function ImagePicker({ open, onClose, onSelect, multi = false }: ImagePic
           </div>
 
           {/* Main content */}
-          <div className="flex-1 flex flex-col min-w-0 p-4 pt-2">
+          <div
+            onDragOver={e => { e.preventDefault(); e.stopPropagation(); setDragOver(true) }}
+            onDragLeave={e => { e.preventDefault(); e.stopPropagation(); setDragOver(false) }}
+            onDrop={e => { e.preventDefault(); e.stopPropagation(); setDragOver(false); const f = e.dataTransfer.files?.[0]; if (f) handleUpload(f) }}
+            className="flex-1 flex flex-col min-w-0 p-4 pt-2 relative"
+          >
+            {dragOver && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg border-4 border-dashed border-primary/60 bg-primary/5 backdrop-blur-sm">
+                <div className="text-center">
+                  <Upload className="mx-auto h-8 w-8 text-primary" />
+                  <p className="mt-1 text-sm font-semibold text-primary">Lepaskan file untuk upload</p>
+                </div>
+              </div>
+            )}
             {/* Top bar */}
             <div className="flex items-center gap-2 mb-3 shrink-0 flex-wrap">
               <div className="relative flex-1 min-w-[120px]">
