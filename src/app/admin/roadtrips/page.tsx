@@ -137,13 +137,13 @@ export default function RoadtripsPage() {
   }
 
   async function handleSinglePublish(slug: string, publish: boolean) {
-    await fetch("/api/admin/itineraries", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slug, is_published: publish }),
-    })
-    fetchRoadtrips(offset)
-    toast.success(publish ? "Dipublikasi" : "Diunpublikasi")
+    try {
+      await api.admin.itineraries.update(slug, { isPublished: publish })
+      setRoadtrips(prev => prev.map(r => r.slug === slug ? { ...r, isPublished: publish } : r))
+      toast.success(publish ? "Dipublikasi" : "Diunpublikasi")
+    } catch {
+      toast.error("Gagal mengubah status")
+    }
   }
 
   return (
