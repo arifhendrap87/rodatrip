@@ -239,7 +239,8 @@ export default function MediaPage() {
         body: JSON.stringify({ oldName, newName: newName.trim() }),
       })
       if (!res.ok) throw new Error("Gagal rename folder")
-      await fetchFolders()
+      // Update folders state locally so rename shows immediately even with 0 files
+      setFolders(prev => prev.map(f => f.name === oldName ? { ...f, name: newName.trim() } : f))
       if (activeFolder === oldName) setActiveFolder(newName.trim())
       toast.success(`Folder "${oldName}" → "${newName.trim()}"`)
     } catch (err) { toast.error((err as Error).message) }
