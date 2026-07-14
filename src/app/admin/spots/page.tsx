@@ -103,18 +103,19 @@ export default function SpotsPage() {
 
   async function fetchSpots(pageOffset = 0) {
     setLoading(true)
-    const params: Record<string, string> = { limit: "20", offset: String(pageOffset) }
-    if (debouncedSearch) params.search = debouncedSearch
-    if (categoryFilter !== "all") params.category = categoryFilter
-    if (provinceFilter !== "all") params.province = provinceFilter
-    if (roadtripFilter !== "all") params.roadtrip = roadtripFilter
-    if (sort !== "terbaru") params.sort = sort
+    const params = new URLSearchParams({ limit: "20", offset: String(pageOffset) })
+    if (debouncedSearch) params.set("search", debouncedSearch)
+    if (categoryFilter !== "all") params.set("category", categoryFilter)
+    if (provinceFilter !== "all") params.set("province", provinceFilter)
+    if (roadtripFilter !== "all") params.set("roadtrip", roadtripFilter)
+    if (sort !== "terbaru") params.set("sort", sort)
 
-    const res = await api.spots.list(params)
-    const data = res.data as any[]
-    const pagination = (res as any).pagination
+    const res = await fetch(`/api/admin/spots?${params}`)
+    const json = await res.json()
+    const spotsData = json.data?.data || json.data || []
+    const pagination = json.data?.pagination
 
-    let filtered = data || []
+    let filtered = spotsData
     if (statusFilter === "published") filtered = filtered.filter((s: any) => s.is_published !== false)
     else if (statusFilter === "draft") filtered = filtered.filter((s: any) => s.is_published === false)
 
