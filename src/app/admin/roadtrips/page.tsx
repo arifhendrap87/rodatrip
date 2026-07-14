@@ -324,13 +324,15 @@ export default function RoadtripsPage() {
                     >
                       <Eye className="h-4 w-4" />
                     </Link>
-                    <Link
-                      href={`/roadtrip/${rt.slug}`}
-                      target="_blank"
-                      className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                    </Link>
+                    {rt.isPublished && (
+                      <Link
+                        href={`/roadtrip/${rt.slug}`}
+                        target="_blank"
+                        className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </Link>
+                    )}
                     <Link
                       href={`/admin/roadtrips/${rt.slug}/edit`}
                       className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted"
