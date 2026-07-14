@@ -83,6 +83,7 @@ export default function EditSpotPage() {
     prompt_gambar: "",
     image_prompt: "",
     is_featured: false,
+    is_published: true,
     images: [],
     nearbyHotels: [] as any[],
     nearbyRestaurants: [] as any[],
@@ -129,6 +130,7 @@ export default function EditSpotPage() {
     prompt_gambar: data.prompt_gambar || "",
     image_prompt: (data as any).image_prompt || "",
             is_featured: data.is_featured || false,
+            is_published: data.is_published !== undefined ? data.is_published : true,
             images: data.images || [],
             nearbyHotels: (data as any).nearby_hotels_jsonb || (data as any).nearby_hotels || [],
             nearbyRestaurants: (data as any).nearby_restaurants_jsonb || (data as any).nearby_restaurants || [],
@@ -173,6 +175,7 @@ export default function EditSpotPage() {
       promptGambar: form.prompt_gambar || undefined,
       imagePrompt: form.image_prompt || undefined,
       isFeatured: form.is_featured,
+      isPublished: form.is_published,
       nearbyHotels: form.nearbyHotels?.length > 0 ? form.nearbyHotels : undefined,
       nearbyRestaurants: form.nearbyRestaurants?.length > 0 ? form.nearbyRestaurants : undefined,
       images: form.images?.length > 0 ? form.images : undefined,
@@ -573,15 +576,23 @@ export default function EditSpotPage() {
               <Button variant="outline" type="button">Cancel</Button>
             </Link>
           </div>
-          <Button variant="destructive" type="button"
-            onClick={async () => {
-              if (confirm("Delete this spot?")) {
-                await api.spots.delete(params.id as string)
-                router.push("/admin/spots")
-              }
-            }}>
-            <Trash2 className="mr-2 h-4 w-4" /> Delete
-          </Button>
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <input type="checkbox" checked={form.is_published}
+                onChange={(e) => setForm((f: any) => ({ ...f, is_published: e.target.checked }))}
+                className="rounded border-gray-300" />
+              Published
+            </label>
+            <Button variant="destructive" type="button"
+              onClick={async () => {
+                if (confirm("Delete this spot?")) {
+                  await api.spots.delete(params.id as string)
+                  router.push("/admin/spots")
+                }
+              }}>
+              <Trash2 className="mr-2 h-4 w-4" /> Delete
+            </Button>
+          </div>
         </div>
       </form>
     </div>

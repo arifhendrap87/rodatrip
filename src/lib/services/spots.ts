@@ -34,6 +34,7 @@ export interface SpotData {
   popular_routes: Record<string, unknown>[]
   related_product_ids: string[]
   is_featured: boolean
+  is_published?: boolean
   view_count: number
   created_at: string
   updated_at: string

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Search, Edit, Trash2, Eye, ExternalLink, Sparkles, ImageIcon, Camera, Loader2 } from "lucide-react"
+import { Plus, Search, Edit, Trash2, Eye, EyeOff, ExternalLink, Sparkles, ImageIcon, Camera, Loader2 } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -141,9 +141,9 @@ export default function SpotsPage() {
     else setSelectedSlugs(new Set(spots.map((s) => s.slug)))
   }
 
-  async function handleBatch(action: "delete") {
+  async function handleBatch(action: "delete" | "publish" | "unpublish") {
     if (selectedSlugs.size === 0) return
-    if (!confirm(`Hapus ${selectedSlugs.size} spot?`)) return
+    if (action === "delete" && !confirm(`Hapus ${selectedSlugs.size} spot?`)) return
     setBatchLoading(true)
     try {
       await fetch("/api/admin/spots/batch", {
@@ -153,7 +153,8 @@ export default function SpotsPage() {
       })
       setSelectedSlugs(new Set())
       fetchSpots(offset)
-      toast.success(`${selectedSlugs.size} spot dihapus`)
+      const label = action === "delete" ? "dihapus" : action === "publish" ? "dipublikasi" : "diunpublikasi"
+      toast.success(`${selectedSlugs.size} spot ${label}`)
     } catch { toast.error("Gagal") }
     setBatchLoading(false)
   }
@@ -265,6 +266,8 @@ export default function SpotsPage() {
       {selectedSlugs.size > 0 && (
         <div className="flex items-center gap-3 px-4 py-2.5 mb-4 rounded-lg border border-primary/20 bg-primary/5">
           <span className="text-sm font-medium">{selectedSlugs.size} terpilih</span>
+          <Button size="sm" variant="default" onClick={() => handleBatch("publish")} disabled={batchLoading}>Publish</Button>
+          <Button size="sm" variant="secondary" onClick={() => handleBatch("unpublish")} disabled={batchLoading}>Unpublish</Button>
           <Button size="sm" variant="destructive" onClick={() => handleBatch("delete")} disabled={batchLoading}>Hapus</Button>
         </div>
       )}
@@ -355,6 +358,14 @@ Tambah Spot
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <h3 className="font-medium truncate">{spot.name}</h3>
+                        {spot.is_published === false ? (
+                          <Badge variant="outline" className="shrink-0 text-xs text-muted-foreground">
+                            <EyeOff className="mr-1 h-3 w-3" />
+                            Draft
+                          </Badge>
+                        ) : (
+                          <Badge variant="secondary" className="shrink-0 text-xs">Published</Badge>
+                        )}
                         {spot.is_featured && (
                           <Badge variant="secondary" className="shrink-0">
                             Featured
@@ -397,12 +408,35 @@ Tambah Spot
 
                     <div className="flex items-center gap-1">
                       <Link
-                        href={`/spot-istimewa/${spot.slug}`}
+                        href={`/admin/spots/preview/${spot.slug}`}
                         target="_blank"
                         className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted"
                       >
-                        <ExternalLink className="h-4 w-4" />
+                        <Eye className="h-4 w-4" />
                       </Link>
+                      <button
+                        onClick={async () => {
+                          const publish = spot.is_published === false
+                          try {
+                            await api.spots.update(spot.slug, { isPublished: publish })
+                            setSpots(prev => prev.map(s => s.slug === spot.slug ? { ...s, is_published: publish } : s))
+                            toast.success(publish ? "Dipublikasi" : "Diunpublikasi")
+                          } catch { toast.error("Gagal") }
+                        }}
+                        className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted text-xs font-medium"
+                        title={spot.is_published === false ? "Publish" : "Unpublish"}
+                      >
+                        {spot.is_published === false ? "📝" : "🔴"}
+                      </button>
+                      {spot.is_published !== false && (
+                        <Link
+                          href={`/spot-istimewa/${spot.slug}`}
+                          target="_blank"
+                          className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </Link>
+                      )}
                       <Link
                         href={`/admin/spots/${spot.slug}/edit`}
                         className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted"

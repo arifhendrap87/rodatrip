@@ -11,8 +11,15 @@ export async function POST(request: Request) {
     return badRequest("action dan slugs wajib diisi")
   }
 
-  if (action !== "delete") return badRequest("Spot hanya support action: delete")
+  if (action === "delete") {
+    await db.from("spots").delete().in("slug", slugs)
+  } else if (action === "publish") {
+    await db.from("spots").update({ is_published: true }).in("slug", slugs)
+  } else if (action === "unpublish") {
+    await db.from("spots").update({ is_published: false }).in("slug", slugs)
+  } else {
+    return badRequest("Action harus delete, publish, atau unpublish")
+  }
 
-  await db.from("spots").delete().in("slug", slugs)
   return success({ affected: slugs.length })
 }

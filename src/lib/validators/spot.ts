@@ -49,6 +49,7 @@ export const createSpotSchema = z.object({
   facilities: z.array(z.string()).optional(),
   distanceFromCity: z.string().optional(),
   isFeatured: z.boolean().optional(),
+  isPublished: z.boolean().optional(),
   nearbyHotels: z.array(nearbyPlaceSchema).optional(),
   nearbyRestaurants: z.array(nearbyPlaceSchema).optional(),
   promptGambar: z.string().optional(),
