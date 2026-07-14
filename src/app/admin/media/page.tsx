@@ -246,7 +246,10 @@ export default function MediaPage() {
         body: JSON.stringify({ oldName, newName: newName.trim() }),
       })
       if (!res.ok) throw new Error("Gagal rename folder")
-      // Update folders state locally so rename shows immediately even with 0 files
+      // Update local folders ref so renamed folder persists even with 0 files
+      const updated = new Set(localFoldersRef.current)
+      if (updated.has(oldName)) { updated.delete(oldName); updated.add(newName.trim()) }
+      localFoldersRef.current = updated
       setFolders(prev => prev.map(f => f.name === oldName ? { ...f, name: newName.trim() } : f))
       if (activeFolder === oldName) setActiveFolder(newName.trim())
       toast.success(`Folder "${oldName}" → "${newName.trim()}"`)
@@ -263,6 +266,8 @@ export default function MediaPage() {
         body: JSON.stringify({ name }),
       })
       if (!res.ok) throw new Error("Gagal hapus folder")
+      // Remove from local folders so it doesn't reappear after refresh
+      localFoldersRef.current = new Set([...localFoldersRef.current].filter(f => f !== name))
       await fetchFolders()
       if (activeFolder === name) setActiveFolder("all")
       await resetAndFetch()
