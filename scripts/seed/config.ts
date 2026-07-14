@@ -28,13 +28,16 @@ async function runRawSQL(sql: string) {
   const projectRef = SUPABASE_URL.match(/https:\/\/(.+)\.supabase\.co/)?.[1]
   if (!projectRef) throw new Error("Cannot parse project ref from URL")
 
+  if (!process.env.SUPABASE_DB_PASSWORD) {
+    throw new Error("SUPABASE_DB_PASSWORD environment variable is required for raw SQL operations")
+  }
   const { Client } = await import("pg")
   const client = new Client({
     host: `db.${projectRef}.supabase.co`,
     port: 5432,
     database: "postgres",
     user: "postgres",
-    password: process.env.SUPABASE_DB_PASSWORD || "Gaskuy2024!",
+    password: process.env.SUPABASE_DB_PASSWORD,
     ssl: { rejectUnauthorized: false },
   })
 

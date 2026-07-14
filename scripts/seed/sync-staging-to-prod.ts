@@ -2,7 +2,8 @@
  * Sync database from staging to production
  * Usage: npx tsx scripts/seed/sync-staging-to-prod.ts
  *
- * Reads from .env.local (staging) and copies to production credentials below.
+ * Reads from .env.local (staging). Production credentials from env vars:
+ *   PROD_SUPABASE_URL, PROD_SUPABASE_SERVICE_KEY
  * WARNING: This will OVERWRITE production data with staging data.
  */
 
@@ -12,8 +13,13 @@ import path from "path"
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env.local") })
 
-const PROD_URL = "https://bpcxdetyjqqfivnlvqwy.supabase.co"
-const PROD_SERVICE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwY3hkZXR5anFxZml2bmx2cXd5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTM1ODg1OCwiZXhwIjoyMDk2OTM0ODU4fQ.eCdNtIby6bYuyk-fpyRCvEaYOocRA_enKGlGrE-lTwE"
+const PROD_URL = process.env.PROD_SUPABASE_URL
+const PROD_SERVICE_KEY = process.env.PROD_SUPABASE_SERVICE_KEY
+
+if (!PROD_URL || !PROD_SERVICE_KEY) {
+  console.error("  ❌ PROD_SUPABASE_URL and PROD_SUPABASE_SERVICE_KEY must be set in environment")
+  process.exit(1)
+}
 
 const staging = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,

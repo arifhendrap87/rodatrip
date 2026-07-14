@@ -38,8 +38,8 @@
                 }
               },
               "example": {
-                "email": "admin@gaskuy.id",
-                "password": "securepassword123"
+                "email": "admin@example.com",
+                "password": "your-password-here"
               }
             }
           }
