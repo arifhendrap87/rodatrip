@@ -53,6 +53,7 @@ export async function getSpots(options?: {
   search?: string
   featured?: boolean
   roadtripId?: string
+  published?: boolean
   limit?: number
   offset?: number
   sort?: string
@@ -77,6 +78,7 @@ export async function getSpots(options?: {
     if (options?.city) query = query.eq("city", options.city)
     if (options?.search) query = query.ilike("name", `%${options.search}%`)
     if (options?.featured) query = query.eq("is_featured", true)
+    if (options?.published) query = query.eq("is_published", true)
     if (spotSlugs) query = query.in("slug", spotSlugs)
 
     const limit = options?.limit || 20

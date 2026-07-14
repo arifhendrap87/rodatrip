@@ -23,7 +23,7 @@ export async function GET(request: Request) {
   const offset = Number(searchParams.get("offset")) || 0
 
   try {
-    const { data, total } = await getSpots({ category, region, province, city, search, sort, roadtripId, limit, offset })
+    const { data, total } = await getSpots({ category, region, province, city, search, sort, roadtripId, published: true, limit, offset })
     return paginated(data, total, limit, offset)
   } catch {
     return paginated([], 0, limit, offset)
