@@ -35,7 +35,29 @@ export default function MediaPage() {
   const [offset, setOffset] = useState(0)
   const LIMIT = 50
   const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [dragOver, setDragOver] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    setDragOver(true)
+  }
+
+  function handleDragLeave(e: React.DragEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    setDragOver(false)
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    setDragOver(false)
+    const files = Array.from(e.dataTransfer.files)
+    if (files.length === 0) return
+    files.forEach((file) => handleUpload(file))
+  }
 
   useEffect(() => {
     resetAndFetch()
@@ -103,7 +125,21 @@ export default function MediaPage() {
   }
 
   return (
-    <div>
+    <div
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      className="relative"
+    >
+      {dragOver && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center rounded-2xl border-4 border-dashed border-primary/60 bg-primary/5 backdrop-blur-sm min-h-[400px]">
+          <div className="text-center">
+            <Upload className="mx-auto h-12 w-12 text-primary" />
+            <p className="mt-2 text-lg font-semibold text-primary">Lepaskan file untuk upload</p>
+            <p className="text-sm text-muted-foreground">JPG, PNG, WebP, AVIF — maks 10MB</p>
+          </div>
+        </div>
+      )}
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold font-heading">Media</h1>
