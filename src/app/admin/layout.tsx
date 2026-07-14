@@ -27,6 +27,7 @@ import {
   MessageCircle,
   CheckCircle,
   Calendar,
+  ChevronRight,
 } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useState } from "react"
@@ -60,6 +61,7 @@ export default function AdminLayout({
   const router = useRouter()
   const { user } = useAuth()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   if (pathname === "/admin/login" || pathname.startsWith("/admin/auth")) {
     return <>{children}</>
@@ -70,13 +72,13 @@ export default function AdminLayout({
     router.push("/admin/login")
   }
 
-  const SidebarContent = () => (
+  const SidebarContent = ({ collapsed }: { collapsed?: boolean }) => (
     <div className="flex h-full flex-col">
-      <div className="flex h-14 items-center gap-2 border-b px-4">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
+      <div className={`flex h-14 items-center gap-2 border-b ${collapsed ? 'justify-center px-0' : 'px-4'}`}>
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground shrink-0">
           R
         </div>
-        <span className="font-heading text-lg font-bold">RodaTrip</span>
+        {!collapsed && <span className="font-heading text-lg font-bold">RodaTrip</span>}
       </div>
 
       <nav className="flex-1 space-y-1 p-2">
@@ -89,14 +91,16 @@ export default function AdminLayout({
               href={item.href}
               onClick={() => setMobileOpen(false)}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                "flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                collapsed ? "justify-center mx-auto w-10" : "gap-3",
                 isActive
                   ? "bg-primary/10 text-primary"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
+              title={collapsed ? item.label : undefined}
             >
-              <Icon className="h-4 w-4" />
-              {item.label}
+              <Icon className="h-4 w-4 shrink-0" />
+              {!collapsed && item.label}
             </Link>
           )
         })}
@@ -105,11 +109,12 @@ export default function AdminLayout({
       <div className="border-t p-2">
         <Button
           variant="ghost"
-          className="w-full justify-start gap-3 text-muted-foreground"
+          className={`w-full justify-start text-muted-foreground ${collapsed ? 'px-0 justify-center' : 'gap-3'}`}
           onClick={handleLogout}
+          title={collapsed ? "Logout" : undefined}
         >
-          <LogOut className="h-4 w-4" />
-          Logout
+          <LogOut className="h-4 w-4 shrink-0" />
+          {!collapsed && "Logout"}
         </Button>
       </div>
     </div>
@@ -118,8 +123,16 @@ export default function AdminLayout({
   return (
     <div className="flex min-h-screen">
       {/* Desktop sidebar */}
-      <aside className="hidden w-56 shrink-0 border-r bg-card md:block">
-        <SidebarContent />
+      <aside className={`hidden shrink-0 border-r bg-card md:block transition-all duration-300 ${sidebarOpen ? 'w-56' : 'w-16'}`}>
+        <div className="relative h-full">
+          <SidebarContent collapsed={!sidebarOpen} />
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="absolute -right-3 top-1/2 z-10 flex h-6 w-6 items-center justify-center rounded-full border bg-background text-muted-foreground hover:text-foreground shadow-sm transition-colors"
+          >
+            <ChevronRight className={`h-3.5 w-3.5 transition-transform duration-300 ${sidebarOpen ? 'rotate-180' : ''}`} />
+          </button>
+        </div>
       </aside>
 
       {/* Mobile sidebar */}
