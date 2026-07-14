@@ -10,7 +10,6 @@ import { SpotHeroImage } from "@/components/spot/SpotHeroImage"
 import { SpotCard } from "@/components/spot/SpotCard"
 import { CopyPromptButton } from "@/components/spot/CopyPromptButton"
 import { NearbyPlaces } from "@/components/roadtrip/NearbyPlaces"
-import { getSpotCoordinates } from "@/lib/services/spots"
 
 interface SpotDetailClientProps {
   spot: SpotData
@@ -28,7 +27,7 @@ function cleanMapsUrl(url: string): string {
 
 export function SpotDetailClient({ spot, relatedItineraries, allSpots }: SpotDetailClientProps) {
   const cat = SPOT_CATEGORIES[spot.category as keyof typeof SPOT_CATEGORIES] || { icon: "📍", label: spot.category }
-  const coords = getSpotCoordinates(spot)
+  const coords = parseLocation(spot.location)
 
   const infoGrid = [
     { icon: "🕐", label: "Jam Buka", value: spot.opening_hours },
