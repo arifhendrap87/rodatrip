@@ -55,7 +55,7 @@ export async function POST(request: Request) {
   if (!admin) return unauthorized()
 
   const body = await request.json()
-  const { title, platform, tone, content_type, source_id, source_title, caption, hashtags, skrip_tiktok, concept_type, text_overlays, image_prompts, source_type, scheduled_at } = body
+  const { title, platform, tone, content_type, source_id, source_title, caption, hashtags, skrip_tiktok, concept_type, text_overlays, image_prompts, source_type, scheduled_at, slide_images } = body
 
   const isCarousel = concept_type === "carousel"
 
@@ -89,6 +89,7 @@ export async function POST(request: Request) {
       skrip_tiktok: skrip_tiktok || "",
       text_overlays: text_overlays || [],
       image_prompts: image_prompts || [],
+      slide_images: slide_images || [],
       scheduled_at: scheduled_at || null,
       created_by: admin.id,
     })
@@ -109,7 +110,7 @@ export async function PUT(request: Request) {
 
   if (!id) return badRequest("id wajib diisi")
 
-  const allowedFields = ["title", "caption", "hashtags", "skrip_tiktok", "text_overlays", "image_prompts", "status", "scheduled_at"]
+  const allowedFields = ["title", "caption", "hashtags", "skrip_tiktok", "text_overlays", "image_prompts", "slide_images", "status", "scheduled_at"]
 
   const updates: Record<string, unknown> = {}
   for (const key of allowedFields) {

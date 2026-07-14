@@ -68,6 +68,7 @@ interface Draft {
   concept_type: string
   text_overlays: string[]
   image_prompts: string[]
+  slide_images: (string | null)[]
   status: string
   scheduled_at: string | null
   created_at: string
@@ -90,6 +91,9 @@ export default function DraftsPage() {
   const [editOverlays, setEditOverlays] = useState<string[]>([])
   const [editPrompts, setEditPrompts] = useState<string[]>([])
   const [editHashtags, setEditHashtags] = useState("")
+  const [editSlideImages, setEditSlideImages] = useState<(string | null)[]>([])
+  const [slideDragOver, setSlideDragOver] = useState<number | null>(null)
+  const [slideImageUpdating, setSlideImageUpdating] = useState<Set<number>>(new Set())
   const [scheduleId, setScheduleId] = useState<string | null>(null)
   const [scheduleDate, setScheduleDate] = useState("")
 
@@ -312,13 +316,54 @@ export default function DraftsPage() {
                               {(editOverlays.length > 0 ? editOverlays : draft.text_overlays || []).map((text, i) => {
                                 const prompts = editPrompts.length > 0 ? editPrompts : draft.image_prompts || []
                                 const gradients = ["from-sky-400/80 via-blue-500/80 to-indigo-600/80","from-emerald-400/80 via-teal-500/80 to-cyan-600/80","from-orange-400/80 via-rose-500/80 to-pink-600/80","from-violet-400/80 via-purple-500/80 to-fuchsia-600/80","from-amber-400/80 via-yellow-500/80 to-orange-600/80"]
+                                const slideImg = editSlideImages[i] || draft.slide_images?.[i]
                                 return (
                                   <div key={i} className="rounded-xl border border-border/50 overflow-hidden bg-white shadow-sm">
-                                    <div className={`aspect-[4/5] bg-gradient-to-br ${gradients[i % gradients.length]} relative flex flex-col justify-end p-0`}>
-                                      <div className="absolute top-2 left-2 bg-black/50 text-white text-[10px] font-bold px-1.5 py-0.5 rounded z-10">{i + 1}</div>
-                                      <div className="bg-gradient-to-t from-black/80 via-black/30 to-transparent p-4 pt-12">
+                                    <div
+                                      onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setSlideDragOver(i) }}
+                                      onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setSlideDragOver(null) }}
+                                      onDrop={async (e) => {
+                                        e.preventDefault(); e.stopPropagation(); setSlideDragOver(null)
+                                        const file = e.dataTransfer.files?.[0]
+                                        if (!file) return
+                                        const maxSize = 10 * 1024 * 1024
+                                        if (file.size > maxSize) { toast.error("File maksimal 10MB"); return }
+                                        const allowed = ["image/jpeg", "image/png", "image/webp", "image/avif"]
+                                        if (!allowed.includes(file.type)) { toast.error("Tipe file harus jpg, png, webp, atau avif"); return }
+                                        setSlideImageUpdating(prev => new Set(prev).add(i))
+                                        try {
+                                          const fd = new FormData(); fd.append("file", file); fd.append("folder", "carousel")
+                                          const r = await fetch("/api/upload", { method: "POST", body: fd })
+                                          const j = await r.json()
+                                          if (!r.ok) throw new Error(j?.error?.message || "Gagal")
+                                          const n = [...editSlideImages]; n[i] = j.data.url; setEditSlideImages(n)
+                                          toast.success("Gambar slide tersimpan!")
+                                        } catch (err) { toast.error("Gagal upload: " + (err as Error).message) }
+                                        setSlideImageUpdating(prev => { const n = new Set(prev); n.delete(i); return n })
+                                      }}
+                                      className={`aspect-[4/5] relative flex flex-col justify-end p-0 overflow-hidden ${slideDragOver === i ? 'ring-2 ring-primary' : ''}`}
+                                    >
+                                      {slideImg ? (
+                                        <img src={slideImg} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                                      ) : (
+                                        <div className={`absolute inset-0 bg-gradient-to-br ${gradients[i % gradients.length]}`} />
+                                      )}
+                                      {slideDragOver === i && (
+                                        <div className="absolute inset-0 bg-primary/20 border-2 border-dashed border-primary z-20 flex items-center justify-center">
+                                          <p className="text-white font-semibold text-sm bg-black/50 px-3 py-1.5 rounded-full">Lepaskan untuk upload</p>
+                                        </div>
+                                      )}
+                                      <div className="absolute top-2 left-2 z-10">
+                                        <span className="bg-black/50 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">{i + 1}</span>
+                                      </div>
+                                      <div className="relative bg-gradient-to-t from-black/80 via-black/30 to-transparent p-4 pt-12">
                                         <p className="text-white font-bold text-sm leading-snug break-words drop-shadow-lg">{text}</p>
                                       </div>
+                                      {slideImageUpdating.has(i) && (
+                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-20">
+                                          <Loader2 className="h-6 w-6 animate-spin text-white" />
+                                        </div>
+                                      )}
                                     </div>
                                     <div className="p-3 bg-muted/30 space-y-2">
                                       <Textarea value={editOverlays[i] ?? text} onChange={(e) => { const n = [...editOverlays]; n[i] = e.target.value; setEditOverlays(n); }} placeholder="Text overlay" rows={2} className="text-xs font-mono min-h-[40px]" />
@@ -339,8 +384,8 @@ export default function DraftsPage() {
                                 setSaving(true)
                                 try {
                                   const res = await fetch("/api/admin/content-generator/drafts", { method: "PUT", headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify({ id: draft.id, text_overlays: editOverlays, image_prompts: editPrompts, caption: editCaption, hashtags: editHashtags }) })
-                                  if (res.ok) { setDrafts((prev) => prev.map((d) => d.id === draft.id ? { ...d, text_overlays: editOverlays, image_prompts: editPrompts, caption: editCaption, hashtags: editHashtags } : d)); setPreviewId(null); toast.success("Konsep diperbarui") }
+                                    body: JSON.stringify({ id: draft.id, text_overlays: editOverlays, image_prompts: editPrompts, slide_images: editSlideImages, caption: editCaption, hashtags: editHashtags }) })
+                                  if (res.ok) { setDrafts((prev) => prev.map((d) => d.id === draft.id ? { ...d, text_overlays: editOverlays, image_prompts: editPrompts, slide_images: editSlideImages, caption: editCaption, hashtags: editHashtags } : d)); setPreviewId(null); toast.success("Konsep diperbarui") }
                                   else { const j = await res.json(); throw new Error(j?.error?.message || "Gagal") }
                                 } catch (e) { toast.error(e instanceof Error ? e.message : "Gagal menyimpan") }
                                 setSaving(false)
@@ -359,7 +404,7 @@ export default function DraftsPage() {
                           {isCarousel && previewId === draft.id ? null : isCarousel ? (
                             <>
                               <Button variant="ghost" size="sm" className="h-8 text-xs gap-1"
-                                onClick={() => { setPreviewId(draft.id); setEditOverlays(draft.text_overlays || []); setEditPrompts(draft.image_prompts || []); setEditCaption(draft.caption); setEditHashtags(draft.hashtags || "") }}>
+                                onClick={() => { setPreviewId(draft.id); setEditOverlays(draft.text_overlays || []); setEditPrompts(draft.image_prompts || []); setEditSlideImages(draft.slide_images || []); setEditCaption(draft.caption); setEditHashtags(draft.hashtags || "") }}>
                                 <Layout className="h-3 w-3" /> Preview
                               </Button>
                               {draft.status !== "published" && (
