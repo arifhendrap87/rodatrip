@@ -73,7 +73,7 @@ export function RoadtripDetailClient({ itinerary }: RoadtripDetailClientProps) {
           {showCover ? (
             <>
               <img src={itinerary.coverImage} alt={`${itinerary.title} — Foto sampul roadtrip`} className="absolute inset-0 w-full h-full object-cover" onError={() => setCoverError(true)} />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
               {itinerary.coverImagePrompt && (
                 <button
                   onClick={() => { navigator.clipboard.writeText(itinerary.coverImagePrompt!); toast.success("Prompt cover tersalin!") }}
