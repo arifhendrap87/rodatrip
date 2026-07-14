@@ -32,24 +32,37 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useState } from "react"
 
-const navItems = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/spots", label: "Spots", icon: MapPin },
-  { href: "/admin/products", label: "Products", icon: ShoppingBag },
-  { href: "/admin/roadtrips", label: "Roadtrips", icon: Map },
-  { href: "/admin/blog", label: "Blog", icon: FileText },
-  { href: "/admin/media", label: "Media", icon: Image },
-  { href: "/admin/regions", label: "Regions", icon: Globe },
-  { href: "/admin/chat", label: "AI Chat", icon: MessageCircle },
-  { href: "/admin/content-generator", label: "Konten Sosmed", icon: Share2 },
-  { href: "/admin/content-generator/drafts", label: "Konsep", icon: FileText },
-  { href: "/admin/content-generator/calendar", label: "Kalender", icon: Calendar },
-  { href: "/admin/prompt-generator", label: "Prompt GPT", icon: Sparkles },
-  { href: "/admin/content-readiness", label: "Kesiapan", icon: CheckCircle },
-  { href: "/admin/waitlist", label: "Waitlist", icon: Mail },
-  { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
-  { href: "/admin/invoice", label: "Invoice", icon: Receipt },
-  { href: "/admin/settings", label: "Settings", icon: Settings },
+interface NavItem { href: string; label: string; icon: React.ComponentType<{ className?: string }> }
+interface NavGroup { label: string; items: NavItem[] }
+
+const navGroups: NavGroup[] = [
+  { label: "Dashboard", items: [
+    { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  ]},
+  { label: "Konten", items: [
+    { href: "/admin/spots", label: "Spots", icon: MapPin },
+    { href: "/admin/products", label: "Products", icon: ShoppingBag },
+    { href: "/admin/roadtrips", label: "Roadtrips", icon: Map },
+    { href: "/admin/blog", label: "Blog", icon: FileText },
+    { href: "/admin/media", label: "Media", icon: Image },
+    { href: "/admin/regions", label: "Regions", icon: Globe },
+  ]},
+  { label: "AI & Sosial Media", items: [
+    { href: "/admin/chat", label: "AI Chat", icon: MessageCircle },
+    { href: "/admin/content-generator", label: "Konten Sosmed", icon: Share2 },
+    { href: "/admin/content-generator/drafts", label: "Konsep", icon: FileText },
+    { href: "/admin/content-generator/calendar", label: "Kalender", icon: Calendar },
+    { href: "/admin/prompt-generator", label: "Prompt GPT", icon: Sparkles },
+  ]},
+  { label: "Data & Analitik", items: [
+    { href: "/admin/content-readiness", label: "Kesiapan", icon: CheckCircle },
+    { href: "/admin/waitlist", label: "Waitlist", icon: Mail },
+    { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
+    { href: "/admin/invoice", label: "Invoice", icon: Receipt },
+  ]},
+  { label: "Pengaturan", items: [
+    { href: "/admin/settings", label: "Settings", icon: Settings },
+  ]},
 ]
 
 export default function AdminLayout({
@@ -81,29 +94,40 @@ export default function AdminLayout({
         {!collapsed && <span className="font-heading text-lg font-bold">RodaTrip</span>}
       </div>
 
-      <nav className="flex-1 space-y-1 p-2">
-        {navItems.map((item) => {
-          const Icon = item.icon
-          const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setMobileOpen(false)}
-              className={cn(
-                "flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                collapsed ? "justify-center mx-auto w-10" : "gap-3",
-                isActive
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              )}
-              title={collapsed ? item.label : undefined}
-            >
-              <Icon className="h-4 w-4 shrink-0" />
-              {!collapsed && item.label}
-            </Link>
-          )
-        })}
+      <nav className="flex-1 overflow-y-auto p-2 space-y-4">
+        {navGroups.map((group) => (
+          <div key={group.label}>
+            {!collapsed && (
+              <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+                {group.label}
+              </p>
+            )}
+            <div className="space-y-0.5">
+              {group.items.map((item) => {
+                const Icon = item.icon
+                const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    className={cn(
+                      "flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                      collapsed ? "justify-center mx-auto w-10" : "gap-3",
+                      isActive
+                        ? "bg-primary/10 text-primary"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    )}
+                    title={collapsed ? item.label : undefined}
+                  >
+                    <Icon className="h-4 w-4 shrink-0" />
+                    {!collapsed && item.label}
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
       <div className="border-t p-2">
