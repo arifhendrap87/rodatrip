@@ -36,6 +36,7 @@ export default function MediaPage() {
   // Data
   const [items, setItems] = useState<MediaItem[]>([])
   const [folders, setFolders] = useState<FolderInfo[]>([])
+  const localFoldersRef = useRef<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -87,7 +88,12 @@ export default function MediaPage() {
     try {
       const res = await fetch("/api/media/folders")
       const json = await res.json()
-      setFolders((json.data || []) as FolderInfo[])
+      const apiFolders: FolderInfo[] = json.data || []
+      // Merge with locally-created folders (empty but should still appear)
+      const merged = new Map<string, number>()
+      for (const f of apiFolders) merged.set(f.name, f.count)
+      for (const name of localFoldersRef.current) { if (!merged.has(name)) merged.set(name, 0) }
+      setFolders(Array.from(merged.entries()).map(([name, count]) => ({ name, count })).sort((a, b) => a.name.localeCompare(b.name)))
     } catch { /* ignore */ }
   }, [])
 
@@ -219,6 +225,7 @@ export default function MediaPage() {
   async function handleCreateFolder() {
     const name = newFolderName.trim()
     if (!name) return
+    localFoldersRef.current = new Set(localFoldersRef.current).add(name)
     // Add to folders list so it shows in sidebar immediately
     setFolders(prev => {
       if (prev.some(f => f.name === name)) return prev
