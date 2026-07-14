@@ -87,7 +87,7 @@ export default function MediaPage() {
     try {
       const res = await fetch("/api/media/folders")
       const json = await res.json()
-      setFolders(json.data || [])
+      setFolders((json.data || []) as FolderInfo[])
     } catch { /* ignore */ }
   }, [])
 
@@ -217,13 +217,17 @@ export default function MediaPage() {
 
   // Folder operations
   async function handleCreateFolder() {
-    if (!newFolderName.trim()) return
-    // Create folder by uploading a placeholder? No, just add it as a valid folder
-    // Folders are dynamic — they exist when files have that folder value.
-    // We'll just switch to that folder so user can upload into it.
-    setActiveFolder(newFolderName.trim())
+    const name = newFolderName.trim()
+    if (!name) return
+    // Add to folders list so it shows in sidebar immediately
+    setFolders(prev => {
+      if (prev.some(f => f.name === name)) return prev
+      return [...prev, { name, count: 0 }].sort((a, b) => a.name.localeCompare(b.name))
+    })
+    setActiveFolder(name)
     setCreateFolderOpen(false)
     setNewFolderName("")
+    toast.success(`Folder "${name}" siap digunakan — upload gambar untuk mulai`)
   }
 
   async function handleRenameFolder(oldName: string, newName: string) {
