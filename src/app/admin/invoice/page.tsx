@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { QRCodeSVG } from "qrcode.react"
-import { Printer, Smartphone, Wifi, Copy, Check, ArrowRight } from "lucide-react"
+import { Printer, Smartphone, Wifi, Copy, Check, ArrowRight, FileText, Headphones, CreditCard, MessageCircle } from "lucide-react"
 import { toast } from "sonner"
 
 const SERVICES = ["pulsa", "paket_data", "token_listrik", "bpjs", "e_wallet", "game_voucher"] as const
@@ -222,97 +222,109 @@ export default function InvoicePage() {
     const prov = getProvider(data.provider)
     return (
       <div className="mx-auto max-w-sm">
-        <div className="print-area overflow-hidden rounded-2xl">
-          {/* Header */}
-          <div className="px-6 pt-8 pb-6 text-white text-center" style={{ backgroundColor: prov.color }}>
-            <ProviderLogo color={prov.color} label={prov.label} size="lg" />
-            <p className="text-sm font-semibold mt-2 opacity-80">{SERVICE_LABELS[data.service] || data.service}</p>
-            <p className="text-lg font-bold mt-0.5">{prov.label}</p>
-          </div>
+        <div className="print-area">
+          {/* Purple background container */}
+          <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: prov.color }}>
+            
+            {/* Header area */}
+            <div className="text-white text-center pt-8 pb-16 px-6">
+              <p className="text-sm opacity-80">{SERVICE_LABELS[data.service] || data.service}</p>
+              <p className="text-lg font-bold">{prov.label}</p>
+            </div>
 
-          {/* Body card */}
-          <div className="bg-white px-6 py-6 space-y-4">
-            {/* Receipt icon */}
-            <div className="flex justify-center -mt-10 mb-2">
-              <div className="flex -space-x-2">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-md">
-                  <Smartphone className="h-5 w-5 text-white" />
-                </div>
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-md mt-2">
-                  <Wifi className="h-5 w-5 text-white" />
+            {/* White card overlapping header */}
+            <div className="bg-white rounded-t-3xl px-6 py-8 relative -mt-8 shadow-xl">
+              
+              {/* Receipt icons - document + headset overlapping */}
+              <div className="flex justify-center mb-4">
+                <div className="flex -space-x-3">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center shadow-lg relative z-10">
+                    <FileText className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-lg mt-2">
+                    <Headphones className="h-6 w-6 text-white" />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Price */}
-            <div className="text-center">
-              <p className="text-3xl font-extrabold text-gray-900">{formatRupiah(data.total)}</p>
-              <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">{data.productName}</p>
-              <p className="text-xs text-gray-400 font-mono mt-0.5">{data.nomorHp}</p>
-              <p className="text-[10px] text-gray-400 font-mono mt-1">#{data.eksternalId}</p>
-            </div>
+              {/* Price */}
+              <div className="text-center mb-4">
+                <p className="text-3xl font-extrabold text-gray-900">{formatRupiah(data.total)}</p>
+                <p className="text-xs text-gray-500 mt-2 leading-relaxed">{data.productName}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{data.nomorHp}</p>
+                <p className="text-[10px] text-gray-400 font-mono mt-1">#{data.eksternalId}</p>
+              </div>
 
-            {/* Chat button */}
-            {data.chatUrl && (
-              <a href={data.chatUrl} target="_blank" rel="noopener noreferrer"
-                className="flex items-center justify-center gap-1.5 w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-xs font-medium text-gray-600 hover:border-gray-400 hover:text-gray-800 transition-colors">
-                Chat dengan CS <ArrowRight className="h-3 w-3" />
-              </a>
-            )}
+              {/* Chat button */}
+              {data.chatUrl && (
+                <a href={data.chatUrl} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center justify-between w-full px-4 py-3 border border-gray-200 rounded-full mb-6 hover:border-gray-300 transition-colors">
+                  <div className="flex items-center gap-2">
+                    <Headphones className="h-4 w-4 text-blue-500" />
+                    <span className="text-sm font-medium text-gray-700">Chat dengan CS</span>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-gray-400" />
+                </a>
+              )}
 
-            {/* Dashed divider */}
-            <div className="border-t border-dashed border-gray-200" />
+              {/* Dashed divider */}
+              <div className="border-t border-dashed border-gray-200 mb-4" />
 
-            {/* Rincian transaksi */}
-            <div>
-              <p className="text-xs font-semibold text-gray-700 mb-2">Rincian transaksi</p>
-              <div className="space-y-1">
+              {/* Rincian transaksi */}
+              <div className="mb-4">
+                <p className="text-sm font-semibold text-gray-900 mb-3">Rincian transaksi</p>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-500">Status</span>
+                    <StatusBadge status={data.status} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-500">Metode pembayaran</span>
+                    <div className="flex items-center gap-1.5">
+                      <CreditCard className="h-3.5 w-3.5 text-blue-500" />
+                      <span className="text-xs font-medium text-gray-900">{data.paymentMethod}</span>
+                    </div>
+                  </div>
+                  <DetailRow label="Waktu" value={data.time} />
+                  <DetailRow label="Tanggal" value={data.date} />
+                  <DetailRow label="ID transaksi" value={data.refId} mono copyKey="refId" />
+                  <DetailRow label="ID Transaksi Gojek" value={data.eksternalId} mono copyKey="eksternal" />
+                  <DetailRow label="Nomor serial" value={data.serialNumber} mono />
+                </div>
+              </div>
+
+              {/* Dashed divider */}
+              <div className="border-t border-dashed border-gray-200 my-4" />
+
+              {/* Pricing */}
+              <div className="space-y-3 mb-4">
+                <DetailRow label="Jumlah" value={formatRupiah(data.price)} />
+                {data.discount > 0 && <DetailRow label="Diskon" value={`-${formatRupiah(data.discount)}`} />}
+                {data.adminFee > 0 && <DetailRow label="Biaya admin" value={formatRupiah(data.adminFee)} />}
+              </div>
+
+              {/* Solid double divider */}
+              <div className="border-t-2 border-double border-gray-300 pt-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500">Status</span>
-                  <StatusBadge status={data.status} />
+                  <span className="text-sm font-bold text-gray-900">Total</span>
+                  <span className="text-lg font-extrabold text-gray-900">{formatRupiah(data.total)}</span>
                 </div>
-                <div className="flex items-center justify-between py-1">
-                  <span className="text-xs text-gray-500">Metode bayar</span>
-                  <span className="text-xs font-medium text-gray-900">💳 {data.paymentMethod}</span>
+              </div>
+            </div>
+
+            {/* Purple footer with QR */}
+            <div className="px-6 pt-6 pb-8 text-center">
+              {data.qrValue && (
+                <div className="bg-white rounded-2xl p-4 inline-block mb-4 shadow-lg">
+                  <QRCodeSVG value={data.qrValue} size={120} level="M" />
                 </div>
-                <DetailRow label="Waktu" value={data.time} />
-                <DetailRow label="Tanggal" value={data.date} />
-                <DetailRow label="ID transaksi" value={data.refId} mono copyKey="refId" />
-                <DetailRow label="ID Eksternal" value={data.eksternalId} mono copyKey="eksternal" />
-                <DetailRow label="Nomor serial" value={data.serialNumber} mono />
+              )}
+              <p className="text-xs text-white/80 mb-1">Scan untuk detail transaksi</p>
+              <p className="text-[11px] text-white/60 mb-3">Dikirim dari app {prov.label}</p>
+              <div className="flex items-center justify-center gap-2">
+                <div className="bg-black/30 rounded-lg px-3 py-1.5 text-[10px] text-white/90 font-medium">App Store</div>
+                <div className="bg-black/30 rounded-lg px-3 py-1.5 text-[10px] text-white/90 font-medium">Google Play</div>
               </div>
-            </div>
-
-            {/* Dashed divider */}
-            <div className="border-t border-dashed border-gray-200" />
-
-            {/* Pricing */}
-            <div className="space-y-1.5">
-              <DetailRow label="Jumlah" value={formatRupiah(data.price)} />
-              {data.discount > 0 && <DetailRow label="Diskon" value={`-${formatRupiah(data.discount)}`} />}
-              {data.adminFee > 0 && <DetailRow label="Biaya admin" value={formatRupiah(data.adminFee)} />}
-            </div>
-
-            <div className="border-t-2 border-double border-gray-300 pt-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-bold text-gray-900">Total</span>
-                <span className="text-lg font-extrabold text-gray-900">{formatRupiah(data.total)}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Footer with QR */}
-          <div className="px-6 pt-6 pb-8 text-center" style={{ backgroundColor: prov.color }}>
-            {data.qrValue && (
-              <div className="bg-white rounded-xl p-3 inline-block mb-3 shadow-md">
-                <QRCodeSVG value={data.qrValue} size={100} level="M" />
-              </div>
-            )}
-            <p className="text-xs text-white/70 mt-1">Scan untuk detail transaksi</p>
-            <p className="text-[11px] text-white/50 mt-2">Dikirim dari app {prov.label}</p>
-            <div className="flex items-center justify-center gap-2 mt-3">
-              <div className="bg-black/20 rounded-lg px-3 py-1.5 text-[10px] text-white/80 font-medium">App Store</div>
-              <div className="bg-black/20 rounded-lg px-3 py-1.5 text-[10px] text-white/80 font-medium">Google Play</div>
             </div>
           </div>
         </div>
