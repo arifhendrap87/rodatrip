@@ -242,7 +242,9 @@ export default function InvoicePage() {
               <p className="text-3xl font-bold mt-0.5">{prov.label}</p>
             </div>
 
-            {/* Perforated/scalloped edge — membuat efek kertas sobek di batas header-card */}
+            {/* Card wrapper — horizontal margin agar card tidak menempel ke tepi */}
+            <div className="px-4">
+              {/* Perforated/scalloped edge — membuat efek kertas sobek di batas header-card */}
             <div className="relative h-4 overflow-hidden" style={{ backgroundColor: prov.color }}>
               <div className="absolute inset-x-0 bottom-0 h-4 bg-white"
                 style={{
@@ -340,6 +342,7 @@ export default function InvoicePage() {
                   <span className="text-lg font-extrabold text-gray-900">{formatRupiah(data.total)}</span>
                 </div>
               </div>
+            </div>
             </div>
 
             {/* Purple footer with QR */}
