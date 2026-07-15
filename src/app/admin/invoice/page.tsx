@@ -22,17 +22,17 @@ import { toast } from "sonner"
 const SERVICES = ["pulsa", "paket_data", "token_listrik", "bpjs", "e_wallet", "game_voucher"] as const
 
 const PROVIDERS = [
-  { value: "gopay", label: "GoPay", color: "#4C3494" },
-  { value: "telkomsel", label: "Telkomsel", color: "#CB0A2C" },
-  { value: "tri", label: "Tri", color: "#002B7F" },
-  { value: "xl", label: "XL", color: "#0033A0" },
-  { value: "indosat", label: "Indosat", color: "#003E7E" },
-  { value: "axis", label: "Axis", color: "#ED1B24" },
-  { value: "smartfren", label: "Smartfren", color: "#E11B22" },
-  { value: "ovo", label: "OVO", color: "#4C2492" },
-  { value: "dana", label: "Dana", color: "#108EE9" },
-  { value: "shopeepay", label: "ShopeePay", color: "#EE4D2D" },
-  { value: "linkaja", label: "LinkAja", color: "#E4002B" },
+  { value: "gopay", label: "GoPay", color: "#4C3494", gradientFrom: "#5B3B9A", gradientTo: "#2D1B69" },
+  { value: "telkomsel", label: "Telkomsel", color: "#CB0A2C", gradientFrom: "#E0112F", gradientTo: "#A00822" },
+  { value: "tri", label: "Tri", color: "#002B7F", gradientFrom: "#003399", gradientTo: "#001A4D" },
+  { value: "xl", label: "XL", color: "#0033A0", gradientFrom: "#0044CC", gradientTo: "#002266" },
+  { value: "indosat", label: "Indosat", color: "#003E7E", gradientFrom: "#0050A0", gradientTo: "#002650" },
+  { value: "axis", label: "Axis", color: "#ED1B24", gradientFrom: "#F0252E", gradientTo: "#CC141C" },
+  { value: "smartfren", label: "Smartfren", color: "#E11B22", gradientFrom: "#E62A30", gradientTo: "#C0151B" },
+  { value: "ovo", label: "OVO", color: "#4C2492", gradientFrom: "#5E2DB3", gradientTo: "#3A1B6E" },
+  { value: "dana", label: "Dana", color: "#108EE9", gradientFrom: "#1A9FF5", gradientTo: "#0C78C4" },
+  { value: "shopeepay", label: "ShopeePay", color: "#EE4D2D", gradientFrom: "#F55A3A", gradientTo: "#D04020" },
+  { value: "linkaja", label: "LinkAja", color: "#E4002B", gradientFrom: "#F00030", gradientTo: "#C80022" },
 ]
 
 const STATUS_OPTIONS = ["Berhasil", "Gagal", "Pending", "Refund"]
@@ -142,6 +142,8 @@ export default function InvoicePage() {
 
   const getProvider = (val: string) => PROVIDERS.find(p => p.value === val) || PROVIDERS[0]
 
+  type Provider = (typeof PROVIDERS)[number]
+
   function updateField<K extends keyof ReceiptData>(key: K, value: ReceiptData[K]) {
     setForm(prev => {
       const next = { ...prev, [key]: value }
@@ -232,7 +234,7 @@ export default function InvoicePage() {
       <div className="mx-auto max-w-sm">
         <div className="print-area">
           {/* Purple background container */}
-          <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: prov.color }}>
+          <div className="rounded-2xl overflow-hidden" style={{ background: `linear-gradient(180deg, ${prov.gradientFrom} 0%, ${prov.color} 50%, ${prov.gradientTo} 100%)` }}>
             
             {/* Header area */}
             <div className="text-white text-center pt-10 pb-20 px-6">
