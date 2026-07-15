@@ -199,11 +199,11 @@ export default function InvoicePage() {
 
   const fmt = generated || form
 
-  const DetailRow = ({ label, value, mono, copyKey }: { label: string; value: string; mono?: boolean; copyKey?: string }) => (
+  const DetailRow = ({ label, value, mono, copyKey, valueClass }: { label: string; value: string; mono?: boolean; copyKey?: string; valueClass?: string }) => (
     <div className="flex items-center justify-between py-1.5">
       <span className="text-xs text-gray-500">{label}</span>
       <div className="flex items-center gap-1.5">
-        <span className={`text-xs text-right ${mono ? "font-mono" : "font-medium"} text-gray-900`}>{value}</span>
+        <span className={`text-xs text-right ${valueClass || ""} ${mono ? "font-mono" : "font-medium"} text-gray-900`}>{value}</span>
         {copyKey && (
           <button onClick={() => handleCopy(value, copyKey)} className="shrink-0">
             {copiedKey === copyKey ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3 text-gray-400 hover:text-gray-600" />}
@@ -215,7 +215,15 @@ export default function InvoicePage() {
 
   const StatusBadge = ({ status }: { status: string }) => {
     const colors: Record<string, string> = { Berhasil: "text-green-600", Gagal: "text-red-500", Pending: "text-yellow-500", Refund: "text-blue-500" }
-    return <span className={`text-xs font-semibold ${colors[status] || "text-gray-500"}`}>{status} {status === "Berhasil" && "✅"}</span>
+    if (status === "Berhasil") {
+      return (
+        <div className="flex items-center gap-1.5">
+          <span className={`text-xs font-semibold ${colors[status] || "text-gray-500"}`}>Selesai</span>
+          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-green-500 text-white text-[9px] font-bold">✓</span>
+        </div>
+      )
+    }
+    return <span className={`text-xs font-semibold ${colors[status] || "text-gray-500"}`}>{status}</span>
   }
 
   const Receipt = ({ data }: { data: ReceiptData }) => {
@@ -227,13 +235,13 @@ export default function InvoicePage() {
           <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: prov.color }}>
             
             {/* Header area */}
-            <div className="text-white text-center pt-8 pb-16 px-6">
-              <p className="text-sm opacity-80">{SERVICE_LABELS[data.service] || data.service}</p>
-              <p className="text-lg font-bold">{prov.label}</p>
+            <div className="text-white text-center pt-10 pb-20 px-6">
+              <p className="text-sm opacity-70">{SERVICE_LABELS[data.service] || data.service}</p>
+              <p className="text-3xl font-bold mt-0.5">{prov.label}</p>
             </div>
 
             {/* White card overlapping header */}
-            <div className="bg-white rounded-t-3xl px-6 py-8 relative -mt-8 shadow-xl">
+            <div className="bg-white rounded-t-[2rem] px-6 py-8 relative -mt-12 shadow-lg">
               
               {/* Receipt icons - document + headset overlapping */}
               <div className="flex justify-center mb-4">
@@ -281,7 +289,7 @@ export default function InvoicePage() {
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-500">Metode pembayaran</span>
                     <div className="flex items-center gap-1.5">
-                      <CreditCard className="h-3.5 w-3.5 text-blue-500" />
+                      <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-white text-[8px]">💳</span>
                       <span className="text-xs font-medium text-gray-900">{data.paymentMethod}</span>
                     </div>
                   </div>
@@ -299,7 +307,7 @@ export default function InvoicePage() {
               {/* Pricing */}
               <div className="space-y-3 mb-4">
                 <DetailRow label="Jumlah" value={formatRupiah(data.price)} />
-                {data.discount > 0 && <DetailRow label="Diskon" value={`-${formatRupiah(data.discount)}`} />}
+                {data.discount > 0 && <DetailRow label="Diskon" value={`-${formatRupiah(data.discount)}`} valueClass="text-red-500" />}
                 {data.adminFee > 0 && <DetailRow label="Biaya admin" value={formatRupiah(data.adminFee)} />}
               </div>
 
@@ -315,15 +323,22 @@ export default function InvoicePage() {
             {/* Purple footer with QR */}
             <div className="px-6 pt-6 pb-8 text-center">
               {data.qrValue && (
-                <div className="bg-white rounded-2xl p-4 inline-block mb-4 shadow-lg">
-                  <QRCodeSVG value={data.qrValue} size={120} level="M" />
+                <div className="bg-white rounded-2xl p-4 inline-block mb-4 shadow-xl">
+                  <QRCodeSVG value={data.qrValue} size={140} level="M" />
                 </div>
               )}
-              <p className="text-xs text-white/80 mb-1">Scan untuk detail transaksi</p>
-              <p className="text-[11px] text-white/60 mb-3">Dikirim dari app {prov.label}</p>
-              <div className="flex items-center justify-center gap-2">
-                <div className="bg-black/30 rounded-lg px-3 py-1.5 text-[10px] text-white/90 font-medium">App Store</div>
-                <div className="bg-black/30 rounded-lg px-3 py-1.5 text-[10px] text-white/90 font-medium">Google Play</div>
+              <p className="text-sm font-semibold text-white mb-1">Dikirim dari app {prov.label}</p>
+              <p className="text-[11px] text-white/70 mb-1">Dapetin gratis transfer 100x/bulan!</p>
+              <p className="text-[10px] text-white/60 mb-4">Aplikasi ringan buat kebutuhan finansialmu.</p>
+              <div className="flex items-center justify-center gap-3">
+                <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 flex items-center gap-1.5">
+                  <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.62-.71 1.64-1.23 2.6-1.13.1 1.04-.3 2.08-.93 2.84-.63.74-1.64 1.18-2.67 1.02-.1-1.02.33-2.07.98-2.73z"/></svg>
+                  <span className="text-[10px] text-white font-medium">App Store</span>
+                </div>
+                <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 flex items-center gap-1.5">
+                  <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.807 1.626a1 1 0 0 1 0 1.732l-2.807 1.626L15.206 12l2.492-2.492zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg>
+                  <span className="text-[10px] text-white font-medium">Google Play</span>
+                </div>
               </div>
             </div>
           </div>
