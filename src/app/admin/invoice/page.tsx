@@ -37,16 +37,23 @@ const SERVICE_LABELS: Record<string, string> = {
   game_voucher: "Game Voucher",
 }
 
-function generateRefId(): string {
-  return "042026020910543" + Math.floor(Math.random() * 10)
-}
+function generateId(type: 'ref' | 'eksternal' | 'serial'): string {
+  const now = new Date()
+  const d = String(now.getDate()).padStart(2, '0')
+  const m = String(now.getMonth() + 1).padStart(2, '0')
+  const y = String(now.getFullYear()).slice(-2)
+  const h = String(now.getHours()).padStart(2, '0')
+  const min = String(now.getMinutes()).padStart(2, '0')
+  const rand = String(Math.floor(Math.random() * 900000) + 100000)
 
-function generateEksternalId(): string {
-  return "1359838484-839585-GOPULSA"
-}
-
-function generateSerial(): string {
-  return "R260209.1754.2200a0"
+  switch (type) {
+    case 'ref':
+      return `042026${d}${m}${y}${h}${min}${rand.slice(0, 3)}`
+    case 'eksternal':
+      return `${rand.slice(0, 6)}-${rand.slice(1, 7)}-GOPULSA`
+    case 'serial':
+      return `R${d}${m}${y}.${h}${min}.${rand}`
+  }
 }
 
 interface ReceiptData {
@@ -84,9 +91,9 @@ const emptyForm: ReceiptData = {
   discount: 8000,
   adminFee: 0,
   total: 70500,
-  refId: "042026020910543",
-  eksternalId: "1359838484-839585-GOPULSA",
-  serialNumber: "R260209.1754.2200a0",
+  refId: "",
+  eksternalId: "",
+  serialNumber: "",
   date: "09 Feb 2026",
   time: "17:54",
   qrValue: "https://gopay.co.id",
@@ -122,9 +129,9 @@ export default function InvoicePage() {
 
     setGenerated({
       ...form,
-      refId: form.refId || generateRefId(),
-      eksternalId: form.eksternalId || generateEksternalId(),
-      serialNumber: form.serialNumber || generateSerial(),
+      refId: generateId('ref'),
+      eksternalId: generateId('eksternal'),
+      serialNumber: generateId('serial'),
     })
     toast.success("Receipt berhasil dibuat!")
   }
