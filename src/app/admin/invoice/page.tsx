@@ -481,7 +481,7 @@ export default function InvoicePage() {
             <Card className="bg-slate-50 border-dashed">
               <CardContent className="p-6">
                 {generated ? (
-                  <Receipt data={generated} />
+                  <Receipt key={generated.refId} data={generated} />
                 ) : (
                   <div className="flex flex-col items-center justify-center py-24 text-muted-foreground bg-white rounded-xl border shadow-inner">
                     <Smartphone className="h-10 w-10 mb-3 text-gray-300 animate-pulse" />
