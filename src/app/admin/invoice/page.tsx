@@ -251,7 +251,12 @@ export default function InvoicePage() {
                   <span className="text-sm text-gray-500">Metode pembayaran</span>
                   <div className="flex items-center gap-1.5">
                     <span className="text-sm font-medium text-gray-900">{data.paymentMethod}</span>
-                    <div className="w-4 h-4 rounded bg-[#00AED6] flex items-center justify-center text-white text-[9px]">💳</div>
+                    <div className="w-4 h-4 rounded bg-[#00AED6] flex items-center justify-center">
+                      <svg viewBox="0 0 37.5 37.4" className="h-3 w-3">
+                        <path fill="white" d="M18.7,0C8.4,0,0,8.4,0,18.7C0,29,8.4,37.4,18.7,37.4c10.3,0,18.7-8.4,18.7-18.7C37.5,8.4,29.1,0,18.7,0z M29.2,24.5c-0.2,2-1.7,3.5-3.6,3.9c-4.3,0.5-8.7,0.5-13.1,0c-2.2-0.4-3.9-2-4.3-4.2c-0.6-3.7-0.6-7.4,0-11.1C8.5,11.2,10,9.5,12,9c3.5-0.6,7.1-0.6,10.6,0c1.6,0.4,2.7,1.8,2.7,3.4h-12c0,0-0.1,0-0.1,0c-0.4,0-0.8,0.4-0.7,0.8c0,0.4,0.4,0.8,0.8,0.7h12.2c2.2,0.1,4,1.9,4.2,4.1C29.7,20.3,29.6,22.4,29.2,24.5z"/>
+                        <path fill="white" d="M25,18.7c-0.6,0-1.2,0.5-1.2,1.2c0,0.3,0.1,0.6,0.4,0.9v0.7c0,0.4,0.3,0.8,0.8,0.8s0.8-0.3,0.8-0.8v-0.7c0.2-0.2,0.4-0.5,0.4-0.9C26.2,19.2,25.6,18.7,25,18.7z"/>
+                      </svg>
+                    </div>
                   </div>
                 </div>
 
