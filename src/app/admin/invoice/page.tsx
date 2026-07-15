@@ -242,8 +242,19 @@ export default function InvoicePage() {
               <p className="text-3xl font-bold mt-0.5">{prov.label}</p>
             </div>
 
+            {/* Perforated/scalloped edge */}
+            <div className="relative h-5 -mb-5 z-10" style={{ backgroundColor: prov.color }}>
+              <div className="absolute inset-0"
+                style={{
+                  backgroundImage: 'radial-gradient(circle at 50% 5px, transparent 6px, white 6px)',
+                  backgroundSize: '24px 12px',
+                  backgroundRepeat: 'repeat-x',
+                }}
+              />
+            </div>
+
             {/* White card overlapping header */}
-            <div className="bg-white rounded-t-[2rem] px-6 py-8 relative -mt-12 shadow-lg">
+            <div className="bg-white rounded-t-[2rem] px-6 py-8 relative shadow-lg" style={{ borderTopLeftRadius: '28px', borderTopRightRadius: '28px' }}>
               
               {/* Receipt icons - document + headset overlapping */}
               <div className="flex justify-center mb-4">
