@@ -2,10 +2,11 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import {
   Select,
   SelectContent,
@@ -14,317 +15,305 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Printer, Smartphone, Wifi } from "lucide-react"
+import { QRCodeSVG } from "qrcode.react"
+import { Printer, Smartphone, Wifi, Copy, Check, ArrowRight } from "lucide-react"
 import { toast } from "sonner"
 
+const SERVICES = ["pulsa", "paket_data", "token_listrik", "bpjs", "e_wallet", "game_voucher"] as const
+
 const PROVIDERS = [
+  { value: "gopay", label: "GoPay", color: "#4C3494" },
   { value: "telkomsel", label: "Telkomsel", color: "#CB0A2C" },
   { value: "tri", label: "Tri", color: "#002B7F" },
   { value: "xl", label: "XL", color: "#0033A0" },
   { value: "indosat", label: "Indosat", color: "#003E7E" },
   { value: "axis", label: "Axis", color: "#ED1B24" },
   { value: "smartfren", label: "Smartfren", color: "#E11B22" },
+  { value: "ovo", label: "OVO", color: "#4C2492" },
+  { value: "dana", label: "Dana", color: "#108EE9" },
+  { value: "shopeepay", label: "ShopeePay", color: "#EE4D2D" },
+  { value: "linkaja", label: "LinkAja", color: "#E4002B" },
 ]
 
-const NOMINAL_PULSA = [
-  { value: "5000", label: "Rp5.000" },
-  { value: "10000", label: "Rp10.000" },
-  { value: "25000", label: "Rp25.000" },
-  { value: "50000", label: "Rp50.000" },
-  { value: "100000", label: "Rp100.000" },
-]
+const STATUS_OPTIONS = ["Berhasil", "Gagal", "Pending", "Refund"]
+const PAYMENT_METHODS = ["GoPay Saldo", "OVO Cash", "Dana", "ShopeePay", "LinkAja", "Transfer Bank", "Cash"]
 
-const PAYMENT_METHODS = [
-  { value: "gopay", label: "GoPay" },
-  { value: "ovo", label: "OVO" },
-  { value: "dana", label: "Dana" },
-  { value: "cash", label: "Cash" },
-  { value: "transfer", label: "Transfer Bank" },
-]
-
-function generateInvoiceData(prefix: string) {
-  const now = new Date()
-  const d = String(now.getDate()).padStart(2, "0")
-  const m = String(now.getMonth() + 1).padStart(2, "0")
-  const y = now.getFullYear()
-  const months = [
-    "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
-    "Jul", "Agu", "Sep", "Okt", "Nov", "Des",
-  ]
-  const h = String(now.getHours()).padStart(2, "0")
-  const min = String(now.getMinutes()).padStart(2, "0")
-  const rand = String(Math.floor(Math.random() * 900000) + 100000)
-  const serial = `R${d}${m}${String(y).slice(-2)}.${h}${min}.${rand}`
-  const chars = "abcdef0123456789"
-  const gpl = `GPL-${Array.from({ length: 14 }, () => chars[Math.floor(Math.random() * 16)]).join("")}`
-  const invoiceNo = `${prefix}-${serial}`
-  return {
-    invoiceNo,
-    date: `${d} ${months[now.getMonth()]} ${y}`,
-    time: `${h}:${min}`,
-    serial,
-    gpl,
-  }
+const SERVICE_LABELS: Record<string, string> = {
+  pulsa: "Pulsa",
+  paket_data: "Paket Data",
+  token_listrik: "Token Listrik",
+  bpjs: "BPJS",
+  e_wallet: "E-Wallet",
+  game_voucher: "Game Voucher",
 }
 
-function ProviderLogo({
-  provider,
-  size = "sm",
-}: {
-  provider: (typeof PROVIDERS)[0]
-  size?: "sm" | "lg"
-}) {
-  const sizes = size === "lg" ? "w-14 h-14 text-lg" : "w-8 h-8 text-xs"
-  const label =
-    provider.label === "Telkomsel"
-      ? "TS"
-      : provider.label === "Tri"
-        ? "TR"
-        : provider.label === "Smartfren"
-          ? "SF"
-          : provider.label.slice(0, 2).toUpperCase()
+function generateRefId(): string {
+  const date = new Date()
+  const d = String(date.getDate()).padStart(2, "0")
+  const m = String(date.getMonth() + 1).padStart(2, "0")
+  const y = String(date.getFullYear()).slice(-2)
+  const h = String(date.getHours()).padStart(2, "0")
+  const min = String(date.getMinutes()).padStart(2, "0")
+  const s = String(date.getSeconds()).padStart(2, "0")
+  const rand = String(Math.floor(Math.random() * 90000) + 10000)
+  return `${d}${m}${y}${h}${min}${s}${rand}`
+}
+
+function generateSerial(): string {
+  const date = new Date()
+  const d = String(date.getDate()).padStart(2, "0")
+  const m = String(date.getMonth() + 1).padStart(2, "0")
+  const y = String(date.getFullYear()).toString().slice(-2)
+  const h = String(date.getHours()).padStart(2, "0")
+  const min = String(date.getMinutes()).padStart(2, "0")
+  const rand = String(Math.floor(Math.random() * 900000) + 100000)
+  return `R${d}${m}${y}.${h}${min}.${rand}`
+}
+
+function getCurrentDate(): string {
+  const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"]
+  const d = new Date()
+  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`
+}
+
+function getCurrentTime(): string {
+  const d = new Date()
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`
+}
+
+function ProviderLogo({ color, label, size = "sm" }: { color: string; label: string; size?: "sm" | "lg" }) {
+  const dims = size === "lg" ? "w-12 h-12 text-base" : "w-8 h-8 text-xs"
+  const initials = label === "Telkomsel" ? "TS" : label === "Tri" ? "TR" : label === "Smartfren" ? "SF" : label.slice(0, 2).toUpperCase()
   return (
-    <div
-      className={`flex items-center justify-center rounded-full text-white font-bold ${sizes}`}
-      style={{ backgroundColor: provider.color }}
-    >
-      {label}
+    <div className={`${dims} flex items-center justify-center rounded-full text-white font-bold shrink-0`} style={{ backgroundColor: color }}>
+      {initials}
     </div>
   )
 }
 
-interface PulsaState {
+interface ReceiptData {
+  service: string
   provider: string
-  nomorHp: string
-  nominal: string
-  harga: number
+  providerLabel: string
+  providerColor: string
+  status: string
   paymentMethod: string
-  generated: ReturnType<typeof generateInvoiceData> | null
-}
-
-interface PaketState {
-  provider: string
   nomorHp: string
-  namaPaket: string
-  harga: number
-  paymentMethod: string
-  generated: ReturnType<typeof generateInvoiceData> | null
+  productName: string
+  price: number
+  discount: number
+  adminFee: number
+  total: number
+  refId: string
+  eksternalId: string
+  serialNumber: string
+  date: string
+  time: string
+  qrValue: string
+  chatUrl: string
 }
 
-const defaultPulsa: PulsaState = {
-  provider: "telkomsel",
+const emptyForm: ReceiptData = {
+  service: "pulsa",
+  provider: "gopay",
+  providerLabel: "GoPay",
+  providerColor: "#4C3494",
+  status: "Berhasil",
+  paymentMethod: "GoPay Saldo",
   nomorHp: "",
-  nominal: "10000",
-  harga: 10000,
-  paymentMethod: "gopay",
-  generated: null,
-}
-
-const defaultPaket: PaketState = {
-  provider: "telkomsel",
-  nomorHp: "",
-  namaPaket: "",
-  harga: 0,
-  paymentMethod: "gopay",
-  generated: null,
+  productName: "",
+  price: 0,
+  discount: 0,
+  adminFee: 0,
+  total: 0,
+  refId: "",
+  eksternalId: "",
+  serialNumber: "",
+  date: getCurrentDate(),
+  time: getCurrentTime(),
+  qrValue: "",
+  chatUrl: "",
 }
 
 export default function InvoicePage() {
-  const [pulsa, setPulsa] = useState<PulsaState>(defaultPulsa)
-  const [paket, setPaket] = useState<PaketState>(defaultPaket)
-  const [activeTab, setActiveTab] = useState("pulsa")
+  const [form, setForm] = useState<ReceiptData>({ ...emptyForm })
+  const [generated, setGenerated] = useState<ReceiptData | null>(null)
+  const [copiedKey, setCopiedKey] = useState<string | null>(null)
 
-  const getProvider = (value: string) =>
-    PROVIDERS.find((p) => p.value === value) || PROVIDERS[0]
+  const getProvider = (val: string) => PROVIDERS.find(p => p.value === val) || PROVIDERS[0]
 
-  const formatRupiah = (num: number) =>
-    `Rp${num.toLocaleString("id-ID")}`
-
-  const handleGeneratePulsa = () => {
-    if (!pulsa.nomorHp.trim()) {
-      toast.error("Nomor HP harus diisi")
-      return
-    }
-    if (pulsa.nominal === "custom" && pulsa.harga <= 0) {
-      toast.error("Harga harus diisi")
-      return
-    }
-    const gen = generateInvoiceData("INV-PL")
-    setPulsa((prev) => ({ ...prev, generated: gen }))
-    toast.success("Invoice pulsa berhasil dibuat")
+  function updateField<K extends keyof ReceiptData>(key: K, value: ReceiptData[K]) {
+    setForm(prev => {
+      const next = { ...prev, [key]: value }
+      if (key === "provider") {
+        const p = getProvider(value as string)
+        next.providerLabel = p.label
+        next.providerColor = p.color
+      }
+      if (key === "price" || key === "discount" || key === "adminFee") {
+        next.total = Math.max(0, (key === "price" ? (value as number) : prev.price) - (key === "discount" ? (value as number) : prev.discount) + (key === "adminFee" ? (value as number) : prev.adminFee))
+      }
+      return next
+    })
   }
 
-  const handleGeneratePaket = () => {
-    if (!paket.nomorHp.trim()) {
-      toast.error("Nomor HP harus diisi")
-      return
-    }
-    if (!paket.namaPaket.trim()) {
-      toast.error("Nama paket harus diisi")
-      return
-    }
-    if (paket.harga <= 0) {
-      toast.error("Harga harus diisi")
-      return
-    }
-    const gen = generateInvoiceData("INV-PD")
-    setPaket((prev) => ({ ...prev, generated: gen }))
-    toast.success("Invoice paket data berhasil dibuat")
+  function handleGenerate() {
+    if (!form.nomorHp.trim()) { toast.error("Nomor HP harus diisi"); return }
+    if (!form.productName.trim()) { toast.error("Nama produk harus diisi"); return }
+    if (form.price <= 0) { toast.error("Harga harus diisi"); return }
+
+    const refId = form.refId || `042026${generateRefId()}`
+    const eksternalId = form.eksternalId || `${generateRefId().slice(0, 6)}-${generateRefId().slice(6, 12)}-GOPULSA`
+    const serialNumber = form.serialNumber || generateSerial()
+
+    setGenerated({
+      ...form,
+      refId,
+      eksternalId,
+      serialNumber,
+      date: getCurrentDate(),
+      time: getCurrentTime(),
+      total: Math.max(0, form.price - form.discount + form.adminFee),
+    })
+    toast.success("Receipt berhasil dibuat!")
   }
 
-  const handleResetPulsa = () => {
-    setPulsa(defaultPulsa)
+  function handleReset() {
+    setForm({ ...emptyForm })
+    setGenerated(null)
   }
 
-  const handleResetPaket = () => {
-    setPaket(defaultPaket)
-  }
-
-  const handleNominalChange = (value: string | null) => {
-    if (!value) return
-    if (value === "custom") {
-      setPulsa((prev) => ({ ...prev, nominal: "custom", harga: 0 }))
-    } else {
-      const num = parseInt(value)
-      setPulsa((prev) => ({ ...prev, nominal: value, harga: num }))
-    }
-  }
-
-  const handlePrint = () => {
+  function handlePrint() {
     window.print()
   }
 
-  const ReceiptPreview = ({
-    type,
-    provider,
-    nomorHp,
-    harga,
-    paymentMethod,
-    generated,
-    namaPaket,
-    nominal,
-  }: {
-    type: "pulsa" | "paket"
-    provider: string
-    nomorHp: string
-    harga: number
-    paymentMethod: string
-    generated: ReturnType<typeof generateInvoiceData> | null
-    namaPaket?: string
-    nominal?: string
-  }) => {
-    if (!generated) {
-      return (
-        <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-          <div className="mb-4 rounded-full bg-muted p-4">
-            {type === "pulsa" ? (
-              <Smartphone className="h-8 w-8" />
-            ) : (
-              <Wifi className="h-8 w-8" />
-            )}
-          </div>
-          <p className="text-sm">Klik "Buat Invoice" untuk membuat receipt</p>
-        </div>
-      )
-    }
+  function handleCopy(val: string, key: string) {
+    navigator.clipboard.writeText(val)
+    setCopiedKey(key)
+    setTimeout(() => setCopiedKey(null), 2000)
+  }
 
-    const prov = getProvider(provider)
-    const payLabel =
-      PAYMENT_METHODS.find((p) => p.value === paymentMethod)?.label ||
-      paymentMethod
+  function formatRupiah(num: number) {
+    return `Rp${num.toLocaleString("id-ID")}`
+  }
 
-    const Row = ({
-      label,
-      value,
-      mono,
-      bold,
-      large,
-    }: {
-      label: string
-      value: string
-      mono?: boolean
-      bold?: boolean
-      large?: boolean
-    }) => (
-      <div className="flex items-center justify-between">
-        <span className="text-muted-foreground text-xs">{label}</span>
-        <span
-          className={`text-right ${
-            large ? "font-heading text-xl font-bold" : bold ? "font-semibold" : "font-medium"
-          } ${mono ? "font-mono text-xs" : "text-sm"}`}
-        >
-          {value}
-        </span>
+  const fmt = generated || form
+
+  const DetailRow = ({ label, value, mono, copyKey }: { label: string; value: string; mono?: boolean; copyKey?: string }) => (
+    <div className="flex items-center justify-between py-1.5">
+      <span className="text-xs text-gray-500">{label}</span>
+      <div className="flex items-center gap-1.5">
+        <span className={`text-xs text-right ${mono ? "font-mono" : "font-medium"} text-gray-900`}>{value}</span>
+        {copyKey && (
+          <button onClick={() => handleCopy(value, copyKey)} className="shrink-0">
+            {copiedKey === copyKey ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3 text-gray-400 hover:text-gray-600" />}
+          </button>
+        )}
       </div>
-    )
+    </div>
+  )
 
+  const StatusBadge = ({ status }: { status: string }) => {
+    const colors: Record<string, string> = { Berhasil: "text-green-600", Gagal: "text-red-500", Pending: "text-yellow-500", Refund: "text-blue-500" }
+    return <span className={`text-xs font-semibold ${colors[status] || "text-gray-500"}`}>{status} {status === "Berhasil" && "✅"}</span>
+  }
+
+  const Receipt = ({ data }: { data: ReceiptData }) => {
+    const prov = getProvider(data.provider)
     return (
-      <div className="print-area">
-        <div className="mx-auto max-w-sm bg-white p-6">
-          {/* Header: Logo + Provider */}
-          <div className="mb-3 flex items-center gap-3">
-            <ProviderLogo provider={prov} size="lg" />
+      <div className="mx-auto max-w-sm">
+        <div className="print-area overflow-hidden rounded-2xl">
+          {/* Header */}
+          <div className="px-6 pt-8 pb-6 text-white text-center" style={{ backgroundColor: prov.color }}>
+            <ProviderLogo color={prov.color} label={prov.label} size="lg" />
+            <p className="text-sm font-semibold mt-2 opacity-80">{SERVICE_LABELS[data.service] || data.service}</p>
+            <p className="text-lg font-bold mt-0.5">{prov.label}</p>
+          </div>
+
+          {/* Body card */}
+          <div className="bg-white px-6 py-6 space-y-4">
+            {/* Receipt icon */}
+            <div className="flex justify-center -mt-10 mb-2">
+              <div className="flex -space-x-2">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-md">
+                  <Smartphone className="h-5 w-5 text-white" />
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-md mt-2">
+                  <Wifi className="h-5 w-5 text-white" />
+                </div>
+              </div>
+            </div>
+
+            {/* Price */}
+            <div className="text-center">
+              <p className="text-3xl font-extrabold text-gray-900">{formatRupiah(data.total)}</p>
+              <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">{data.productName}</p>
+              <p className="text-xs text-gray-400 font-mono mt-0.5">{data.nomorHp}</p>
+              <p className="text-[10px] text-gray-400 font-mono mt-1">#{data.eksternalId}</p>
+            </div>
+
+            {/* Chat button */}
+            {data.chatUrl && (
+              <a href={data.chatUrl} target="_blank" rel="noopener noreferrer"
+                className="flex items-center justify-center gap-1.5 w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-xs font-medium text-gray-600 hover:border-gray-400 hover:text-gray-800 transition-colors">
+                Chat dengan CS <ArrowRight className="h-3 w-3" />
+              </a>
+            )}
+
+            {/* Dashed divider */}
+            <div className="border-t border-dashed border-gray-200" />
+
+            {/* Rincian transaksi */}
             <div>
-              <p className="text-sm font-bold">{prov.label}</p>
-              <p className="text-xs text-muted-foreground">
-                {type === "pulsa" ? "Pulsa" : "Paket Data"}
-              </p>
+              <p className="text-xs font-semibold text-gray-700 mb-2">Rincian transaksi</p>
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-500">Status</span>
+                  <StatusBadge status={data.status} />
+                </div>
+                <div className="flex items-center justify-between py-1">
+                  <span className="text-xs text-gray-500">Metode bayar</span>
+                  <span className="text-xs font-medium text-gray-900">💳 {data.paymentMethod}</span>
+                </div>
+                <DetailRow label="Waktu" value={data.time} />
+                <DetailRow label="Tanggal" value={data.date} />
+                <DetailRow label="ID transaksi" value={data.refId} mono copyKey="refId" />
+                <DetailRow label="ID Eksternal" value={data.eksternalId} mono copyKey="eksternal" />
+                <DetailRow label="Nomor serial" value={data.serialNumber} mono />
+              </div>
+            </div>
+
+            {/* Dashed divider */}
+            <div className="border-t border-dashed border-gray-200" />
+
+            {/* Pricing */}
+            <div className="space-y-1.5">
+              <DetailRow label="Jumlah" value={formatRupiah(data.price)} />
+              {data.discount > 0 && <DetailRow label="Diskon" value={`-${formatRupiah(data.discount)}`} />}
+              {data.adminFee > 0 && <DetailRow label="Biaya admin" value={formatRupiah(data.adminFee)} />}
+            </div>
+
+            <div className="border-t-2 border-double border-gray-300 pt-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-bold text-gray-900">Total</span>
+                <span className="text-lg font-extrabold text-gray-900">{formatRupiah(data.total)}</span>
+              </div>
             </div>
           </div>
 
-          {/* Big Price */}
-          <div className="mb-2">
-            <span className="font-heading text-3xl font-bold">
-              {formatRupiah(harga)}
-            </span>
-          </div>
-
-          {/* Dibayar ke */}
-          <p className="mb-3 text-xs text-muted-foreground">
-            Dibayar ke <span className="font-medium text-foreground">{prov.label}</span>
-          </p>
-
-          {/* GPL + Status */}
-          <div className="mb-4 flex items-center justify-between border-b border-dashed pb-4">
-            <span className="font-mono text-xs text-muted-foreground">
-              {generated.gpl}
-            </span>
-            <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
-              Berhasil
-            </span>
-          </div>
-
-          {/* Detail */}
-          <div className="space-y-2.5 text-sm">
-            <Row label="Nomor Tujuan" value={nomorHp} />
-            {type === "paket" && namaPaket && (
-              <Row label="Nama Paket" value={namaPaket} />
+          {/* Footer with QR */}
+          <div className="px-6 pt-6 pb-8 text-center" style={{ backgroundColor: prov.color }}>
+            {data.qrValue && (
+              <div className="bg-white rounded-xl p-3 inline-block mb-3 shadow-md">
+                <QRCodeSVG value={data.qrValue} size={100} level="M" />
+              </div>
             )}
-            <Row
-              label="Tanggal"
-              value={`${generated.date}, ${generated.time}`}
-            />
-            <Row label="Nomor Serial" value={generated.serial} mono />
-            <Row label="Metode Pembayaran" value={payLabel} />
-          </div>
-
-          {/* Dashed Divider */}
-          <div className="my-4 border-t border-dashed" />
-
-          {/* Jumlah */}
-          <Row label="Jumlah" value={formatRupiah(harga)} bold />
-
-          {/* Divider */}
-          <div className="my-3 border-t border-dashed" />
-
-          {/* Total */}
-          <Row label="Total" value={formatRupiah(harga)} bold large />
-
-          {/* Footer */}
-          <div className="mt-6 text-center">
-            <p className="text-[10px] text-muted-foreground">
-              {generated.invoiceNo}
-            </p>
+            <p className="text-xs text-white/70 mt-1">Scan untuk detail transaksi</p>
+            <p className="text-[11px] text-white/50 mt-2">Dikirim dari app {prov.label}</p>
+            <div className="flex items-center justify-center gap-2 mt-3">
+              <div className="bg-black/20 rounded-lg px-3 py-1.5 text-[10px] text-white/80 font-medium">App Store</div>
+              <div className="bg-black/20 rounded-lg px-3 py-1.5 text-[10px] text-white/80 font-medium">Google Play</div>
+            </div>
           </div>
         </div>
       </div>
@@ -335,363 +324,167 @@ export default function InvoicePage() {
     <>
       <style>{`
         @media print {
-          body * {
-            visibility: hidden;
-          }
-          .print-area,
-          .print-area * {
-            visibility: visible;
-          }
-          .print-area {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-          }
-          .print-area > div {
-            box-shadow: none !important;
-            border: none !important;
-            max-width: 100% !important;
-            padding: 0 !important;
-          }
-          @page {
-            margin: 1cm;
-          }
+          body * { visibility: hidden; }
+          .print-area, .print-area * { visibility: visible; }
+          .print-area { position: absolute; left: 0; top: 0; width: 100%; }
+          .print-area > div { box-shadow: none !important; }
+          @page { margin: 0; }
         }
       `}</style>
 
       <div>
         <div className="mb-6">
           <h1 className="text-2xl font-bold font-heading">Invoice</h1>
-          <p className="text-muted-foreground">
-            Cetak invoice Pulsa &amp; Paket Data
-          </p>
+          <p className="text-muted-foreground">Cetak receipt pembayaran — template GoPay</p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-6">
-            <TabsTrigger value="pulsa" className="gap-2">
-              <Smartphone className="h-4 w-4" />
-              Pulsa
-            </TabsTrigger>
-            <TabsTrigger value="paket" className="gap-2">
-              <Wifi className="h-4 w-4" />
-              Paket Data
-            </TabsTrigger>
-          </TabsList>
+        <div className="grid gap-6 lg:grid-cols-5">
+          {/* Form */}
+          <div className="lg:col-span-2 space-y-4">
+            <Card>
+              <CardContent className="p-5 space-y-4">
+                <p className="text-sm font-semibold font-heading">Data Transaksi</p>
 
-          <TabsContent value="pulsa">
-            <div className="grid gap-6 lg:grid-cols-5">
-              {/* Form */}
-              <div className="lg:col-span-2">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Form Pulsa</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>Provider</Label>
-                      <Select
-                        value={pulsa.provider}
-                        onValueChange={(v) =>
-                          v &&
-                          setPulsa((prev) => ({ ...prev, provider: v }))
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {PROVIDERS.map((p) => (
-                            <SelectItem key={p.value} value={p.value}>
-                              <div className="flex items-center gap-2">
-                                <ProviderLogo provider={p} />
-                                {p.label}
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                <div className="space-y-2">
+                  <Label className="text-xs">Layanan</Label>
+                  <Select value={form.service} onValueChange={v => v && updateField("service", v)}>
+                    <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {SERVICES.map(s => (
+                        <SelectItem key={s} value={s} className="text-xs">{SERVICE_LABELS[s]}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                    <div className="space-y-2">
-                      <Label>Nomor HP</Label>
-                      <Input
-                        placeholder="+628xxx"
-                        value={pulsa.nomorHp}
-                        onChange={(e) =>
-                          setPulsa((prev) => ({
-                            ...prev,
-                            nomorHp: e.target.value,
-                          }))
-                        }
-                      />
-                    </div>
+                <div className="space-y-2">
+                  <Label className="text-xs">Provider / Channel</Label>
+                  <Select value={form.provider} onValueChange={v => v && updateField("provider", v)}>
+                    <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {PROVIDERS.map(p => (
+                        <SelectItem key={p.value} value={p.value} className="text-xs">
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: p.color }} />
+                            {p.label}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                    <div className="space-y-2">
-                      <Label>Nominal</Label>
-                      <Select
-                        value={pulsa.nominal}
-                        onValueChange={handleNominalChange}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {NOMINAL_PULSA.map((n) => (
-                            <SelectItem key={n.value} value={n.value}>
-                              {n.label}
-                            </SelectItem>
-                          ))}
-                          <SelectItem value="custom">Lainnya</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label className="text-xs">Status</Label>
+                    <Select value={form.status} onValueChange={v => v && updateField("status", v)}>
+                      <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {STATUS_OPTIONS.map(s => (
+                          <SelectItem key={s} value={s} className="text-xs">{s}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs">Metode Bayar</Label>
+                    <Select value={form.paymentMethod} onValueChange={v => v && updateField("paymentMethod", v)}>
+                      <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {PAYMENT_METHODS.map(m => (
+                          <SelectItem key={m} value={m} className="text-xs">{m}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
 
-                    <div className="space-y-2">
-                      <Label>Harga</Label>
-                      <Input
-                        type="number"
-                        placeholder="0"
-                        value={pulsa.harga || ""}
-                        onChange={(e) =>
-                          setPulsa((prev) => ({
-                            ...prev,
-                            harga: parseInt(e.target.value) || 0,
-                          }))
-                        }
-                      />
-                    </div>
+                <div className="space-y-2">
+                  <Label className="text-xs">Nomor HP</Label>
+                  <Input placeholder="08981103804" value={form.nomorHp} onChange={e => updateField("nomorHp", e.target.value)} className="h-9 text-xs" />
+                </div>
 
-                    <div className="space-y-2">
-                      <Label>Metode Pembayaran</Label>
-                      <Select
-                        value={pulsa.paymentMethod}
-                        onValueChange={(v) =>
-                          v &&
-                          setPulsa((prev) => ({
-                            ...prev,
-                            paymentMethod: v,
-                          }))
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {PAYMENT_METHODS.map((m) => (
-                            <SelectItem key={m.value} value={m.value}>
-                              {m.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                <div className="space-y-2">
+                  <Label className="text-xs">Nama Produk</Label>
+                  <Input placeholder="GoPulsa - TRI Happy Play Movies 25GB" value={form.productName} onChange={e => updateField("productName", e.target.value)} className="h-9 text-xs" />
+                </div>
 
-                    <div className="flex gap-2 pt-2">
-                      <Button
-                        onClick={handleGeneratePulsa}
-                        className="flex-1"
-                      >
-                        Buat Invoice
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={handleResetPulsa}
-                      >
-                        Reset
-                      </Button>
-                    </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="space-y-2">
+                    <Label className="text-xs">Harga</Label>
+                    <Input type="number" placeholder="78500" value={form.price || ""} onChange={e => updateField("price", parseInt(e.target.value) || 0)} className="h-9 text-xs" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs">Diskon</Label>
+                    <Input type="number" placeholder="8000" value={form.discount || ""} onChange={e => updateField("discount", parseInt(e.target.value) || 0)} className="h-9 text-xs" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs">Admin</Label>
+                    <Input type="number" placeholder="0" value={form.adminFee || ""} onChange={e => updateField("adminFee", parseInt(e.target.value) || 0)} className="h-9 text-xs" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-                    {pulsa.generated && (
-                      <Button
-                        variant="secondary"
-                        onClick={handlePrint}
-                        className="w-full gap-2"
-                      >
-                        <Printer className="h-4 w-4" />
-                        Cetak Invoice
-                      </Button>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
+            <Card>
+              <CardContent className="p-5 space-y-4">
+                <p className="text-sm font-semibold font-heading">Referensi & QR</p>
 
-              {/* Preview */}
-              <div className="lg:col-span-3">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Preview Receipt</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ReceiptPreview
-                      type="pulsa"
-                      provider={pulsa.provider}
-                      nomorHp={pulsa.nomorHp}
-                      harga={pulsa.harga}
-                      paymentMethod={pulsa.paymentMethod}
-                      generated={pulsa.generated}
-                      nominal={pulsa.nominal}
-                    />
-                  </CardContent>
-                </Card>
-              </div>
+                <div className="space-y-2">
+                  <Label className="text-xs">ID Transaksi (kosongi untuk auto)</Label>
+                  <Input placeholder="042026020910543..." value={form.refId} onChange={e => updateField("refId", e.target.value)} className="h-9 text-xs font-mono" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs">ID Eksternal (kosongi untuk auto)</Label>
+                  <Input placeholder="1359838484-839585..." value={form.eksternalId} onChange={e => updateField("eksternalId", e.target.value)} className="h-9 text-xs font-mono" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs">Nomor Serial (kosongi untuk auto)</Label>
+                  <Input placeholder="R260209..." value={form.serialNumber} onChange={e => updateField("serialNumber", e.target.value)} className="h-9 text-xs font-mono" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs">QR Code Value</Label>
+                  <Input placeholder="Kode manual untuk QR" value={form.qrValue} onChange={e => updateField("qrValue", e.target.value)} className="h-9 text-xs" />
+                  <p className="text-[10px] text-muted-foreground">Masukkan teks/apapun untuk digenerate sebagai QR code</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs">URL Chat CS (opsional)</Label>
+                  <Input placeholder="https://wa.me/628xxx" value={form.chatUrl} onChange={e => updateField("chatUrl", e.target.value)} className="h-9 text-xs" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="flex gap-2">
+              <Button onClick={handleGenerate} className="flex-1">Buat Receipt</Button>
+              <Button variant="outline" onClick={handleReset}>Reset</Button>
+              {generated && (
+                <Button variant="secondary" onClick={handlePrint} className="gap-2">
+                  <Printer className="h-4 w-4" /> Cetak
+                </Button>
+              )}
             </div>
-          </TabsContent>
+          </div>
 
-          <TabsContent value="paket">
-            <div className="grid gap-6 lg:grid-cols-5">
-              {/* Form */}
-              <div className="lg:col-span-2">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Form Paket Data</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>Provider</Label>
-                      <Select
-                        value={paket.provider}
-                        onValueChange={(v) =>
-                          v &&
-                          setPaket((prev) => ({ ...prev, provider: v }))
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {PROVIDERS.map((p) => (
-                            <SelectItem key={p.value} value={p.value}>
-                              <div className="flex items-center gap-2">
-                                <ProviderLogo provider={p} />
-                                {p.label}
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Nomor HP</Label>
-                      <Input
-                        placeholder="+628xxx"
-                        value={paket.nomorHp}
-                        onChange={(e) =>
-                          setPaket((prev) => ({
-                            ...prev,
-                            nomorHp: e.target.value,
-                          }))
-                        }
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Nama Paket</Label>
-                      <Input
-                        placeholder="Contoh: OMG! 75GB 30 Hari"
-                        value={paket.namaPaket}
-                        onChange={(e) =>
-                          setPaket((prev) => ({
-                            ...prev,
-                            namaPaket: e.target.value,
-                          }))
-                        }
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Harga</Label>
-                      <Input
-                        type="number"
-                        placeholder="0"
-                        value={paket.harga || ""}
-                        onChange={(e) =>
-                          setPaket((prev) => ({
-                            ...prev,
-                            harga: parseInt(e.target.value) || 0,
-                          }))
-                        }
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Metode Pembayaran</Label>
-                      <Select
-                        value={paket.paymentMethod}
-                        onValueChange={(v) =>
-                          v &&
-                          setPaket((prev) => ({
-                            ...prev,
-                            paymentMethod: v,
-                          }))
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {PAYMENT_METHODS.map((m) => (
-                            <SelectItem key={m.value} value={m.value}>
-                              {m.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="flex gap-2 pt-2">
-                      <Button
-                        onClick={handleGeneratePaket}
-                        className="flex-1"
-                      >
-                        Buat Invoice
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={handleResetPaket}
-                      >
-                        Reset
-                      </Button>
-                    </div>
-
-                    {paket.generated && (
-                      <Button
-                        variant="secondary"
-                        onClick={handlePrint}
-                        className="w-full gap-2"
-                      >
-                        <Printer className="h-4 w-4" />
-                        Cetak Invoice
-                      </Button>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Preview */}
-              <div className="lg:col-span-3">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Preview Receipt</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ReceiptPreview
-                      type="paket"
-                      provider={paket.provider}
-                      nomorHp={paket.nomorHp}
-                      harga={paket.harga}
-                      paymentMethod={paket.paymentMethod}
-                      generated={paket.generated}
-                      namaPaket={paket.namaPaket}
-                    />
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+          {/* Preview */}
+          <div className="lg:col-span-3">
+            <Card>
+              <CardContent className="p-5">
+                {generated ? (
+                  <Receipt data={generated} />
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+                    <Smartphone className="h-10 w-10 mb-3 text-gray-300" />
+                    <p className="text-sm">Isi form dan klik "Buat Receipt"</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </>
   )
