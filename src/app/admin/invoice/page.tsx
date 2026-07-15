@@ -6,7 +6,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import {
   Select,
   SelectContent,
@@ -14,32 +13,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { QRCodeSVG } from "qrcode.react"
-import { Printer, Smartphone, Wifi, Copy, Check, ArrowRight, FileText, Headphones, CreditCard, MessageCircle } from "lucide-react"
+import { Printer, Smartphone, Copy, Check, ChevronRight, FileText, Bookmark } from "lucide-react"
 import { toast } from "sonner"
 
 const SERVICES = ["pulsa", "paket_data", "token_listrik", "bpjs", "e_wallet", "game_voucher"] as const
 
 const PROVIDERS = [
-  { value: "gopay", label: "GoPay", color: "#4C3494", gradientFrom: "#5B3B9A", gradientTo: "#2D1B69" },
+  { value: "gopay", label: "GoPay", color: "#0081A0", gradientFrom: "#2B61FD", gradientTo: "#2B61FD" },
   { value: "telkomsel", label: "Telkomsel", color: "#CB0A2C", gradientFrom: "#E0112F", gradientTo: "#A00822" },
   { value: "tri", label: "Tri", color: "#002B7F", gradientFrom: "#003399", gradientTo: "#001A4D" },
-  { value: "xl", label: "XL", color: "#0033A0", gradientFrom: "#0044CC", gradientTo: "#002266" },
-  { value: "indosat", label: "Indosat", color: "#003E7E", gradientFrom: "#0050A0", gradientTo: "#002650" },
-  { value: "axis", label: "Axis", color: "#ED1B24", gradientFrom: "#F0252E", gradientTo: "#CC141C" },
-  { value: "smartfren", label: "Smartfren", color: "#E11B22", gradientFrom: "#E62A30", gradientTo: "#C0151B" },
-  { value: "ovo", label: "OVO", color: "#4C2492", gradientFrom: "#5E2DB3", gradientTo: "#3A1B6E" },
-  { value: "dana", label: "Dana", color: "#108EE9", gradientFrom: "#1A9FF5", gradientTo: "#0C78C4" },
-  { value: "shopeepay", label: "ShopeePay", color: "#EE4D2D", gradientFrom: "#F55A3A", gradientTo: "#D04020" },
-  { value: "linkaja", label: "LinkAja", color: "#E4002B", gradientFrom: "#F00030", gradientTo: "#C80022" },
 ]
 
 const STATUS_OPTIONS = ["Berhasil", "Gagal", "Pending", "Refund"]
-const PAYMENT_METHODS = ["GoPay Saldo", "OVO Cash", "Dana", "ShopeePay", "LinkAja", "Transfer Bank", "Cash"]
+const PAYMENT_METHODS = ["GoPay Saldo", "OVO Cash", "Dana", "ShopeePay", "Transfer Bank"]
 
 const SERVICE_LABELS: Record<string, string> = {
-  pulsa: "Pulsa",
+  pulsa: "GoPulsa",
   paket_data: "Paket Data",
   token_listrik: "Token Listrik",
   bpjs: "BPJS",
@@ -48,47 +38,15 @@ const SERVICE_LABELS: Record<string, string> = {
 }
 
 function generateRefId(): string {
-  const date = new Date()
-  const d = String(date.getDate()).padStart(2, "0")
-  const m = String(date.getMonth() + 1).padStart(2, "0")
-  const y = String(date.getFullYear()).slice(-2)
-  const h = String(date.getHours()).padStart(2, "0")
-  const min = String(date.getMinutes()).padStart(2, "0")
-  const s = String(date.getSeconds()).padStart(2, "0")
-  const rand = String(Math.floor(Math.random() * 90000) + 10000)
-  return `${d}${m}${y}${h}${min}${s}${rand}`
+  return "042026020910543" + Math.floor(Math.random() * 10)
+}
+
+function generateEksternalId(): string {
+  return "1359838484-839585-GOPULSA"
 }
 
 function generateSerial(): string {
-  const date = new Date()
-  const d = String(date.getDate()).padStart(2, "0")
-  const m = String(date.getMonth() + 1).padStart(2, "0")
-  const y = String(date.getFullYear()).toString().slice(-2)
-  const h = String(date.getHours()).padStart(2, "0")
-  const min = String(date.getMinutes()).padStart(2, "0")
-  const rand = String(Math.floor(Math.random() * 900000) + 100000)
-  return `R${d}${m}${y}.${h}${min}.${rand}`
-}
-
-function getCurrentDate(): string {
-  const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"]
-  const d = new Date()
-  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`
-}
-
-function getCurrentTime(): string {
-  const d = new Date()
-  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`
-}
-
-function ProviderLogo({ color, label, size = "sm" }: { color: string; label: string; size?: "sm" | "lg" }) {
-  const dims = size === "lg" ? "w-12 h-12 text-base" : "w-8 h-8 text-xs"
-  const initials = label === "Telkomsel" ? "TS" : label === "Tri" ? "TR" : label === "Smartfren" ? "SF" : label.slice(0, 2).toUpperCase()
-  return (
-    <div className={`${dims} flex items-center justify-center rounded-full text-white font-bold shrink-0`} style={{ backgroundColor: color }}>
-      {initials}
-    </div>
-  )
+  return "R260209.1754.2200a0"
 }
 
 interface ReceiptData {
@@ -117,22 +75,22 @@ const emptyForm: ReceiptData = {
   service: "pulsa",
   provider: "gopay",
   providerLabel: "GoPay",
-  providerColor: "#4C3494",
+  providerColor: "#2B61FD",
   status: "Berhasil",
   paymentMethod: "GoPay Saldo",
-  nomorHp: "",
-  productName: "",
-  price: 0,
-  discount: 0,
+  nomorHp: "08981103804",
+  productName: "TRI Happy Play Movies 25GB 30 Hari",
+  price: 78500,
+  discount: 8000,
   adminFee: 0,
-  total: 0,
-  refId: "",
-  eksternalId: "",
-  serialNumber: "",
-  date: getCurrentDate(),
-  time: getCurrentTime(),
-  qrValue: "",
-  chatUrl: "",
+  total: 70500,
+  refId: "042026020910543",
+  eksternalId: "1359838484-839585-GOPULSA",
+  serialNumber: "R260209.1754.2200a0",
+  date: "09 Feb 2026",
+  time: "17:54",
+  qrValue: "https://gopay.co.id",
+  chatUrl: "#",
 }
 
 export default function InvoicePage() {
@@ -141,8 +99,6 @@ export default function InvoicePage() {
   const [copiedKey, setCopiedKey] = useState<string | null>(null)
 
   const getProvider = (val: string) => PROVIDERS.find(p => p.value === val) || PROVIDERS[0]
-
-  type Provider = (typeof PROVIDERS)[number]
 
   function updateField<K extends keyof ReceiptData>(key: K, value: ReceiptData[K]) {
     setForm(prev => {
@@ -164,18 +120,11 @@ export default function InvoicePage() {
     if (!form.productName.trim()) { toast.error("Nama produk harus diisi"); return }
     if (form.price <= 0) { toast.error("Harga harus diisi"); return }
 
-    const refId = form.refId || `042026${generateRefId()}`
-    const eksternalId = form.eksternalId || `${generateRefId().slice(0, 6)}-${generateRefId().slice(6, 12)}-GOPULSA`
-    const serialNumber = form.serialNumber || generateSerial()
-
     setGenerated({
       ...form,
-      refId,
-      eksternalId,
-      serialNumber,
-      date: getCurrentDate(),
-      time: getCurrentTime(),
-      total: Math.max(0, form.price - form.discount + form.adminFee),
+      refId: form.refId || generateRefId(),
+      eksternalId: form.eksternalId || generateEksternalId(),
+      serialNumber: form.serialNumber || generateSerial(),
     })
     toast.success("Receipt berhasil dibuat!")
   }
@@ -196,225 +145,213 @@ export default function InvoicePage() {
   }
 
   function formatRupiah(num: number) {
-    return `Rp${num.toLocaleString("id-ID")}`
+    return `Rp${num.toLocaleString("id-ID").replace(/,/g, ".")}`
   }
 
-  const fmt = generated || form
-
-  const DetailRow = ({ label, value, mono, copyKey, valueClass }: { label: string; value: string; mono?: boolean; copyKey?: string; valueClass?: string }) => (
-    <div className="flex items-center justify-between py-1.5">
-      <span className="text-xs text-gray-500">{label}</span>
-      <div className="flex items-center gap-1.5">
-        <span className={`text-xs text-right ${valueClass || ""} ${mono ? "font-mono" : "font-medium"} text-gray-900`}>{value}</span>
+  const DetailRow = ({ label, value, copyKey, isTruncated }: { label: string; value: string; copyKey?: string; isTruncated?: boolean }) => (
+    <div className="flex items-center justify-between py-1">
+      <span className="text-sm text-gray-500">{label}</span>
+      <div className="flex items-center gap-1 max-w-[65%]">
+        <span className={`text-sm text-right font-medium text-gray-900 ${isTruncated ? "truncate block max-w-[150px]" : ""}`}>{value}</span>
         {copyKey && (
-          <button onClick={() => handleCopy(value, copyKey)} className="shrink-0">
-            {copiedKey === copyKey ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3 text-gray-400 hover:text-gray-600" />}
+          <button onClick={() => handleCopy(value, copyKey)} className="shrink-0 p-0.5 text-gray-400 hover:text-gray-600">
+            {copiedKey === copyKey ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
           </button>
         )}
       </div>
     </div>
   )
 
-  const StatusBadge = ({ status }: { status: string }) => {
-    const colors: Record<string, string> = { Berhasil: "text-green-600", Gagal: "text-red-500", Pending: "text-yellow-500", Refund: "text-blue-500" }
-    if (status === "Berhasil") {
-      return (
-        <div className="flex items-center gap-1.5">
-          <span className={`text-xs font-semibold ${colors[status] || "text-gray-500"}`}>Selesai</span>
-          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-green-500 text-white text-[9px] font-bold">✓</span>
-        </div>
-      )
-    }
-    return <span className={`text-xs font-semibold ${colors[status] || "text-gray-500"}`}>{status}</span>
-  }
-
   const Receipt = ({ data }: { data: ReceiptData }) => {
-    const prov = getProvider(data.provider)
     return (
-      <div className="mx-auto max-w-sm">
-        <div className="print-area">
-          {/* Purple background container */}
-          <div className="rounded-2xl overflow-hidden" style={{ background: `linear-gradient(180deg, ${prov.gradientFrom} 0%, ${prov.color} 50%, ${prov.gradientTo} 100%)` }}>
-            
-            {/* Header area */}
-            <div className="text-white text-center pt-10 pb-20 px-6">
-              <p className="text-sm opacity-70">{SERVICE_LABELS[data.service] || data.service}</p>
-              <p className="text-3xl font-bold mt-0.5">{prov.label}</p>
+      <div className="mx-auto max-w-[380px] font-sans antialiased print-area">
+        {/* Main Custom Blue/Purple Container */}
+        <div className="bg-[#4424ff] rounded-[32px] p-4 flex flex-col items-center shadow-md select-none">
+          
+          {/* GoPay Header Logo */}
+          <div className="flex items-center justify-center gap-2 text-white my-2">
+            {/* Circle icon with wallet SVG */}
+            <div className="w-8 h-8 flex items-center justify-center">
+              <svg viewBox="0 0 37.5 37.4" className="h-8 w-8">
+                <path fill="#00AED6" d="M18.7,0C8.4,0,0,8.4,0,18.7C0,29,8.4,37.4,18.7,37.4c10.3,0,18.7-8.4,18.7-18.7C37.5,8.4,29.1,0,18.7,0z M29.2,24.5c-0.2,2-1.7,3.5-3.6,3.9c-4.3,0.5-8.7,0.5-13.1,0c-2.2-0.4-3.9-2-4.3-4.2c-0.6-3.7-0.6-7.4,0-11.1C8.5,11.2,10,9.5,12,9c3.5-0.6,7.1-0.6,10.6,0c1.6,0.4,2.7,1.8,2.7,3.4h-12c0,0-0.1,0-0.1,0c-0.4,0-0.8,0.4-0.7,0.8c0,0.4,0.4,0.8,0.8,0.7h12.2c2.2,0.1,4,1.9,4.2,4.1C29.7,20.3,29.6,22.4,29.2,24.5z"/>
+                <path fill="#00AED6" d="M25,18.7c-0.6,0-1.2,0.5-1.2,1.2c0,0.3,0.1,0.6,0.4,0.9v0.7c0,0.4,0.3,0.8,0.8,0.8s0.8-0.3,0.8-0.8v-0.7c0.2-0.2,0.4-0.5,0.4-0.9C26.2,19.2,25.6,18.7,25,18.7z"/>
+              </svg>
             </div>
+            <span className="font-bold text-xl tracking-tight">gopay</span>
+          </div>
 
-            {/* Card wrapper — horizontal margin agar card tidak menempel ke tepi */}
-            <div className="px-4">
-              {/* Scalloped top */}
-              <div className="relative h-4 overflow-hidden" style={{ backgroundColor: prov.color }}>
-                <div className="absolute inset-x-0 bottom-0 h-4 bg-white"
-                  style={{
-                    backgroundImage: 'radial-gradient(circle, transparent 3.5px, white 3.5px)',
-                    backgroundSize: '18px 10px',
-                    backgroundRepeat: 'repeat-x',
-                    backgroundPosition: '0 0',
-                    WebkitMaskImage: 'radial-gradient(circle at 9px 0, transparent 3.5px, white 3.5px)',
-                    WebkitMaskSize: '18px 10px',
-                    WebkitMaskRepeat: 'repeat-x',
-                    maskImage: 'radial-gradient(circle at 9px 0, transparent 3.5px, white 3.5px)',
-                    maskSize: '18px 10px',
-                    maskRepeat: 'repeat-x',
-                  }}
-                />
-              </div>
+          {/* White Paper Ticket */}
+          <div className="w-full relative shadow-sm flex flex-col">
+            
+            {/* Top Scallop Gerigi Kertas (Menggunakan #4424ff) */}
+            <div 
+              className="w-full h-3 bg-white rounded-t-2xl"
+              style={{
+                backgroundImage: 'radial-gradient(circle at 50% 0%, #4424ff 6px, white 7px)',
+                backgroundSize: '16px 12px',
+                backgroundPosition: 'center top',
+                backgroundRepeat: 'repeat-x'
+              }}
+            />
 
-              {/* Card row — card body + scalloped kiri/kanan */}
-              <div className="flex">
-                {/* Scalloped left */}
-                <div className="w-[10px] shrink-0 overflow-hidden" style={{ backgroundColor: prov.color }}>
-                  <div className="w-full h-full bg-white"
-                    style={{
-                      WebkitMaskImage: 'radial-gradient(circle at 0 9px, transparent 3.5px, white 3.5px)',
-                      WebkitMaskSize: '10px 18px',
-                      WebkitMaskRepeat: 'repeat-y',
-                      maskImage: 'radial-gradient(circle at 0 9px, transparent 3.5px, white 3.5px)',
-                      maskSize: '10px 18px',
-                      maskRepeat: 'repeat-y',
-                    }}
-                  />
-                </div>
-
-                {/* White card body */}
-                <div className="flex-1 bg-white px-6 py-8 relative shadow-lg">
-
-                  {/* Receipt icons - document + headset overlapping */}
-              <div className="flex justify-center mb-4">
-                <div className="flex -space-x-3">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center shadow-lg relative z-10">
-                    <FileText className="h-6 w-6 text-white" />
+            {/* White Card Body */}
+            <div className="w-full bg-white px-5 py-3">
+              {/* Overlapping Rounded Icons Header */}
+              <div className="flex justify-center mb-3">
+                <div className="relative w-16 h-16 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-full bg-[#EBF7FA] border border-white flex items-center justify-center shadow-sm absolute left-0 z-0">
+                    <FileText className="h-5 w-5 text-[#00AED6]" />
                   </div>
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-lg mt-2">
-                    <Headphones className="h-6 w-6 text-white" />
+                  <div className="w-7 h-7 rounded-full bg-[#EBF7FA] border-2 border-white flex items-center justify-center shadow-sm absolute right-1 bottom-1 z-10">
+                    <Bookmark className="h-3 w-3 text-[#00AED6]" fill="#00AED6" />
                   </div>
                 </div>
               </div>
 
-              {/* Price */}
-              <div className="text-center mb-4">
-                <p className="text-3xl font-extrabold text-gray-900">{formatRupiah(data.total)}</p>
-                <p className="text-xs text-gray-500 mt-2 leading-relaxed">{data.productName}</p>
-                <p className="text-xs text-gray-400 mt-0.5">{data.nomorHp}</p>
-                <p className="text-[10px] text-gray-400 font-mono mt-1">#{data.eksternalId}</p>
+              {/* Title / Amount */}
+              <div className="text-center mb-6 px-2">
+                <h2 className="text-2xl font-bold text-gray-900 tracking-tight">{formatRupiah(data.total)}</h2>
+                <p className="text-sm text-gray-500 mt-2 font-normal leading-tight">
+                  {SERVICE_LABELS[data.service]} - {data.productName} - {data.nomorHp}
+                </p>
+                <p className="text-xs text-gray-400 mt-1 font-normal break-all">#{data.eksternalId}</p>
               </div>
 
-              {/* Chat button */}
-              {data.chatUrl && (
-                <a href={data.chatUrl} target="_blank" rel="noopener noreferrer"
-                  className="flex items-center justify-between w-full px-4 py-3 border border-gray-200 rounded-full mb-6 hover:border-gray-300 transition-colors">
-                  <div className="flex items-center gap-2">
-                    <Headphones className="h-4 w-4 text-blue-500" />
-                    <span className="text-sm font-medium text-gray-700">Chat dengan CS</span>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-gray-400" />
-                </a>
-              )}
-
-              {/* Dashed divider */}
-              <div className="border-t border-dashed border-gray-200 mb-4" />
-
-              {/* Rincian transaksi */}
-              <div className="mb-4">
-                <p className="text-sm font-semibold text-gray-900 mb-3">Rincian transaksi</p>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500">Status</span>
-                    <StatusBadge status={data.status} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500">Metode pembayaran</span>
-                    <div className="flex items-center gap-1.5">
-                      <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-white text-[8px]">💳</span>
-                      <span className="text-xs font-medium text-gray-900">{data.paymentMethod}</span>
+              {/* Chat dengan CS pill */}
+              <div className="px-1 mb-6">
+                <div className="flex items-center justify-between w-full px-4 py-2 bg-white border border-gray-100 rounded-full shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <div className="w-7 h-7 rounded-full bg-[#E6EDFF] flex items-center justify-center">
+                      <span className="text-xs">🎧</span>
                     </div>
+                    <span className="text-xs font-medium text-gray-700">Chat dengan CS</span>
                   </div>
-                  <DetailRow label="Waktu" value={data.time} />
-                  <DetailRow label="Tanggal" value={data.date} />
-                  <DetailRow label="ID transaksi" value={data.refId} mono copyKey="refId" />
-                  <DetailRow label="ID Transaksi Gojek" value={data.eksternalId} mono copyKey="eksternal" />
-                  <DetailRow label="Nomor serial" value={data.serialNumber} mono />
+                  <ChevronRight className="h-5 w-5 text-green-600 stroke-[2.5]" />
                 </div>
               </div>
 
-              {/* Dashed divider */}
+              {/* Dashed Separator */}
               <div className="border-t border-dashed border-gray-200 my-4" />
 
-              {/* Pricing */}
-              <div className="space-y-3 mb-4">
+              {/* Section: Rincian Transaksi */}
+              <div className="space-y-2">
+                <h3 className="text-sm font-bold text-gray-900 mb-3">Rincian transaksi</h3>
+                
+                <div className="flex items-center justify-between py-1">
+                  <span className="text-sm text-gray-500">Status</span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-sm font-bold text-green-600">Selesai</span>
+                    <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center">
+                      <span className="text-white text-[9px] font-bold">✓</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between py-1">
+                  <span className="text-sm text-gray-500">Metode pembayaran</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm font-medium text-gray-900">{data.paymentMethod}</span>
+                    <div className="w-4 h-4 rounded bg-[#00AED6] flex items-center justify-center text-white text-[9px]">💳</div>
+                  </div>
+                </div>
+
+                <DetailRow label="Waktu" value={data.time} />
+                <DetailRow label="Tanggal" value={data.date} />
+                <DetailRow label="ID transaksi" value={data.refId} copyKey="refId" isTruncated={true} />
+                <DetailRow label="ID Transaksi Gojek" value={data.eksternalId} copyKey="eksternal" isTruncated={true} />
+                <DetailRow label="Nomor serial" value={data.serialNumber} />
+              </div>
+
+              {/* Dashed Separator */}
+              <div className="border-t border-dashed border-gray-200 my-4" />
+
+              {/* Section: Calculations */}
+              <div className="space-y-2 mb-4">
                 <DetailRow label="Jumlah" value={formatRupiah(data.price)} />
-                {data.discount > 0 && <DetailRow label="Diskon" value={`-${formatRupiah(data.discount)}`} valueClass="text-red-500" />}
+                {data.discount > 0 && (
+                  <div className="flex items-center justify-between py-1">
+                    <span className="text-sm text-gray-500">Diskon</span>
+                    <span className="text-sm font-medium text-gray-900">-{formatRupiah(data.discount)}</span>
+                  </div>
+                )}
                 {data.adminFee > 0 && <DetailRow label="Biaya admin" value={formatRupiah(data.adminFee)} />}
               </div>
 
-              {/* Solid double divider */}
-              <div className="border-t-2 border-double border-gray-300 pt-3">
+              {/* Solid Separator */}
+              <div className="border-t border-gray-200 pt-3 mt-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-bold text-gray-900">Total</span>
-                  <span className="text-lg font-extrabold text-gray-900">{formatRupiah(data.total)}</span>
+                  <span className="text-base font-bold text-gray-900">{formatRupiah(data.total)}</span>
                 </div>
               </div>
-            </div>   {/* /card body */}
-
-            {/* Scalloped right inside flex row */}
-            <div className="w-[10px] shrink-0 overflow-hidden" style={{ backgroundColor: prov.color }}>
-              <div className="w-full h-full bg-white"
-                style={{
-                  WebkitMaskImage: 'radial-gradient(circle at 100% 9px, transparent 3.5px, white 3.5px)',
-                  WebkitMaskSize: '10px 18px',
-                  WebkitMaskRepeat: 'repeat-y',
-                  maskImage: 'radial-gradient(circle at 100% 9px, transparent 3.5px, white 3.5px)',
-                  maskSize: '10px 18px',
-                  maskRepeat: 'repeat-y',
-                }}
-              />
             </div>
-            </div>   {/* /flex row */}
 
-            {/* Scalloped bottom */}
-            <div className="relative h-4 overflow-hidden" style={{ backgroundColor: prov.color }}>
-              <div className="absolute inset-x-0 top-0 h-4 bg-white"
-                style={{
-                  WebkitMaskImage: 'radial-gradient(circle at 9px 100%, transparent 3.5px, white 3.5px)',
-                  WebkitMaskSize: '18px 10px',
-                  WebkitMaskRepeat: 'repeat-x',
-                  maskImage: 'radial-gradient(circle at 9px 100%, transparent 3.5px, white 3.5px)',
-                  maskSize: '18px 10px',
-                  maskRepeat: 'repeat-x',
-                }}
-              />
-            </div>
-            </div>   {/* /card wrapper */}
+            {/* Bottom Scallop Gerigi Kertas (Menggunakan #4424ff) */}
+            <div 
+              className="w-full h-3 bg-white rounded-b-2xl"
+              style={{
+                backgroundImage: 'radial-gradient(circle at 50% 100%, #4424ff 6px, white 7px)',
+                backgroundSize: '16px 12px',
+                backgroundPosition: 'center bottom',
+                backgroundRepeat: 'repeat-x'
+              }}
+            />
+          </div>
 
-            {/* Purple footer with QR */}
-            <div className="px-6 pt-6 pb-8 text-center">
-              {data.qrValue && (
-                <div className="bg-white rounded-2xl p-4 inline-block mb-4 shadow-xl">
-                  <QRCodeSVG value={data.qrValue} size={140} level="M" />
+          {/* Blue Bottom Area (QR Code & Promo Text) */}
+          <div className="w-full pt-6 pb-4 px-2 flex items-start gap-4 text-white">
+            {/* QR Code Left Side */}
+            {data.qrValue && (
+              <div className="bg-white rounded-xl p-1.5 inline-block shrink-0 shadow-sm relative">
+                <QRCodeSVG value={data.qrValue} size={84} level="M" includeMargin={false} />
+                <div className="absolute inset-0 m-auto w-5 h-5 bg-[#00AED6] rounded-full border border-white flex items-center justify-center">
+                  <span className="text-white text-[8px] font-bold">●</span>
                 </div>
-              )}
-              <p className="text-sm font-semibold text-white mb-1">Dikirim dari app {prov.label}</p>
-              <p className="text-[11px] text-white/70 mb-1">Dapetin gratis transfer 100x/bulan!</p>
-              <p className="text-[10px] text-white/60 mb-4">Aplikasi ringan buat kebutuhan finansialmu.</p>
-              <div className="flex items-center justify-center gap-3">
-                <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 flex items-center gap-1.5">
-                  <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.62-.71 1.64-1.23 2.6-1.13.1 1.04-.3 2.08-.93 2.84-.63.74-1.64 1.18-2.67 1.02-.1-1.02.33-2.07.98-2.73z"/></svg>
-                  <span className="text-[10px] text-white font-medium">App Store</span>
+              </div>
+            )}
+            
+            {/* Promo Text & Download Badges Right Side */}
+            <div className="flex-1 text-left flex flex-col justify-between h-full pt-0.5">
+              <div>
+                <p className="text-[13px] font-bold leading-snug tracking-wide">
+                  Dikirim dari app GoPay. Dapetin gratis transfer 100x/bulan!
+                </p>
+                <p className="text-[11px] text-white/80 mt-0.5 font-normal leading-normal">
+                  Aplikasi ringan buat kebutuhan finansialmu.
+                </p>
+              </div>
+              
+              {/* App Store / Google Play Icons Horizontal */}
+              <div className="flex items-center gap-2 mt-3">
+                {/* App Store */}
+                <div className="bg-black text-white rounded px-2 py-0.5 flex items-center gap-1 border border-white/10 h-[26px]">
+                  <svg className="h-3 w-3 fill-current shrink-0" viewBox="0 0 24 24">
+                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.62-.71 1.64-1.23 2.6-1.13.1 1.04-.3 2.08-.93 2.84-.63.74-1.64 1.18-2.67 1.02-.1-1.02.33-2.07.98-2.73z"/>
+                  </svg>
+                  <div className="text-left leading-none">
+                    <p className="text-[5px] opacity-60 uppercase font-sans tracking-tight">Download on the</p>
+                    <p className="text-[8px] font-bold font-sans tracking-tight">App Store</p>
+                  </div>
                 </div>
-                <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 flex items-center gap-1.5">
-                  <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.807 1.626a1 1 0 0 1 0 1.732l-2.807 1.626L15.206 12l2.492-2.492zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg>
-                  <span className="text-[10px] text-white font-medium">Google Play</span>
+
+                {/* Google Play */}
+                <div className="bg-black text-white rounded px-2 py-0.5 flex items-center gap-1 border border-white/10 h-[26px]">
+                  <svg className="h-3 w-3 fill-current shrink-0" viewBox="0 0 24 24">
+                    <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.807 1.626a1 1 0 0 1 0 1.732l-2.807 1.626L15.206 12l2.492-2.492zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/>
+                  </svg>
+                  <div className="text-left leading-none">
+                    <p className="text-[5px] opacity-60 uppercase font-sans tracking-tight">GET IT ON</p>
+                    <p className="text-[8px] font-bold font-sans tracking-tight">Google Play</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+
         </div>
       </div>
     )
   }
-
   return (
     <>
       <style>{`
@@ -429,12 +366,12 @@ export default function InvoicePage() {
 
       <div>
         <div className="mb-6">
-          <h1 className="text-2xl font-bold font-heading">Invoice</h1>
-          <p className="text-muted-foreground">Cetak receipt pembayaran — template GoPay</p>
+          <h1 className="text-2xl font-bold font-heading">Invoice Builder</h1>
+          <p className="text-muted-foreground">Kustomisasi struk transaksi agar persis dengan template GoPay asli.</p>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-5">
-          {/* Form */}
+        <div className="grid gap-6 lg:grid-cols-5 items-start">
+          {/* Form input data */}
           <div className="lg:col-span-2 space-y-4">
             <Card>
               <CardContent className="p-5 space-y-4">
@@ -447,23 +384,6 @@ export default function InvoicePage() {
                     <SelectContent>
                       {SERVICES.map(s => (
                         <SelectItem key={s} value={s} className="text-xs">{SERVICE_LABELS[s]}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-xs">Provider / Channel</Label>
-                  <Select value={form.provider} onValueChange={v => v && updateField("provider", v)}>
-                    <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {PROVIDERS.map(p => (
-                        <SelectItem key={p.value} value={p.value} className="text-xs">
-                          <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: p.color }} />
-                            {p.label}
-                          </div>
-                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -501,7 +421,7 @@ export default function InvoicePage() {
 
                 <div className="space-y-2">
                   <Label className="text-xs">Nama Produk</Label>
-                  <Input placeholder="GoPulsa - TRI Happy Play Movies 25GB" value={form.productName} onChange={e => updateField("productName", e.target.value)} className="h-9 text-xs" />
+                  <Input placeholder="TRI Happy Play Movies 25GB 30 Hari" value={form.productName} onChange={e => updateField("productName", e.target.value)} className="h-9 text-xs" />
                 </div>
 
                 <div className="grid grid-cols-3 gap-3">
@@ -518,43 +438,22 @@ export default function InvoicePage() {
                     <Input type="number" placeholder="0" value={form.adminFee || ""} onChange={e => updateField("adminFee", parseInt(e.target.value) || 0)} className="h-9 text-xs" />
                   </div>
                 </div>
-              </CardContent>
-            </Card>
 
-            <Card>
-              <CardContent className="p-5 space-y-4">
-                <p className="text-sm font-semibold font-heading">Referensi & QR</p>
-
-                <div className="space-y-2">
-                  <Label className="text-xs">ID Transaksi (kosongi untuk auto)</Label>
-                  <Input placeholder="042026020910543..." value={form.refId} onChange={e => updateField("refId", e.target.value)} className="h-9 text-xs font-mono" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-xs">ID Eksternal (kosongi untuk auto)</Label>
-                  <Input placeholder="1359838484-839585..." value={form.eksternalId} onChange={e => updateField("eksternalId", e.target.value)} className="h-9 text-xs font-mono" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-xs">Nomor Serial (kosongi untuk auto)</Label>
-                  <Input placeholder="R260209..." value={form.serialNumber} onChange={e => updateField("serialNumber", e.target.value)} className="h-9 text-xs font-mono" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-xs">QR Code Value</Label>
-                  <Input placeholder="Kode manual untuk QR" value={form.qrValue} onChange={e => updateField("qrValue", e.target.value)} className="h-9 text-xs" />
-                  <p className="text-[10px] text-muted-foreground">Masukkan teks/apapun untuk digenerate sebagai QR code</p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-xs">URL Chat CS (opsional)</Label>
-                  <Input placeholder="https://wa.me/628xxx" value={form.chatUrl} onChange={e => updateField("chatUrl", e.target.value)} className="h-9 text-xs" />
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-[11px]">Waktu</Label>
+                    <Input value={form.time} onChange={e => updateField("time", e.target.value)} className="h-8 text-xs" />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[11px]">Tanggal</Label>
+                    <Input value={form.date} onChange={e => updateField("date", e.target.value)} className="h-8 text-xs" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
             <div className="flex gap-2">
-              <Button onClick={handleGenerate} className="flex-1">Buat Receipt</Button>
+              <Button onClick={handleGenerate} className="flex-1 bg-blue-600 hover:bg-blue-700">Buat Preview</Button>
               <Button variant="outline" onClick={handleReset}>Reset</Button>
               {generated && (
                 <Button variant="secondary" onClick={handlePrint} className="gap-2">
@@ -564,16 +463,16 @@ export default function InvoicePage() {
             </div>
           </div>
 
-          {/* Preview */}
-          <div className="lg:col-span-3">
-            <Card>
-              <CardContent className="p-5">
+          {/* Area Preview */}
+          <div className="lg:col-span-3 sticky top-4">
+            <Card className="bg-slate-50 border-dashed">
+              <CardContent className="p-6">
                 {generated ? (
                   <Receipt data={generated} />
                 ) : (
-                  <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-                    <Smartphone className="h-10 w-10 mb-3 text-gray-300" />
-                    <p className="text-sm">Isi form dan klik "Buat Receipt"</p>
+                  <div className="flex flex-col items-center justify-center py-24 text-muted-foreground bg-white rounded-xl border shadow-inner">
+                    <Smartphone className="h-10 w-10 mb-3 text-gray-300 animate-pulse" />
+                    <p className="text-sm">Klik <strong className="text-blue-600">"Buat Preview"</strong> untuk memuat tampilan struk GoPay.</p>
                   </div>
                 )}
               </CardContent>
