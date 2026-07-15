@@ -242,19 +242,28 @@ export default function InvoicePage() {
               <p className="text-3xl font-bold mt-0.5">{prov.label}</p>
             </div>
 
-            {/* Perforated/scalloped edge */}
-            <div className="relative h-5 -mb-5 z-10" style={{ backgroundColor: prov.color }}>
-              <div className="absolute inset-0"
+            {/* Perforated/scalloped edge — membuat efek kertas sobek di batas header-card */}
+            <div className="relative h-4 overflow-hidden" style={{ backgroundColor: prov.color }}>
+              <div className="absolute inset-x-0 bottom-0 h-4 bg-white"
                 style={{
-                  backgroundImage: 'radial-gradient(circle at 50% 5px, transparent 6px, white 6px)',
-                  backgroundSize: '24px 12px',
+                  borderTopLeftRadius: '28px',
+                  borderTopRightRadius: '28px',
+                  backgroundImage: 'radial-gradient(circle, transparent 3.5px, white 3.5px)',
+                  backgroundSize: '18px 10px',
                   backgroundRepeat: 'repeat-x',
+                  backgroundPosition: '0 0',
+                  WebkitMaskImage: 'radial-gradient(circle at 9px 0, transparent 3.5px, white 3.5px)',
+                  WebkitMaskSize: '18px 10px',
+                  WebkitMaskRepeat: 'repeat-x',
+                  maskImage: 'radial-gradient(circle at 9px 0, transparent 3.5px, white 3.5px)',
+                  maskSize: '18px 10px',
+                  maskRepeat: 'repeat-x',
                 }}
               />
             </div>
 
-            {/* White card overlapping header */}
-            <div className="bg-white rounded-t-[2rem] px-6 py-8 relative shadow-lg" style={{ borderTopLeftRadius: '28px', borderTopRightRadius: '28px' }}>
+            {/* White card */}
+            <div className="bg-white px-6 py-8 relative shadow-lg" style={{ borderTopLeftRadius: '0', borderTopRightRadius: '0' }}>
               
               {/* Receipt icons - document + headset overlapping */}
               <div className="flex justify-center mb-4">
