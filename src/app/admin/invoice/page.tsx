@@ -263,7 +263,7 @@ export default function InvoicePage() {
             </div>
 
             {/* White card */}
-            <div className="bg-white px-6 py-8 relative shadow-lg" style={{ borderTopLeftRadius: '0', borderTopRightRadius: '0' }}>
+            <div className="bg-white px-6 py-8 relative shadow-lg border-l border-r border-b border-gray-200/70" style={{ borderTopLeftRadius: '0', borderTopRightRadius: '0' }}>
               
               {/* Receipt icons - document + headset overlapping */}
               <div className="flex justify-center mb-4">
