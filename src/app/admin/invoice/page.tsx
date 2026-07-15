@@ -244,30 +244,44 @@ export default function InvoicePage() {
 
             {/* Card wrapper — horizontal margin agar card tidak menempel ke tepi */}
             <div className="px-4">
-              {/* Perforated/scalloped edge — membuat efek kertas sobek di batas header-card */}
-            <div className="relative h-4 overflow-hidden" style={{ backgroundColor: prov.color }}>
-              <div className="absolute inset-x-0 bottom-0 h-4 bg-white"
-                style={{
-                  borderTopLeftRadius: '28px',
-                  borderTopRightRadius: '28px',
-                  backgroundImage: 'radial-gradient(circle, transparent 3.5px, white 3.5px)',
-                  backgroundSize: '18px 10px',
-                  backgroundRepeat: 'repeat-x',
-                  backgroundPosition: '0 0',
-                  WebkitMaskImage: 'radial-gradient(circle at 9px 0, transparent 3.5px, white 3.5px)',
-                  WebkitMaskSize: '18px 10px',
-                  WebkitMaskRepeat: 'repeat-x',
-                  maskImage: 'radial-gradient(circle at 9px 0, transparent 3.5px, white 3.5px)',
-                  maskSize: '18px 10px',
-                  maskRepeat: 'repeat-x',
-                }}
-              />
-            </div>
+              {/* Scalloped top */}
+              <div className="relative h-4 overflow-hidden" style={{ backgroundColor: prov.color }}>
+                <div className="absolute inset-x-0 bottom-0 h-4 bg-white"
+                  style={{
+                    backgroundImage: 'radial-gradient(circle, transparent 3.5px, white 3.5px)',
+                    backgroundSize: '18px 10px',
+                    backgroundRepeat: 'repeat-x',
+                    backgroundPosition: '0 0',
+                    WebkitMaskImage: 'radial-gradient(circle at 9px 0, transparent 3.5px, white 3.5px)',
+                    WebkitMaskSize: '18px 10px',
+                    WebkitMaskRepeat: 'repeat-x',
+                    maskImage: 'radial-gradient(circle at 9px 0, transparent 3.5px, white 3.5px)',
+                    maskSize: '18px 10px',
+                    maskRepeat: 'repeat-x',
+                  }}
+                />
+              </div>
 
-            {/* White card */}
-            <div className="bg-white px-6 py-8 relative shadow-lg border-l border-r border-b border-gray-200/70" style={{ borderTopLeftRadius: '0', borderTopRightRadius: '0' }}>
-              
-              {/* Receipt icons - document + headset overlapping */}
+              {/* Card row — card body + scalloped kiri/kanan */}
+              <div className="flex">
+                {/* Scalloped left */}
+                <div className="w-[10px] shrink-0 overflow-hidden" style={{ backgroundColor: prov.color }}>
+                  <div className="w-full h-full bg-white"
+                    style={{
+                      WebkitMaskImage: 'radial-gradient(circle at 0 9px, transparent 3.5px, white 3.5px)',
+                      WebkitMaskSize: '10px 18px',
+                      WebkitMaskRepeat: 'repeat-y',
+                      maskImage: 'radial-gradient(circle at 0 9px, transparent 3.5px, white 3.5px)',
+                      maskSize: '10px 18px',
+                      maskRepeat: 'repeat-y',
+                    }}
+                  />
+                </div>
+
+                {/* White card body */}
+                <div className="flex-1 bg-white px-6 py-8 relative shadow-lg">
+
+                  {/* Receipt icons - document + headset overlapping */}
               <div className="flex justify-center mb-4">
                 <div className="flex -space-x-3">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center shadow-lg relative z-10">
@@ -342,8 +356,37 @@ export default function InvoicePage() {
                   <span className="text-lg font-extrabold text-gray-900">{formatRupiah(data.total)}</span>
                 </div>
               </div>
+            </div>   {/* /card body */}
+
+            {/* Scalloped right inside flex row */}
+            <div className="w-[10px] shrink-0 overflow-hidden" style={{ backgroundColor: prov.color }}>
+              <div className="w-full h-full bg-white"
+                style={{
+                  WebkitMaskImage: 'radial-gradient(circle at 100% 9px, transparent 3.5px, white 3.5px)',
+                  WebkitMaskSize: '10px 18px',
+                  WebkitMaskRepeat: 'repeat-y',
+                  maskImage: 'radial-gradient(circle at 100% 9px, transparent 3.5px, white 3.5px)',
+                  maskSize: '10px 18px',
+                  maskRepeat: 'repeat-y',
+                }}
+              />
             </div>
+            </div>   {/* /flex row */}
+
+            {/* Scalloped bottom */}
+            <div className="relative h-4 overflow-hidden" style={{ backgroundColor: prov.color }}>
+              <div className="absolute inset-x-0 top-0 h-4 bg-white"
+                style={{
+                  WebkitMaskImage: 'radial-gradient(circle at 9px 100%, transparent 3.5px, white 3.5px)',
+                  WebkitMaskSize: '18px 10px',
+                  WebkitMaskRepeat: 'repeat-x',
+                  maskImage: 'radial-gradient(circle at 9px 100%, transparent 3.5px, white 3.5px)',
+                  maskSize: '18px 10px',
+                  maskRepeat: 'repeat-x',
+                }}
+              />
             </div>
+            </div>   {/* /card wrapper */}
 
             {/* Purple footer with QR */}
             <div className="px-6 pt-6 pb-8 text-center">
