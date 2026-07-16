@@ -37,6 +37,16 @@ const SORT_OPTIONS = [
   { value: "ukuran", label: "Ukuran" },
 ]
 
+function getLocalFolders(): Set<string> {
+  if (typeof window === "undefined") return new Set()
+  try { return new Set(JSON.parse(localStorage.getItem("mediaLocalFolders") || "[]")) }
+  catch { return new Set() }
+}
+
+function saveLocalFolders(set: Set<string>) {
+  try { localStorage.setItem("mediaLocalFolders", JSON.stringify([...set])) } catch { /* ignore */ }
+}
+
 export function ImagePicker({ open, onClose, onSelect, multi = false }: ImagePickerProps) {
   // Data
   const [items, setItems] = useState<MediaItem[]>([])
@@ -66,7 +76,6 @@ export function ImagePicker({ open, onClose, onSelect, multi = false }: ImagePic
   const [newFolderName, setNewFolderName] = useState("")
   const [renamingFolder, setRenamingFolder] = useState<string | null>(null)
   const [renameFolderValue, setRenameFolderValue] = useState("")
-  const localFoldersRef = useRef<Set<string>>(new Set())
   const folderCreateRef = useRef<HTMLInputElement>(null)
   const folderRenameRef = useRef<HTMLInputElement>(null)
 
@@ -89,7 +98,8 @@ export function ImagePicker({ open, onClose, onSelect, multi = false }: ImagePic
       const apiFolders: FolderInfo[] = json.data || []
       const merged = new Map<string, number>()
       for (const f of apiFolders) merged.set(f.name, f.count)
-      for (const name of localFoldersRef.current) { if (!merged.has(name)) merged.set(name, 0) }
+      const local = getLocalFolders()
+      for (const name of local) { if (!merged.has(name)) merged.set(name, 0) }
       setFolders(Array.from(merged.entries()).map(([name, count]) => ({ name, count })).sort((a, b) => a.name.localeCompare(b.name)))
     } catch { /* ignore */ }
   }, [])
@@ -173,7 +183,9 @@ export function ImagePicker({ open, onClose, onSelect, multi = false }: ImagePic
   async function handleCreateFolder() {
     const name = newFolderName.trim()
     if (!name) return
-    localFoldersRef.current = new Set(localFoldersRef.current).add(name)
+    const updated = getLocalFolders()
+    updated.add(name)
+    saveLocalFolders(updated)
     setFolders(prev => {
       if (prev.some(f => f.name === name)) return prev
       return [...prev, { name, count: 0 }].sort((a, b) => a.name.localeCompare(b.name))
@@ -193,9 +205,9 @@ export function ImagePicker({ open, onClose, onSelect, multi = false }: ImagePic
         body: JSON.stringify({ oldName, newName: newName.trim() }),
       })
       if (!res.ok) throw new Error("Gagal rename folder")
-      const updated = new Set(localFoldersRef.current)
+      const updated = getLocalFolders()
       if (updated.has(oldName)) { updated.delete(oldName); updated.add(newName.trim()) }
-      localFoldersRef.current = updated
+      saveLocalFolders(updated)
       setFolders(prev => prev.map(f => f.name === oldName ? { ...f, name: newName.trim() } : f))
       if (activeFolder === oldName) setActiveFolder(newName.trim())
       toast.success(`Folder "${oldName}" → "${newName.trim()}"`)
@@ -212,7 +224,9 @@ export function ImagePicker({ open, onClose, onSelect, multi = false }: ImagePic
         body: JSON.stringify({ name }),
       })
       if (!res.ok) throw new Error("Gagal hapus folder")
-      localFoldersRef.current = new Set([...localFoldersRef.current].filter(f => f !== name))
+      const updated = getLocalFolders()
+      updated.delete(name)
+      saveLocalFolders(updated)
       await fetchFolders()
       if (activeFolder === name) setActiveFolder("all")
       await fetchMedia()
