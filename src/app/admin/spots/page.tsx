@@ -7,6 +7,7 @@ import { api } from "@/lib/api/client"
 import { parseLocation } from "@/lib/utils/location"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Plus, Search, Edit, Trash2, Eye, EyeOff, ExternalLink, Sparkles, ImageIcon, Camera, Loader2 } from "lucide-react"
@@ -82,9 +83,12 @@ export default function SpotsPage() {
   const [batchLoading, setBatchLoading] = useState(false)
   const [pickerSpot, setPickerSpot] = useState<string | null>(null)
   const [updatingImage, setUpdatingImage] = useState<Set<string>>(new Set())
+  const [cityFilter, setCityFilter] = useState("all")
+  const [cityList, setCityList] = useState<{ code: string; name: string }[]>([])
+  const [loadingCity, setLoadingCity] = useState(false)
 
   useEffect(() => {
-    fetch("/api/wilayah/provinces")
+    fetch("/api/regions/provinces")
       .then((r) => r.json())
       .then((json) => { setProvinceList(json.data || []); setLoadingProv(false) })
       .catch(() => setLoadingProv(false))
@@ -95,11 +99,24 @@ export default function SpotsPage() {
       .catch(() => setLoadingRoadtrips(false))
   }, [])
 
+  // Fetch cities when province changes
+  useEffect(() => {
+    if (!provinceFilter || provinceFilter === "all") { setCityList([]); setCityFilter("all"); return }
+    const prov = provinceList.find((p) => p.name === provinceFilter)
+    if (!prov) return
+    setLoadingCity(true)
+    setCityFilter("all")
+    fetch(`/api/regions/regencies/${prov.code}`)
+      .then((r) => r.json())
+      .then((json) => { setCityList(json.data || []); setLoadingCity(false) })
+      .catch(() => setLoadingCity(false))
+  }, [provinceFilter, provinceList])
+
   useEffect(() => {
     setOffset(0)
     setSpots([])
     fetchSpots(0)
-  }, [debouncedSearch, categoryFilter, provinceFilter, roadtripFilter, statusFilter, sort])
+  }, [debouncedSearch, categoryFilter, provinceFilter, cityFilter, roadtripFilter, statusFilter, sort])
 
   async function fetchSpots(pageOffset = 0) {
     setLoading(true)
@@ -107,6 +124,7 @@ export default function SpotsPage() {
     if (debouncedSearch) params.set("search", debouncedSearch)
     if (categoryFilter !== "all") params.set("category", categoryFilter)
     if (provinceFilter !== "all") params.set("province", provinceFilter)
+    if (cityFilter !== "all") params.set("city", cityFilter)
     if (roadtripFilter !== "all") params.set("roadtrip", roadtripFilter)
     if (sort !== "terbaru") params.set("sort", sort)
 
@@ -198,78 +216,115 @@ export default function SpotsPage() {
 
       <Card className="mb-6">
         <CardContent className="p-4">
-          <div className="flex flex-wrap gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Cari spot..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-9"
-              />
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="space-y-1 flex-1">
+              <Label className="text-xs text-muted-foreground">Cari</Label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Cari spot..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
             </div>
-            <Select value={categoryFilter} onValueChange={(v) => v && setCategoryFilter(v)}>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Kategori" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Kategori</SelectItem>
-                {CATEGORIES.map((c) => (
-                  <SelectItem key={c.value} value={c.value}>
-                    {c.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={provinceFilter} onValueChange={(v) => v && setProvinceFilter(v)}>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Provinsi" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Provinsi</SelectItem>
-                {loadingProv ? (
-                  <SelectItem value="loading" disabled>Loading...</SelectItem>
-                ) : (
-                  provinceList.map((p) => (
-                    <SelectItem key={p.code} value={p.name}>{p.name}</SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
-            <Select value={roadtripFilter} onValueChange={(v) => v && setRoadtripFilter(v)}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Roadtrip">
-                  {roadtripFilter !== "all"
-                    ? roadtripList.find(r => r.id === roadtripFilter)?.title
-                    : undefined}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Roadtrip</SelectItem>
-                {loadingRoadtrips ? (
-                  <SelectItem value="loading" disabled>Loading...</SelectItem>
-                ) : roadtripList.length === 0 ? (
-                  <SelectItem value="empty" disabled>Tidak ada roadtrip</SelectItem>
-                ) : (
-                  roadtripList.map((r) => (
-                    <SelectItem key={r.id} value={r.id}>{r.title}</SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
-              className="h-9 rounded-lg border border-input bg-background px-3 text-sm text-muted-foreground">
-              <option value="all">Semua Status</option>
-              <option value="published">Published</option>
-              <option value="draft">Draft</option>
-            </select>
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground hidden sm:inline">Urut:</span>
-              <select value={sort} onChange={(e) => setSort(e.target.value)}
-                className="h-9 rounded-lg border border-input bg-background px-3 text-sm text-muted-foreground">
-                {SORT_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Kategori</Label>
+              <Select value={categoryFilter} onValueChange={(v) => v && setCategoryFilter(v)}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Kategori" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Kategori</SelectItem>
+                  {CATEGORIES.map((c) => (
+                    <SelectItem key={c.value} value={c.value}>
+                      {c.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Provinsi</Label>
+              <Select value={provinceFilter} onValueChange={(v) => v && setProvinceFilter(v)}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Provinsi" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Provinsi</SelectItem>
+                  {loadingProv ? (
+                    <SelectItem value="loading" disabled>Loading...</SelectItem>
+                  ) : (
+                    provinceList.map((p) => (
+                      <SelectItem key={p.code} value={p.name}>{p.name}</SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+            {provinceFilter !== "all" && (
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">Kota</Label>
+                <Select value={cityFilter} onValueChange={(v) => v && setCityFilter(v)}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="Kota" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Kota</SelectItem>
+                    {loadingCity ? (
+                      <SelectItem value="loading" disabled>Loading...</SelectItem>
+                    ) : (
+                      cityList.map((c) => (
+                        <SelectItem key={c.code} value={c.name}>{c.name}</SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Roadtrip</Label>
+              <Select value={roadtripFilter} onValueChange={(v) => v && setRoadtripFilter(v)}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Roadtrip">
+                    {roadtripFilter !== "all"
+                      ? roadtripList.find(r => r.id === roadtripFilter)?.title
+                      : undefined}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Roadtrip</SelectItem>
+                  {loadingRoadtrips ? (
+                    <SelectItem value="loading" disabled>Loading...</SelectItem>
+                  ) : roadtripList.length === 0 ? (
+                    <SelectItem value="empty" disabled>Tidak ada roadtrip</SelectItem>
+                  ) : (
+                    roadtripList.map((r) => (
+                      <SelectItem key={r.id} value={r.id}>{r.title}</SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Status</Label>
+              <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
+                className="h-9 rounded-lg border border-input bg-background px-3 text-sm text-muted-foreground w-full">
+                <option value="all">Semua Status</option>
+                <option value="published">Published</option>
+                <option value="draft">Draft</option>
               </select>
-              <span className="text-xs text-muted-foreground hidden sm:inline">{total} total</span>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Urut</Label>
+              <div className="flex items-center gap-2">
+                <select value={sort} onChange={(e) => setSort(e.target.value)}
+                  className="h-9 rounded-lg border border-input bg-background px-3 text-sm text-muted-foreground">
+                  {SORT_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+                </select>
+                <span className="text-xs text-muted-foreground hidden sm:inline">{total} total</span>
+              </div>
             </div>
           </div>
         </CardContent>
