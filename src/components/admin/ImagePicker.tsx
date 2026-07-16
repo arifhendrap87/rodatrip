@@ -181,7 +181,7 @@ export function ImagePicker({ open, onClose, onSelect, multi = false }: ImagePic
 
   // Folder operations
   async function handleCreateFolder() {
-    const name = newFolderName.trim()
+    const name = newFolderName.trim().replace(/[^a-zA-Z0-9_-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "")
     if (!name) return
     const updated = getLocalFolders()
     updated.add(name)
