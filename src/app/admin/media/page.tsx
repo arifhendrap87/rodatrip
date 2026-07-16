@@ -140,7 +140,8 @@ export default function MediaPage() {
     formData.append("folder", activeFolder === "all" ? "spots" : activeFolder)
 
     try {
-      await fetch("/api/media", { method: "POST", body: formData })
+      const res = await fetch("/api/media", { method: "POST", body: formData })
+      if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err?.error?.message || "Gagal upload") }
       await resetAndFetch()
       await fetchFolders()
     } catch (err) {
