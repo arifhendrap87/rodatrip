@@ -164,6 +164,7 @@ export async function POST(request: Request) {
       ...transformStopForDb(stop as unknown as Record<string, unknown>, stop.province),
       slug,
       tags: [stop.category],
+      is_published: false,
     }
 
     const { error } = await db
