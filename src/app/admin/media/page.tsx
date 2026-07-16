@@ -34,7 +34,13 @@ const SORT_OPTIONS = [
 
 function getLocalFolders(): Set<string> {
   if (typeof window === "undefined") return new Set()
-  try { return new Set(JSON.parse(localStorage.getItem("mediaLocalFolders") || "[]")) }
+  try {
+    const raw = JSON.parse(localStorage.getItem("mediaLocalFolders") || "[]")
+    const sanitized = (raw as string[]).map((name) =>
+      name.replace(/[^a-zA-Z0-9_-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "")
+    )
+    return new Set(sanitized)
+  }
   catch { return new Set() }
 }
 
