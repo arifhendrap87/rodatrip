@@ -69,7 +69,7 @@ export async function POST(request: Request) {
     if (error) return internalError(`Gagal simpan ke database: ${error.message}`)
 
     return success(data, 201)
-  } catch {
-    return internalError("Gagal upload gambar")
+  } catch (err) {
+    return internalError(`Gagal upload gambar${err instanceof Error ? `: ${err.message}` : ''}`)
   }
 }
