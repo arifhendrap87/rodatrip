@@ -459,7 +459,7 @@ Tambah Spot
                           </Badge>
                         )}
                         <span className="text-xs text-muted-foreground">
-                          {spot.province}
+                          {spot.city ? `${spot.province} — ${spot.city}` : spot.province}
                         </span>
                         <span className="text-xs text-muted-foreground">
                           ⭐ {spot.rating}
