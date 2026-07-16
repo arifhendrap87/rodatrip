@@ -20,10 +20,12 @@ export default function ImportRoadtripPage() {
   const [saving, setSaving] = useState(false)
   const [result, setResult] = useState<ImportResult | null>(null)
   const [error, setError] = useState("")
+  const [spotStatuses, setSpotStatuses] = useState<Map<number, { name: string; exists: boolean }>>(new Map())
 
   function handleParse() {
     setParseError("")
     setParsed(null)
+    setSpotStatuses(new Map())
     try {
       const obj = JSON.parse(jsonInput)
       if (!obj.title) { setParseError("JSON harus memiliki field 'title'"); return }
@@ -32,9 +34,26 @@ export default function ImportRoadtripPage() {
         return
       }
       setParsed(obj)
+      checkSpotExistence(obj.stops)
     } catch {
       setParseError("JSON tidak valid. Periksa format.")
     }
+  }
+
+  async function checkSpotExistence(stops: Record<string, unknown>[]) {
+    try {
+      const res = await fetch("/api/spots?limit=500")
+      const json = await res.json()
+      const existingSlugs = new Set((json.data || []).map((s: any) => s.slug))
+
+      const map = new Map<number, { name: string; exists: boolean }>()
+      for (let i = 0; i < stops.length; i++) {
+        const name = (stops[i].name as string) || ""
+        const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+        map.set(i, { name, exists: existingSlugs.has(slug) })
+      }
+      setSpotStatuses(map)
+    } catch { /* ignore */ }
   }
 
   async function handleSubmit() {
@@ -155,7 +174,7 @@ export default function ImportRoadtripPage() {
             </Card>
           ) : parsed ? (
             <>
-              <PreviewCard parsed={parsed} />
+              <PreviewCard parsed={parsed} spotStatuses={spotStatuses} />
 
               {error && (
                 <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
@@ -181,7 +200,7 @@ export default function ImportRoadtripPage() {
   )
 }
 
-function PreviewCard({ parsed }: { parsed: Record<string, unknown> }) {
+function PreviewCard({ parsed, spotStatuses }: { parsed: Record<string, unknown>; spotStatuses: Map<number, { name: string; exists: boolean }> }) {
   const p = parsed as Record<string, string>
   const stops = (parsed.stops as Array<Record<string, string>>) || []
 
@@ -215,29 +234,38 @@ function PreviewCard({ parsed }: { parsed: Record<string, unknown> }) {
               Destinasi ({stops.length})
             </p>
             <div className="space-y-2 max-h-[400px] overflow-y-auto">
-              {stops.map((stop, i) => (
-                <div key={i} className="flex gap-3 rounded-xl border border-border/40 p-3">
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                    {i + 1}
-                  </div>
-                  <div className="min-w-0 flex-1 break-words">
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      <p className="text-sm font-medium">{stop.name || "(tanpa nama)"}</p>
-                      {stop.category && <span className="text-[10px] uppercase px-1.5 py-0.5 rounded bg-muted text-muted-foreground">{stop.category}</span>}
+              {stops.map((stop, i) => {
+                const status = spotStatuses.get(i)
+                return (
+                  <div key={i} className="flex gap-3 rounded-xl border border-border/40 p-3">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                      {i + 1}
                     </div>
-                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground mt-1">
-                      {stop.visit_duration && <span>⏱️ {stop.visit_duration}</span>}
-                      {stop.ticket_price && <span>🎟️ {stop.ticket_price}</span>}
-                      {stop.physical_effort && <span>🏃 {stop.physical_effort}</span>}
-                      {stop.road_access && <span>🛣️ {stop.road_access}</span>}
-                      {stop.opening_hours && <span>🕐 {stop.opening_hours}</span>}
+                    {status && (
+                      <span className={`shrink-0 text-xs mt-1 ${status.exists ? "text-amber-500" : "text-green-500"}`}
+                        title={status.exists ? `Sudah ada (${status.name})` : "Spot baru"}>
+                        {status.exists ? "⚠️" : "✅"}
+                      </span>
+                    )}
+                    <div className="min-w-0 flex-1 break-words">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <p className="text-sm font-medium">{stop.name || "(tanpa nama)"}</p>
+                        {stop.category && <span className="text-[10px] uppercase px-1.5 py-0.5 rounded bg-muted text-muted-foreground">{stop.category}</span>}
+                      </div>
+                      <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground mt-1">
+                        {stop.visit_duration && <span>⏱️ {stop.visit_duration}</span>}
+                        {stop.ticket_price && <span>🎟️ {stop.ticket_price}</span>}
+                        {stop.physical_effort && <span>🏃 {stop.physical_effort}</span>}
+                        {stop.road_access && <span>🛣️ {stop.road_access}</span>}
+                        {stop.opening_hours && <span>🕐 {stop.opening_hours}</span>}
+                      </div>
+                      {stop.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{stop.description}</p>}
+                      {stop.tips && <p className="text-xs text-muted-foreground mt-0.5">💡 {stop.tips}</p>}
+                      {stop.facilities && <div className="flex flex-wrap gap-1 mt-1">{String(stop.facilities).split(",").map((f: string) => <span key={f} className="rounded bg-muted px-1.5 py-0.5 text-[10px]">{f.trim()}</span>)}</div>}
                     </div>
-                    {stop.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{stop.description}</p>}
-                    {stop.tips && <p className="text-xs text-muted-foreground mt-0.5">💡 {stop.tips}</p>}
-                    {stop.facilities && <div className="flex flex-wrap gap-1 mt-1">{String(stop.facilities).split(",").map((f: string) => <span key={f} className="rounded bg-muted px-1.5 py-0.5 text-[10px]">{f.trim()}</span>)}</div>}
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         </CardContent>
