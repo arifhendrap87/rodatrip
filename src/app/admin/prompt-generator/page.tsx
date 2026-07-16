@@ -44,6 +44,8 @@ export default function PromptGeneratorPage() {
   const [generatedRaw, setGeneratedRaw] = useState("")
   const [generatedError, setGeneratedError] = useState("")
   const [existingCities, setExistingCities] = useState<Set<string>>(new Set())
+  const [provinceStats, setProvinceStats] = useState<Record<string, { total: number; withRoadtrip: number; percentage: number }>>({})
+  const [overallPercentage, setOverallPercentage] = useState(0)
 
   // Fetch provinces on mount
   useEffect(() => {
@@ -94,6 +96,18 @@ export default function PromptGeneratorPage() {
           if (m) cities.add(m[1].trim())
         }
         setExistingCities(cities)
+      })
+      .catch(() => {})
+  }, [])
+
+  // Fetch roadtrip stats per province
+  useEffect(() => {
+    fetch("/api/admin/roadtrip-stats")
+      .then((r) => r.json())
+      .then((json) => {
+        const data = json.data || {}
+        setProvinceStats(data.byProvince || {})
+        setOverallPercentage(data.overall?.percentage || 0)
       })
       .catch(() => {})
   }, [])
@@ -172,7 +186,14 @@ export default function PromptGeneratorPage() {
                       <SelectItem value="loading" disabled>Memuat...</SelectItem>
                     ) : (
                       provinsiList.map((p) => (
-                        <SelectItem key={p.code} value={p.name}>{p.name}</SelectItem>
+                        <SelectItem key={p.code} value={p.name}>
+                          <span className="flex items-center justify-between w-full gap-4">
+                            <span>{p.name}</span>
+                            <span className="text-xs text-muted-foreground shrink-0">
+                              {provinceStats[p.name]?.percentage ?? "-"}%
+                            </span>
+                          </span>
+                        </SelectItem>
                       ))
                     )}
                   </SelectContent>
@@ -229,7 +250,7 @@ export default function PromptGeneratorPage() {
               <div className="text-sm space-y-2">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Provinsi</span>
-                  <span className="font-medium">{provinsi}</span>
+                  <span className="font-medium">{provinsi} <span className="text-muted-foreground text-xs">{provinceStats[provinsi]?.percentage ?? 0}%</span></span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Kota</span>
