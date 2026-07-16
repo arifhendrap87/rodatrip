@@ -37,7 +37,7 @@ export default function PromptGeneratorPage() {
   const [provCode, setProvCode] = useState("")
   const [provinsi, setProvinsi] = useState("")
   const [kota, setKota] = useState("Bandung")
-  const [days, setDays] = useState(2)
+  const [days, setDays] = useState(3)
   const [copied, setCopied] = useState(false)
   const [generating, setGenerating] = useState(false)
   const [generatedJson, setGeneratedJson] = useState<Record<string, unknown> | null>(null)
