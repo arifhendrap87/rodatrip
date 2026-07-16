@@ -51,6 +51,7 @@ Roadtrip di ${kota}, ${provinsi}
 - Nama restoran/warung/rumah makan di nearby_restaurants & hotel WAJIB BENAR-BENAR ADA dan merupakan tempat kuliner sungguhan yang hits — contoh: "Sate Maranggi Hj. Yeti", "Batagor Kingsley"
 - culinary_notes: sebutkan minimal 3 makanan khas daerah + rekomendasi tempat makan paling hits
 - Nama tempat WAJIB BENAR-BENAR ADA dan merupakan destinasi wisata sungguhan di ${provinsi}
+- WAJIB: pastikan semua destinasi (stops) yang dipilih TIDAK TUTUP PERMANEN — cek di Google Maps bahwa tempat tersebut masih beroperasi dan buka untuk umum. Jangan pilih tempat yang sudah tutup permanen atau tidak beroperasi lagi.
 - Bahasa Indonesia natural dan engaging
 - Durasi: ${durasi}
 
