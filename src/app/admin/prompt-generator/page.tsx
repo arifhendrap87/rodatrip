@@ -302,7 +302,14 @@ export default function PromptGeneratorPage() {
                         <p>⏱️ {(generatedJson as any).itinerary_duration || "-"}</p>
                         <p>📏 {(generatedJson as any).total_distance || "-"}</p>
                         {stops.map((s: any, i: number) => (
-                          <p key={i} className="ml-2">• {s.name} ({s.category})</p>
+                          <p key={i} className="ml-2 flex items-center gap-2">
+                            <span>• {s.name} ({s.category})</span>
+                            <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.name)}`}
+                              target="_blank" rel="noopener noreferrer"
+                              className="text-blue-500 hover:text-blue-700 hover:underline shrink-0"
+                              title="Cek di Google Maps"
+                            >📍Cek GMaps</a>
+                          </p>
                         ))}
                       </div>
                     )
