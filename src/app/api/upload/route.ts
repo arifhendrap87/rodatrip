@@ -14,7 +14,8 @@ export async function POST(request: Request) {
 
   const formData = await request.formData()
   const file = formData.get("file") as File | null
-  const folder = (formData.get("folder") as string) || "spots"
+  const folder = ((formData.get("folder") as string) || "spots")
+    .replace(/[^a-zA-Z0-9_-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "")
 
   if (!file) return badRequest("File required")
 

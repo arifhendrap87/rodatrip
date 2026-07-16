@@ -24,7 +24,8 @@ export async function uploadImage(
   fileName: string,
   folder: string = "spots"
 ): Promise<string> {
-  const path = `${envPrefix}/${folder}/${Date.now()}-${fileName}`
+  const safeFolder = folder.replace(/[^a-zA-Z0-9_-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "")
+  const path = `${envPrefix}/${safeFolder}/${Date.now()}-${fileName}`
 
   const { error } = await db.storage.from(BUCKET).upload(path, file, {
     contentType: getContentType(fileName),
