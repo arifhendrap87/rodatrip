@@ -19,6 +19,11 @@ function getMaxStops(days: number): number {
   return 9
 }
 
+function getStopsPerDay(days: number): string {
+  if (days <= 1) return '3'
+  return '3'
+}
+
 function generateMapsUrl(maxStops: number): string {
   const origin = "Stop+1"
   const dest = `Stop+${maxStops}`
@@ -42,18 +47,14 @@ Buatkan 1 data roadtrip itinerary dalam format JSON.
 Roadtrip di ${kota}, ${provinsi}
 
 ## KRITERIA
-- ${stopsRange} destinasi (stops) searah secara geografis di ${kota}, ${provinsi}
-- WAJIB: pilih destinasi PRIMADONA / ANDALAN dengan RATING TERTINGGI di ${kota}, ${provinsi}
-- Subtitle/tema dibuat BERDASARKAN destinasi yang dipilih, BUKAN sebaliknya
-- Jangan korbankan destinasi bagus hanya untuk mencocokkan tema
-- Jangan pilih destinasi pinggiran/random yang kurang populer
-- WAJIB: rekomendasi kuliner (culinary_notes & nama tempat di nearby_restaurants) adalah tempat MAKAN PALING TERKENAL dan TERFAVORIT di daerah tersebut, BUKAN nama generik/placeholder seperti "RM A", "Warung B", "Kedai C"
-- Nama restoran/warung/rumah makan di nearby_restaurants & hotel WAJIB BENAR-BENAR ADA dan merupakan tempat kuliner sungguhan yang hits — contoh: "Sate Maranggi Hj. Yeti", "Batagor Kingsley"
-- culinary_notes: sebutkan minimal 3 makanan khas daerah + rekomendasi tempat makan paling hits
-- Nama tempat WAJIB BENAR-BENAR ADA dan merupakan destinasi wisata sungguhan di ${provinsi}
-- WAJIB: pastikan semua destinasi (stops) yang dipilih TIDAK TUTUP PERMANEN — cek di Google Maps bahwa tempat tersebut masih beroperasi dan buka untuk umum. Jangan pilih tempat yang sudah tutup permanen atau tidak beroperasi lagi.
-- Bahasa Indonesia natural dan engaging
-- Durasi: ${durasi}
+- TOTAL DESTINASI & RUTE LOGIS: Wajib menyediakan tepat ${stopsRange} destinasi wisata (stops) yang dibagi secara proporsional menjadi ${getStopsPerDay(days)} destinasi per hari selama ${durasi}.
+- GEOGRAFIS SEARAH & BERURUTAN: Semua destinasi wajib berada di dalam satu jalur geografis yang searah, berurutan, dan logis di wilayah ${kota} tujuan. Rute perjalanan harus dimulai dari titik terdekat (misal pintu keluar tol/pusat kota) menuju ke titik terjauh secara linier, tanpa ada rute yang memutar balik atau zigzag.
+- WAJIB DESTINASI JANGKAR (PRIMADONA): Wajib menentukan dan memasukkan minimal 2 destinasi jangkar utama yang merupakan ikon wisata paling populer dengan rating tertinggi di jalur tersebut. Sisa destinasi lainnya wajib dipilih dari objek wisata andalan yang juga populer. Dilarang keras memasukkan destinasi pinggiran, random, atau objek wisata kecil yang kurang terkenal.
+- TEMA MENGIKUTI DESTINASI: Subtitle atau tema harian wajib dibuat menyesuaikan dengan karakter destinasi primadona yang terpilih pada hari tersebut, BUKAN sebaliknya. Jangan pernah mencoret atau mengorbankan destinasi yang bagus hanya demi mencocokkan tema buatan.
+- VALIDASI STATUS OPERASIONAL: Wajib memastikan seluruh destinasi yang dipilih AKTIF BEROPERASI dan TIDAK TUTUP PERMANEN berdasarkan data Google Maps terbaru.
+- KULINER HITS & REALISTIS (Strict): Rekomendasi tempat makan pada poin nearby_restaurants dan pilihan hotel WAJIB benar-benar ada secara nyata (exist), legal, beroperasi, serta merupakan tempat kuliner dan akomodasi yang paling terkenal, hits, dan terfavorit di jalur geografis tersebut. Dilarang keras menggunakan nama generik, samaran, atau placeholder seperti "RM A", "Warung B", "Kedai C", atau "Resto Lokal".
+- CULINARY NOTES DETAIL: Pada bagian culinary_notes, wajib menyebutkan minimal 3 makanan/minuman khas asli dari daerah ${kota} tersebut, lengkap dengan rekomendasi nama toko atau tempat spesifik yang paling legendaris untuk membelinya di sepanjang rute.
+- GAYA BAHASA: Menggunakan Bahasa Indonesia yang natural, kasual namun tetap sopan, informatif, dan engaging (menarik minat pembaca).
 
 ## FORMAT OUTPUT (HANYA JSON, tanpa teks lain)
 
