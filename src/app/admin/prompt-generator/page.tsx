@@ -43,6 +43,7 @@ export default function PromptGeneratorPage() {
   const [generatedJson, setGeneratedJson] = useState<Record<string, unknown> | null>(null)
   const [generatedRaw, setGeneratedRaw] = useState("")
   const [generatedError, setGeneratedError] = useState("")
+  const [existingCities, setExistingCities] = useState<Set<string>>(new Set())
 
   // Fetch provinces on mount
   useEffect(() => {
@@ -81,6 +82,21 @@ export default function PromptGeneratorPage() {
         setLoadingKota(false)
       })
   }, [provCode])
+
+  // Fetch existing roadtrips to mark cities that already have data
+  useEffect(() => {
+    fetch("/api/admin/roadtrips-mini")
+      .then((r) => r.json())
+      .then((json) => {
+        const cities = new Set<string>()
+        for (const trip of (json.data || [])) {
+          const m = trip.title?.match(/Road Trip (.*?):/)
+          if (m) cities.add(m[1].trim())
+        }
+        setExistingCities(cities)
+      })
+      .catch(() => {})
+  }, [])
 
   function handleProvinsiChange(name: string) {
     const prov = provinsiList.find((p) => p.name === name)
@@ -176,7 +192,12 @@ export default function PromptGeneratorPage() {
                       <SelectItem value="" disabled>Pilih provinsi dulu</SelectItem>
                     ) : (
                       kotaList.map((k) => (
-                        <SelectItem key={k.code} value={k.name}>{k.name}</SelectItem>
+                        <SelectItem key={k.code} value={k.name}>
+                          <span className="flex items-center gap-2">
+                            {k.name}
+                            {existingCities.has(k.name) && <span className="text-green-500 text-[10px]">✅</span>}
+                          </span>
+                        </SelectItem>
                       ))
                     )}
                   </SelectContent>
