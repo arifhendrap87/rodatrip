@@ -5,16 +5,7 @@ import { uploadImage } from "@/lib/storage"
 const API_TOKEN = process.env.REPLICATE_API_TOKEN
 const API_URL = "https://api.replicate.com/v1/models/black-forest-labs/flux-2-pro/predictions"
 
-const ENHANCE_PROMPTS: Record<string, string> = {
-  alam: "Enhance this nature landscape photo, improve lighting and color, make it vibrant and sharp with rich green and blue tones, keep the original scene exactly as is, photorealistic, natural lighting, high detail",
-  kuliner: "Improve food photography lighting, enhance textures and colors, make it appetizing and warm, keep the dish and arrangement exactly as is, photorealistic, sharp details",
-  budaya: "Enhance cultural scene, improve contrast and warmth, keep authentic details, natural warm colors, sharp details, photorealistic",
-  foto: "Enhance photo quality, improve composition and lighting, make colors pop naturally, keep original subject and scene, sharp details, photorealistic",
-  petualangan: "Enhance adventure scene, improve dynamic range, make sky and landscape vivid, keep original scene, natural lighting, high detail",
-  sejarah: "Enhance historical site photo, improve lighting and sharpness, keep architectural details accurate, natural colors, photorealistic",
-  hotel: "Enhance property photo, improve indoor lighting, make space look inviting, realistic warm colors, sharp details, keep original layout",
-  restaurant: "Enhance restaurant ambiance photo, warm cozy lighting, improve food and interior details, keep original scene, photorealistic",
-}
+const DEFAULT_PROMPT = "Create a beautiful fresh high-quality photo inspired by this reference image, change the perspective and composition to make it original, photorealistic, natural lighting, vibrant colors, sharp details, professional photography style"
 
 async function callReplicate(imageUrl: string, prompt: string): Promise<string> {
   if (!API_TOKEN) throw new Error("REPLICATE_API_TOKEN not configured")
@@ -30,7 +21,7 @@ async function callReplicate(imageUrl: string, prompt: string): Promise<string> 
       input: {
         image: imageUrl,
         prompt,
-        output_format: "jpeg",
+        output_format: "jpg",
         num_outputs: 1,
       },
     }),
@@ -83,21 +74,21 @@ export async function POST(request: Request) {
   if (!admin) return unauthorized()
 
   try {
-    const { imageUrl, prompt, category } = await request.json()
+    const { imageUrl, prompt } = await request.json()
 
     if (!imageUrl) return badRequest("imageUrl wajib diisi")
 
-    const finalPrompt = prompt || (category ? ENHANCE_PROMPTS[category] : null) || ENHANCE_PROMPTS.foto
+    const finalPrompt = prompt || DEFAULT_PROMPT
 
     const outputUrl = await callReplicate(imageUrl, finalPrompt)
 
-    // Download hasil dari Replicate
+    // Download hasil
     const imgRes = await fetch(outputUrl)
     if (!imgRes.ok) throw new Error("Gagal download hasil generate")
 
     const buffer = Buffer.from(await imgRes.arrayBuffer())
-    const fileName = `enhanced-${Date.now()}.jpeg`
-    const folder = "enhanced"
+    const fileName = `generated-${Date.now()}.jpg`
+    const folder = "generated"
 
     // Upload ke Supabase Storage
     const url = await uploadImage(buffer, fileName, folder)

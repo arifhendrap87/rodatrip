@@ -4,7 +4,7 @@ import { useState, useRef } from "react"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Loader2, Upload, X, ImageIcon } from "lucide-react"
+import { Loader2, Upload, X, ImageIcon, Sparkles } from "lucide-react"
 import { ImagePicker } from "@/components/admin/ImagePicker"
 
 interface ImageUploadProps {
@@ -20,6 +20,7 @@ export function ImageUpload({ value, onChange, label, folder = "spots", placehol
   const [preview, setPreview] = useState(value)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [dragOver, setDragOver] = useState(false)
+  const [generating, setGenerating] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   function handleDragOver(e: React.DragEvent) {
@@ -79,6 +80,27 @@ export function ImageUpload({ value, onChange, label, folder = "spots", placehol
   function handleClear() {
     setPreview("")
     onChange("")
+  }
+
+  async function handleGenerate() {
+    const url = value || preview
+    if (!url) return
+    setGenerating(true)
+    try {
+      const res = await fetch("/api/ai/generate-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageUrl: url }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json?.error?.message || "Gagal generate")
+      setPreview(json.data.url)
+      onChange(json.data.url)
+      alert("Gambar berhasil dibuat!")
+    } catch (err) {
+      alert("Gagal generate: " + (err as Error).message)
+    }
+    setGenerating(false)
   }
 
   return (
@@ -164,6 +186,18 @@ export function ImageUpload({ value, onChange, label, folder = "spots", placehol
         placeholder={placeholder || `https://pub-xxx.r2.dev/${folder}/...`}
         className="text-xs font-mono"
       />
+      <div className="flex items-center gap-2">
+        <Button type="button" variant="outline" size="sm" className="gap-1.5 text-xs"
+          onClick={handleGenerate} disabled={generating || !value}>
+          {generating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+          {generating ? "Generating..." : "🎨 Generate dari Referensi"}
+        </Button>
+        {value && (
+          <span className="text-[10px] text-muted-foreground">
+            Paste URL gambar referensi, lalu klik Generate
+          </span>
+        )}
+      </div>
 
       <ImagePicker
         open={pickerOpen}
