@@ -91,7 +91,12 @@ export default function EditRoadtripPage() {
         body: JSON.stringify({
           type: "roadtrip",
           title: form.title,
-          description: form.culinaryNotes || form.drivingSafetyTips || "",
+          description: [
+            form.drivingSafetyTips && `Kondisi jalan: ${form.drivingSafetyTips}`,
+            form.roadCondition && `Akses: ${form.roadCondition}`,
+            form.totalDistance && `Jarak: ${form.totalDistance}`,
+            form.bestDrivingTime && `Waktu tempuh: ${form.bestDrivingTime}`,
+          ].filter(Boolean).join(". ") || form.culinaryNotes || "",
         }),
       })
       const json = await res.json()
