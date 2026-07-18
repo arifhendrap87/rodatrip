@@ -52,7 +52,10 @@ Aturan:
 - Sertakan: subjek utama, lingkungan/setting, pencahayaan, suasana, gaya visual
 - Format yang cocok untuk Midjourney (deskriptif, detail, tidak terlalu pendek)
 - Jangan gunakan --ar atau parameter teknis Midjourney
-- Prompt length: 50-100 kata`
+- Prompt length: 50-100 kata
+- DILARANG membuat asumsi elemen fiktif seperti kendaraan spesifik (mobil merah, motor, dll), waktu spesifik (pagi, siang, malam), atau orang tertentu yang TIDAK ADA di data deskripsi
+- Jika ${typeLabel} adalah roadtrip, gambarkan suasana perjalanan secara umum (jalan, pemandangan sekitar, kendaraan umum, destinasi) tanpa menambahkan elemen fiktif
+- Fokus pada lanskap, destinasi, dan suasana alam/urbannya — bukan pada kendaraan atau orang imajiner`
 
     const result = await callDeepSeek(prompt)
     return success({ text: result })
