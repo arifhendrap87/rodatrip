@@ -5,7 +5,7 @@ import { uploadImage } from "@/lib/storage"
 const API_TOKEN = process.env.REPLICATE_API_TOKEN
 const API_URL = "https://api.replicate.com/v1/models/black-forest-labs/flux-2-pro/predictions"
 
-const DEFAULT_PROMPT = "Create a beautiful fresh high-quality photo inspired by this reference image, change the perspective and composition to make it original, photorealistic, natural lighting, vibrant colors, sharp details, professional photography style"
+const DEFAULT_PROMPT = "Photorealistic photo of the same subject from a fresh camera angle, improve composition and lighting, keep the exact same subject and scene but from a different perspective, natural lighting, high detail, vibrant natural colors"
 
 async function callReplicate(imageUrl: string, prompt: string): Promise<string> {
   if (!API_TOKEN) throw new Error("REPLICATE_API_TOKEN not configured")
@@ -21,6 +21,7 @@ async function callReplicate(imageUrl: string, prompt: string): Promise<string> 
       input: {
         image: imageUrl,
         prompt,
+        strength: 0.4,
         output_format: "jpg",
         num_outputs: 1,
       },
