@@ -54,8 +54,9 @@ Aturan:
 - Jangan gunakan --ar atau parameter teknis Midjourney
 - Prompt length: 50-100 kata
 - DILARANG membuat asumsi elemen fiktif seperti kendaraan spesifik (mobil merah, motor, dll), waktu spesifik (pagi, siang, malam), atau orang tertentu yang TIDAK ADA di data deskripsi
-- Jika ${typeLabel} adalah roadtrip, gambarkan suasana perjalanan secara umum (jalan, pemandangan sekitar, kendaraan umum, destinasi) tanpa menambahkan elemen fiktif
-- Fokus pada lanskap, destinasi, dan suasana alam/urbannya — bukan pada kendaraan atau orang imajiner`
+- PILIH SATU LOKASI PALING REPRESENTATIF: Jika ${typeLabel} adalah roadtrip, pilih SATU spot destinasi dari deskripsi yang paling ikonik dan gambarkan HANYA tempat itu secara utuh. Jangan menggambarkan perjalanan atau transisi antar lokasi.
+- DILARANG menggunakan kata transisi seperti "transitioning", "passing through", "then narrowing", "moving to", "leading to" — karena akan menghasilkan gambar komposit tidak realistis.
+- Fokus pada detail visual SATU lokasi spesifik (nama tempat, arsitektur/lingkungan, pencahayaan, suasana) — bukan pada kendaraan atau orang imajiner.`
 
     const result = await callDeepSeek(prompt)
     return success({ text: result })
