@@ -3,7 +3,7 @@ import { getServerAdmin } from "@/lib/api/auth"
 import { uploadImage } from "@/lib/storage"
 
 const API_TOKEN = process.env.REPLICATE_API_TOKEN
-const API_URL = "https://api.replicate.com/v1/models/black-forest-labs/flux-2-pro/predictions"
+const API_URL = "https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions"
 
 const DEFAULT_PROMPT = "Photorealistic scenic landscape photo, natural lighting, high detail, vibrant colors, professional photography style"
 
