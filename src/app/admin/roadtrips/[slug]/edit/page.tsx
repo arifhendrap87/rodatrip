@@ -253,6 +253,16 @@ export default function EditRoadtripPage() {
             <div className="space-y-2"><Label>Waktu Terbaik</Label><Input value={form.bestDrivingTime} onChange={(e) => updateField("bestDrivingTime", e.target.value)} /></div>
             <div className="space-y-2"><Label>Fasilitas Jalur</Label><Input value={form.routeFacilities} onChange={(e) => updateField("routeFacilities", e.target.value)} /></div>
             <div className="space-y-2"><Label>Maps Embed URL</Label><Input value={form.mapsEmbedUrl} onChange={(e) => updateField("mapsEmbedUrl", e.target.value)} /></div>
+            {stops.filter(s => s.name).length > 0 && (
+              <div className="rounded-lg bg-blue-50 border border-blue-100 p-3 text-xs text-blue-700 leading-relaxed">
+                <span className="font-semibold">📍 Rute: </span>
+                {stops.filter(s => s.name).map((s, i, arr) => (
+                  <span key={s.key}>
+                    {s.name}{i < arr.length - 1 ? ' → ' : ''}
+                  </span>
+                ))}
+              </div>
+            )}
             <ImageUpload value={form.coverImage} onChange={(v) => updateField("coverImage", v)} label="Cover Banner" folder="cover" placeholder="https://pub-xxx.r2.dev/prod/cover/..." />
             <div className="pt-4 border-t border-border/50 space-y-4">
               <Button type="button" variant="outline" size="sm"
