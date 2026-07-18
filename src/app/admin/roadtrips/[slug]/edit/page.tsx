@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { ReadinessScore } from "@/components/ui/ReadinessScore"
-import { ArrowLeft, Save, Loader2, Plus, Trash2, ExternalLink, Copy, Check, ImageIcon, Eye } from "lucide-react"
+import { ArrowLeft, Save, Loader2, Plus, Trash2, ExternalLink, Copy, Check, ImageIcon, Eye, Sparkles } from "lucide-react"
 import Link from "next/link"
 import { SpotSelect } from "@/components/admin/SpotSelect"
 import { ImageUpload } from "@/components/ui/image-upload"
@@ -28,6 +28,7 @@ export default function EditRoadtripPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [generatingImage, setGeneratingImage] = useState(false)
+  const [generatingCover, setGeneratingCover] = useState(false)
   const [imagePrompt, setImagePrompt] = useState("")
   const [copiedPrompt, setCopiedPrompt] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -108,6 +109,26 @@ export default function EditRoadtripPage() {
       toast.error(err instanceof Error ? err.message : "Gagal generate prompt gambar")
     }
     setGeneratingImage(false)
+  }
+
+  async function handleGenerateCover() {
+    const promptText = form.coverImagePrompt || form.promptGambar
+    if (!promptText) { toast.error("Tidak ada prompt. Generate prompt dulu."); return }
+    setGeneratingCover(true)
+    try {
+      const res = await fetch("/api/ai/generate-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: promptText }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json?.error?.message || "Gagal generate gambar")
+      updateField("coverImage", json.data.url)
+      toast.success("Cover berhasil dibuat!")
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Gagal generate cover")
+    }
+    setGeneratingCover(false)
   }
 
   function generateFacebookText(): string {
@@ -287,6 +308,11 @@ export default function EditRoadtripPage() {
                   </button>
                 </div>
                 <Textarea value={form.coverImagePrompt || form.promptGambar} onChange={(e) => updateField("coverImagePrompt", e.target.value)} placeholder="Prompt untuk generate gambar (cover image)" rows={3} className="text-xs font-mono" />
+                <Button type="button" variant="default" size="sm" className="gap-1.5 mt-2"
+                  onClick={handleGenerateCover} disabled={generatingCover || !form.coverImagePrompt && !form.promptGambar}>
+                  {generatingCover ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                  {generatingCover ? "Membuat gambar..." : "🎨 Generate Cover"}
+                </Button>
               </div>
             </div>
           </CardContent>

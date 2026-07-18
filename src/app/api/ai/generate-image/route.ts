@@ -5,9 +5,9 @@ import { uploadImage } from "@/lib/storage"
 const API_TOKEN = process.env.REPLICATE_API_TOKEN
 const API_URL = "https://api.replicate.com/v1/models/black-forest-labs/flux-2-pro/predictions"
 
-const DEFAULT_PROMPT = "Photorealistic photo of the same subject from a fresh camera angle, improve composition and lighting, keep the exact same subject and scene but from a different perspective, natural lighting, high detail, vibrant natural colors"
+const DEFAULT_PROMPT = "Photorealistic scenic landscape photo, natural lighting, high detail, vibrant colors, professional photography style"
 
-async function callReplicate(imageUrl: string, prompt: string): Promise<string> {
+async function callReplicate(prompt: string): Promise<string> {
   if (!API_TOKEN) throw new Error("REPLICATE_API_TOKEN not configured")
 
   const res = await fetch(API_URL, {
@@ -19,9 +19,7 @@ async function callReplicate(imageUrl: string, prompt: string): Promise<string> 
     },
     body: JSON.stringify({
       input: {
-        image: imageUrl,
         prompt,
-        strength: 0.4,
         output_format: "jpg",
         num_outputs: 1,
       },
@@ -44,7 +42,6 @@ async function callReplicate(imageUrl: string, prompt: string): Promise<string> 
     return outputUrl as string
   }
 
-  // If still processing (sync mode timed out), use polling
   if (data.status === "starting" || data.status === "processing") {
     const predictionId = data.id
     const getUrl = `https://api.replicate.com/v1/predictions/${predictionId}`
@@ -75,15 +72,12 @@ export async function POST(request: Request) {
   if (!admin) return unauthorized()
 
   try {
-    const { imageUrl, prompt } = await request.json()
-
-    if (!imageUrl) return badRequest("imageUrl wajib diisi")
+    const { prompt } = await request.json()
 
     const finalPrompt = prompt || DEFAULT_PROMPT
 
-    const outputUrl = await callReplicate(imageUrl, finalPrompt)
+    const outputUrl = await callReplicate(finalPrompt)
 
-    // Download hasil
     const imgRes = await fetch(outputUrl)
     if (!imgRes.ok) throw new Error("Gagal download hasil generate")
 
@@ -91,7 +85,6 @@ export async function POST(request: Request) {
     const fileName = `generated-${Date.now()}.jpg`
     const folder = "generated"
 
-    // Upload ke Supabase Storage
     const url = await uploadImage(buffer, fileName, folder)
 
     return success({ url })
