@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { ArrowLeft, Save, Loader2, Trash2, Copy, Check, ImageIcon } from "lucide-react"
+import { ArrowLeft, Save, Loader2, Trash2, Copy, Check, ImageIcon, Sparkles } from "lucide-react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import TiptapEditor from "@/components/ui/tiptap/tiptap-editor"
@@ -45,6 +45,7 @@ export default function EditSpotPage() {
   const [generatingImage, setGeneratingImage] = useState(false)
   const [imagePrompt, setImagePrompt] = useState("")
   const [copiedPrompt, setCopiedPrompt] = useState(false)
+  const [enhancingImage, setEnhancingImage] = useState(false)
   const [provinceList, setProvinceList] = useState<{ code: string; name: string }[]>([])
   const [cityList, setCityList] = useState<{ code: string; name: string }[]>([])
   const [provCode, setProvCode] = useState("")
@@ -188,6 +189,28 @@ export default function EditSpotPage() {
       toast.error("Error: " + (err as Error).message)
     }
     setSaving(false)
+  }
+
+  async function handleEnhanceImage() {
+    if (!form.image_url) { toast.error("Tidak ada gambar untuk di-enhance"); return }
+    setEnhancingImage(true)
+    try {
+      const res = await fetch("/api/ai/generate-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          imageUrl: form.image_url,
+          category: form.category,
+        }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json?.error?.message || "Gagal enhance gambar")
+      setForm((f: any) => ({ ...f, image_url: json.data.url }))
+      toast.success("Gambar berhasil ditingkatkan!")
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Gagal enhance gambar")
+    }
+    setEnhancingImage(false)
   }
 
   async function handleGenerateImage() {
@@ -445,6 +468,15 @@ export default function EditSpotPage() {
               </div>
             </div>
             <ImageUpload value={form.image_url} onChange={(v) => setForm((f: any) => ({ ...f, image_url: v }))} label="🖼️ Image" folder="spots" />
+            {form.image_url && (
+              <div className="mt-2">
+                <Button type="button" variant="outline" size="sm" className="gap-1.5"
+                  onClick={handleEnhanceImage} disabled={enhancingImage}>
+                  {enhancingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                  {enhancingImage ? "Enhancing..." : "✨ Perbaiki Gambar"}
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
 

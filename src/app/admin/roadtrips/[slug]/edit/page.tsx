@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { ReadinessScore } from "@/components/ui/ReadinessScore"
-import { ArrowLeft, Save, Loader2, Plus, Trash2, ExternalLink, Copy, Check, ImageIcon, Eye } from "lucide-react"
+import { ArrowLeft, Save, Loader2, Plus, Trash2, ExternalLink, Copy, Check, ImageIcon, Eye, Sparkles } from "lucide-react"
 import Link from "next/link"
 import { SpotSelect } from "@/components/admin/SpotSelect"
 import { ImageUpload } from "@/components/ui/image-upload"
@@ -30,6 +30,7 @@ export default function EditRoadtripPage() {
   const [generatingImage, setGeneratingImage] = useState(false)
   const [imagePrompt, setImagePrompt] = useState("")
   const [copiedPrompt, setCopiedPrompt] = useState(false)
+  const [enhancingCover, setEnhancingCover] = useState(false)
   const [copied, setCopied] = useState(false)
   const [form, setForm] = useState({ title: "", itineraryDuration: "", totalDistance: "", roadCondition: "", estimatedCost: "", bestDrivingTime: "", routeFacilities: "", mapsEmbedUrl: "", drivingSafetyTips: "", culinaryNotes: "", coverImage: "", isPublished: false, promptGambar: "", coverImagePrompt: "" })
   const [stops, setStops] = useState<StopForm[]>([])
@@ -108,6 +109,25 @@ export default function EditRoadtripPage() {
       toast.error(err instanceof Error ? err.message : "Gagal generate prompt gambar")
     }
     setGeneratingImage(false)
+  }
+
+  async function handleEnhanceCover() {
+    if (!form.coverImage) { toast.error("Tidak ada cover untuk di-enhance"); return }
+    setEnhancingCover(true)
+    try {
+      const res = await fetch("/api/ai/generate-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageUrl: form.coverImage }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json?.error?.message || "Gagal enhance cover")
+      updateField("coverImage", json.data.url)
+      toast.success("Cover berhasil ditingkatkan!")
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Gagal enhance cover")
+    }
+    setEnhancingCover(false)
   }
 
   function generateFacebookText(): string {
@@ -269,6 +289,15 @@ export default function EditRoadtripPage() {
               </div>
             )}
             <ImageUpload value={form.coverImage} onChange={(v) => updateField("coverImage", v)} label="Cover Banner" folder="cover" placeholder="https://pub-xxx.r2.dev/prod/cover/..." />
+            {form.coverImage && (
+              <div className="mt-2">
+                <Button type="button" variant="outline" size="sm" className="gap-1.5"
+                  onClick={handleEnhanceCover} disabled={enhancingCover}>
+                  {enhancingCover ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                  {enhancingCover ? "Enhancing..." : "✨ Perbaiki Cover"}
+                </Button>
+              </div>
+            )}
             <div className="pt-4 border-t border-border/50 space-y-4">
               <Button type="button" variant="outline" size="sm"
                 onClick={handleGenerateImage} disabled={generatingImage || !form.title}
