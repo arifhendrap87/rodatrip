@@ -323,7 +323,7 @@ export function ImagePicker({ open, onClose, onSelect, multi = false }: ImagePic
                   <button onClick={() => setActiveFolder(f.name)}
                     className={`w-full flex items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-medium transition-colors ${activeFolder === f.name ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}>
                     <ChevronRight className="h-3 w-3" />
-                    <span className="flex-1 text-left truncate">{f.name}</span>
+                    <span className="flex-1 text-left break-words text-[11px] leading-tight" title={f.name}>{f.name}</span>
                     <span className="text-[10px] text-muted-foreground">{f.count}</span>
                   </button>
                 )}

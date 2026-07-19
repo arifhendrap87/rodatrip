@@ -345,7 +345,7 @@ export default function MediaPage() {
                 <button onClick={() => setActiveFolder(f.name)}
                   className={`w-full flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${activeFolder === f.name ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}>
                   <ChevronRight className="h-3.5 w-3.5" />
-                  <span className="flex-1 text-left truncate">{f.name}</span>
+                  <span className="flex-1 text-left break-words text-xs leading-tight" title={f.name}>{f.name}</span>
                   <span className="text-xs text-muted-foreground">{f.count}</span>
                 </button>
               )}
