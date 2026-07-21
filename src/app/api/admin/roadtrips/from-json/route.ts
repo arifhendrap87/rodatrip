@@ -156,7 +156,7 @@ export async function POST(request: Request) {
     // Cek duplicate by nama mirip + koordinat
     const duplicate = await findDuplicateSpot(stop.name, stop.lat as number | undefined, stop.lng as number | undefined)
     if (duplicate) {
-      spotResults.push({ stopNumber: i + 1, name: stop.name, slug: duplicate.slug, status: `skipped (similar to: ${duplicate.name} — ${duplicate.matchType})` })
+      spotResults.push({ stopNumber: i + 1, name: stop.name, slug: `${generateSlug(stop.name)} (duplicate of: ${duplicate.slug})`, status: `skipped (similar to: ${duplicate.name} — ${duplicate.matchType})` })
       continue
     }
 
