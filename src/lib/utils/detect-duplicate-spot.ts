@@ -95,6 +95,14 @@ function nameSimilarity(a: string, b: string): number {
   const bWords = b.split(/\s+/).filter(Boolean)
   if (aWords.length === 0 || bWords.length === 0) return 0
 
+  // Jika kata terpanjang tidak cocok di kedua nama → bukan duplicate
+  const longestInA = [...aWords].sort((x, y) => y.length - x.length)[0]
+  const longestInB = [...bWords].sort((x, y) => y.length - x.length)[0]
+  const longestWord = longestInA.length >= longestInB.length ? longestInA : longestInB
+  if (!aWords.includes(longestWord) || !bWords.includes(longestWord)) {
+    return 0
+  }
+
   const matches = aWords.filter((w) => bWords.includes(w)).length
   return matches / Math.max(aWords.length, bWords.length)
 }
