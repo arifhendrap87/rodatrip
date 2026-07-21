@@ -75,7 +75,7 @@ export async function findDuplicateSpot(
     }
 
     // Coord very close even if name different
-    if (lat && lng && parsed && dist < 0.3) {
+    if (lat && lng && parsed && dist < 0.15) {
       if (!bestMatch || dist < bestMatch.distance) {
         bestMatch = { slug: spot.slug, name: spot.name, distance: Math.round(dist * 1000) / 1000, matchType: "coord_nearby" }
       }
