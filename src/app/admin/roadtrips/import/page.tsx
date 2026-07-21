@@ -20,7 +20,7 @@ export default function ImportRoadtripPage() {
   const [saving, setSaving] = useState(false)
   const [result, setResult] = useState<ImportResult | null>(null)
   const [error, setError] = useState("")
-  const [spotStatuses, setSpotStatuses] = useState<Map<number, { name: string; exists: boolean }>>(new Map())
+  const [spotStatuses, setSpotStatuses] = useState<Map<number, { name: string; exists: boolean; matchType?: string; duplicateName?: string }>>(new Map())
 
   function handleParse() {
     setParseError("")
@@ -42,15 +42,22 @@ export default function ImportRoadtripPage() {
 
   async function checkSpotExistence(stops: Record<string, unknown>[]) {
     try {
-      const res = await fetch("/api/spots?limit=500")
+      const res = await fetch("/api/admin/roadtrips/validate-import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ stops }),
+      })
       const json = await res.json()
-      const existingSlugs = new Set((json.data || []).map((s: any) => s.slug))
+      const results = json.data || []
 
-      const map = new Map<number, { name: string; exists: boolean }>()
-      for (let i = 0; i < stops.length; i++) {
-        const name = (stops[i].name as string) || ""
-        const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
-        map.set(i, { name, exists: existingSlugs.has(slug) })
+      const map = new Map<number, { name: string; exists: boolean; matchType?: string; duplicateName?: string }>()
+      for (const r of results) {
+        map.set(r.stopNumber - 1, {
+          name: r.name,
+          exists: r.exists,
+          matchType: r.matchType,
+          duplicateName: r.duplicateName,
+        })
       }
       setSpotStatuses(map)
     } catch { /* ignore */ }
@@ -200,7 +207,7 @@ export default function ImportRoadtripPage() {
   )
 }
 
-function PreviewCard({ parsed, spotStatuses }: { parsed: Record<string, unknown>; spotStatuses: Map<number, { name: string; exists: boolean }> }) {
+function PreviewCard({ parsed, spotStatuses }: { parsed: Record<string, unknown>; spotStatuses: Map<number, { name: string; exists: boolean; matchType?: string; duplicateName?: string }> }) {
   const p = parsed as Record<string, string>
   const stops = (parsed.stops as Array<Record<string, string>>) || []
 
@@ -243,7 +250,11 @@ function PreviewCard({ parsed, spotStatuses }: { parsed: Record<string, unknown>
                     </div>
                     {status && (
                       <span className={`shrink-0 text-xs mt-1 ${status.exists ? "text-amber-500" : "text-green-500"}`}
-                        title={status.exists ? `Sudah ada (${status.name})` : "Spot baru"}>
+                        title={
+                          status.exists
+                            ? `Sudah ada: ${status.duplicateName || status.name} (${status.matchType || "slug"})`
+                            : "Spot baru"
+                        }>
                         {status.exists ? "⚠️" : "✅"}
                       </span>
                     )}
