@@ -4,7 +4,8 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
 const ALLOWED_ORIGINS = [
-  "https://rodatrip.vercel.app",
+  "https://rodatrip.id",
+  "https://www.rodatrip.id",
   "https://rodatrip.vercel.app",
   "https://rodatrip-git-staging-arifhendrap87s-projects.vercel.app",
   "http://localhost:3000",

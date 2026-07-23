@@ -17,7 +17,7 @@ export async function GET() {
     const { data } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || "https://rodatrip.vercel.app"}/admin/auth/callback`,
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || "https://rodatrip.id"}/admin/auth/callback`,
       },
     })
 
