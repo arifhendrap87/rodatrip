@@ -86,20 +86,7 @@ export function Navbar() {
                   Keluar
                 </button>
               </div>
-            ) : (
-              <>
-                <Link href="/login">
-                  <Button size="sm" variant="ghost" className="text-[#D95D39] hover:text-white hover:bg-[#D95D39]/20 rounded-xl text-xs font-semibold">
-                    Masuk
-                  </Button>
-                </Link>
-                <Link href="/register">
-                  <Button size="sm" className="bg-[#D95D39] text-white font-semibold shadow-lg shadow-black/20 hover:bg-[#D95D39]/90 rounded-xl text-xs">
-                    Daftar
-                  </Button>
-                </Link>
-              </>
-            )}
+            ) : null}
           </div>
           <Link href="/roadtrip">
             <Button size="sm" className="bg-[#D95D39] text-white font-semibold shadow-lg shadow-black/20 hover:bg-[#D95D39]/90 rounded-xl">
@@ -158,20 +145,7 @@ export function Navbar() {
                     Keluar
                   </button>
                 </div>
-              ) : (
-                <div className="flex gap-2 px-3">
-                  <Link href="/login" onClick={() => setOpen(false)} className="flex-1">
-                    <Button variant="ghost" className="w-full text-[#D95D39] hover:text-white hover:bg-[#D95D39]/20 rounded-xl text-sm font-semibold">
-                      Masuk
-                    </Button>
-                  </Link>
-                  <Link href="/register" onClick={() => setOpen(false)} className="flex-1">
-                    <Button className="w-full bg-[#D95D39] text-white font-semibold hover:bg-[#D95D39]/90 rounded-xl text-sm">
-                      Daftar
-                    </Button>
-                  </Link>
-                </div>
-              )}
+              ) : null}
               <div className="mt-3 px-3">
                 <Link href="/roadtrip" onClick={() => setOpen(false)}>
                   <Button className="w-full bg-white/10 text-white hover:bg-white/20 rounded-xl text-sm h-10">
