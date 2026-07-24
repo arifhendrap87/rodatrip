@@ -19,8 +19,10 @@ interface SpotDetailClientProps {
 
 function cleanMapsUrl(url: string): string {
   if (!url) return url
-  const md = url.match(/\]\(([^)]+)\)/)
+  // Markdown: [display_text](target) → ambil display_text (yang benar adalah maps_url)
+  const md = url.match(/^\[([^\]]+)\]/)
   if (md) return md[1]
+  // Already a plain URL
   if (url.startsWith("http")) return url
   return url
 }
