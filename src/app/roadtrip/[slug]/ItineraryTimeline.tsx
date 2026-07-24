@@ -108,17 +108,6 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
                   <img src={stop.imageUrl} alt={stop.name} className="w-full aspect-[16/7] object-cover" loading="lazy" />
                 </div>
               )}
-              {stop.imagePrompt && (
-                <div className="mt-2">
-                  <button
-                    onClick={() => { navigator.clipboard.writeText(stop.imagePrompt!); toast.success("Prompt gambar tersalin!") }}
-                    className="text-xs text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
-                  >
-                    <Copy className="h-3 w-3" />
-                    Copy Prompt Gambar
-                  </button>
-                </div>
-              )}
 
               {isOpen && (
                 <div className="space-y-4 mt-4">

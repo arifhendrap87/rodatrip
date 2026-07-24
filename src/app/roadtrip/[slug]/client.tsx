@@ -74,15 +74,6 @@ export function RoadtripDetailClient({ itinerary }: RoadtripDetailClientProps) {
             <>
               <img src={itinerary.coverImage} alt={`${itinerary.title} — Foto sampul roadtrip`} className="absolute inset-0 w-full h-full object-cover" onError={() => setCoverError(true)} />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
-              {itinerary.coverImagePrompt && (
-                <button
-                  onClick={() => { navigator.clipboard.writeText(itinerary.coverImagePrompt!); toast.success("Prompt cover tersalin!") }}
-                  className="absolute top-24 right-4 z-20 bg-black/40 hover:bg-black/60 text-white/80 text-xs px-2.5 py-1.5 rounded-full transition-colors flex items-center gap-1"
-                >
-                  <Copy className="h-3 w-3" />
-                  Copy Prompt Gambar
-                </button>
-              )}
             </>
         ) : (
           <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.08] via-accent/[0.03] to-background pointer-events-none">
