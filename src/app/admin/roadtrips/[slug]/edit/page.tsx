@@ -279,16 +279,31 @@ export default function EditRoadtripPage() {
             <div className="space-y-2"><Label>Waktu Terbaik</Label><Input value={form.bestDrivingTime} onChange={(e) => updateField("bestDrivingTime", e.target.value)} /></div>
             <div className="space-y-2"><Label>Fasilitas Jalur</Label><Input value={form.routeFacilities} onChange={(e) => updateField("routeFacilities", e.target.value)} /></div>
             <div className="space-y-2"><Label>Maps Embed URL</Label><Input value={form.mapsEmbedUrl} onChange={(e) => updateField("mapsEmbedUrl", e.target.value)} /></div>
-            {stops.filter(s => s.name).length > 0 && (
-              <div className="rounded-lg bg-blue-50 border border-blue-100 p-3 text-xs text-blue-700 leading-relaxed">
-                <span className="font-semibold">📍 Rute: </span>
-                {stops.filter(s => s.name).map((s, i, arr) => (
-                  <span key={s.key}>
-                    {s.name}{i < arr.length - 1 ? ' → ' : ''}
-                  </span>
-                ))}
-              </div>
-            )}
+            {(() => {
+              const routeStops = stops.filter(s => s.name)
+              if (routeStops.length === 0) return null
+              const routeText = routeStops.map(s => s.name).join(' → ')
+              const mapsUrl = `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${encodeURIComponent(routeStops[0].name)}&destination=${encodeURIComponent(routeStops[routeStops.length - 1].name)}${routeStops.length > 2 ? `&waypoints=${routeStops.slice(1, -1).map(s => encodeURIComponent(s.name)).join('|')}` : ''}`
+              return (
+                <div className="rounded-lg bg-blue-50 border border-blue-100 p-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="text-xs text-blue-700 leading-relaxed flex-1">
+                      <span className="font-semibold">📍 Rute: </span>
+                      {routeText}
+                    </span>
+                    <button onClick={() => { navigator.clipboard.writeText(routeText); toast.success("Rute tersalin!") }}
+                      className="shrink-0 text-blue-500 hover:text-blue-700 p-1" title="Copy rute">
+                      <Copy className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                  <a href={mapsUrl} target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 mt-2 text-xs text-blue-600 hover:text-blue-800 font-medium">
+                    <ExternalLink className="h-3.5 w-3.5" />
+                    Buka Rute di Google Maps
+                  </a>
+                </div>
+              )
+            })()}
             <ImageUpload value={form.coverImage} onChange={(v) => updateField("coverImage", v)} label="Cover Banner" folder="cover" placeholder="https://pub-xxx.r2.dev/prod/cover/..." />
             <div className="pt-4 border-t border-border/50 space-y-4">
               <Button type="button" variant="outline" size="sm"
