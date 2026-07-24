@@ -59,6 +59,15 @@ export default function EditRoadtripPage() {
     load()
   }, [slug, router])
 
+  // Auto-generate Maps URL dari stops saat load (jika masih kosong)
+  useEffect(() => {
+    const routeStops = stops.filter(s => s.name)
+    if (routeStops.length < 2) return
+    if (form.mapsEmbedUrl) return
+    const url = `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${encodeURIComponent(routeStops[0].name)}&destination=${encodeURIComponent(routeStops[routeStops.length - 1].name)}${routeStops.length > 2 ? `&waypoints=${routeStops.slice(1, -1).map(s => encodeURIComponent(s.name)).join('|')}` : ''}`
+    updateField("mapsEmbedUrl", url)
+  }, [stops])
+
   function addStop() { setStops((prev) => [...prev, createEmptyStop(prev.length + 1)]) }
   function removeStop(key: string) { setStops((prev) => { const f = prev.filter((s) => s.key !== key); return f.map((s, i) => ({ ...s, stopNumber: i + 1 })) }) }
   function updateField(field: string, value: string | boolean) { setForm((f) => ({ ...f, [field]: value })) }
@@ -280,19 +289,7 @@ export default function EditRoadtripPage() {
             <div className="space-y-2"><Label>Fasilitas Jalur</Label><Input value={form.routeFacilities} onChange={(e) => updateField("routeFacilities", e.target.value)} /></div>
             <div className="space-y-2">
               <Label>Maps Embed URL</Label>
-              <div className="flex gap-2">
-                <Input value={form.mapsEmbedUrl} onChange={(e) => updateField("mapsEmbedUrl", e.target.value)} className="flex-1" />
-                <Button type="button" variant="outline" size="sm" className="gap-1 shrink-0"
-                  onClick={() => {
-                    const routeStops = stops.filter(s => s.name)
-                    if (routeStops.length < 2) { toast.error("Minimal 2 stop"); return }
-                    const url = `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${encodeURIComponent(routeStops[0].name)}&destination=${encodeURIComponent(routeStops[routeStops.length - 1].name)}${routeStops.length > 2 ? `&waypoints=${routeStops.slice(1, -1).map(s => encodeURIComponent(s.name)).join('|')}` : ''}`
-                    updateField("mapsEmbedUrl", url)
-                    toast.success("Maps URL digenerate!")
-                  }}>
-                  🎯 Generate
-                </Button>
-              </div>
+              <Input value={form.mapsEmbedUrl} onChange={(e) => updateField("mapsEmbedUrl", e.target.value)} />
             </div>
             {(() => {
               const routeStops = stops.filter(s => s.name)
