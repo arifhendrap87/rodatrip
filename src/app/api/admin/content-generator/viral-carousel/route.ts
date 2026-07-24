@@ -13,7 +13,7 @@ async function callDeepSeek(prompt: string): Promise<string> {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${API_KEY}` },
     body: JSON.stringify({
-      model: "deepseek-chat",
+      model: "deepseek-v4-flash",
       messages: [
         { role: "system", content: "Kamu adalah content writer RodaTrip. Output HANYA JSON valid." },
         { role: "user", content: prompt },
