@@ -39,7 +39,7 @@ export async function POST(request: Request) {
         Authorization: `Bearer ${API_KEY}`,
       },
       body: JSON.stringify({
-        model: "deepseek-chat",
+        model: "deepseek-v4-flash",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           ...messages.map((m: Message) => ({ role: m.role, content: m.content })),

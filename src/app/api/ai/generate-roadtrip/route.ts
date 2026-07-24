@@ -13,7 +13,7 @@ export async function POST(request: Request) {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${API_KEY}` },
       body: JSON.stringify({
-        model: "deepseek-chat",
+        model: "deepseek-v4-flash",
         messages: [
           { role: "system", content: "Kamu adalah content writer travel untuk platform RodaTrip. Output HANYA JSON valid, tanpa teks lain." },
           { role: "user", content: prompt },
