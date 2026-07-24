@@ -63,7 +63,6 @@ export default function EditRoadtripPage() {
   useEffect(() => {
     const routeStops = stops.filter(s => s.name)
     if (routeStops.length < 2) return
-    if (form.mapsEmbedUrl) return
     const url = `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${encodeURIComponent(routeStops[0].name)}&destination=${encodeURIComponent(routeStops[routeStops.length - 1].name)}${routeStops.length > 2 ? `&waypoints=${routeStops.slice(1, -1).map(s => encodeURIComponent(s.name)).join('|')}` : ''}`
     updateField("mapsEmbedUrl", url)
   }, [stops])
