@@ -278,7 +278,22 @@ export default function EditRoadtripPage() {
             <div className="space-y-2"><Label>Kondisi Jalan</Label><Input value={form.roadCondition} onChange={(e) => updateField("roadCondition", e.target.value)} /></div>
             <div className="space-y-2"><Label>Waktu Terbaik</Label><Input value={form.bestDrivingTime} onChange={(e) => updateField("bestDrivingTime", e.target.value)} /></div>
             <div className="space-y-2"><Label>Fasilitas Jalur</Label><Input value={form.routeFacilities} onChange={(e) => updateField("routeFacilities", e.target.value)} /></div>
-            <div className="space-y-2"><Label>Maps Embed URL</Label><Input value={form.mapsEmbedUrl} onChange={(e) => updateField("mapsEmbedUrl", e.target.value)} /></div>
+            <div className="space-y-2">
+              <Label>Maps Embed URL</Label>
+              <div className="flex gap-2">
+                <Input value={form.mapsEmbedUrl} onChange={(e) => updateField("mapsEmbedUrl", e.target.value)} className="flex-1" />
+                <Button type="button" variant="outline" size="sm" className="gap-1 shrink-0"
+                  onClick={() => {
+                    const routeStops = stops.filter(s => s.name)
+                    if (routeStops.length < 2) { toast.error("Minimal 2 stop"); return }
+                    const url = `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${encodeURIComponent(routeStops[0].name)}&destination=${encodeURIComponent(routeStops[routeStops.length - 1].name)}${routeStops.length > 2 ? `&waypoints=${routeStops.slice(1, -1).map(s => encodeURIComponent(s.name)).join('|')}` : ''}`
+                    updateField("mapsEmbedUrl", url)
+                    toast.success("Maps URL digenerate!")
+                  }}>
+                  🎯 Generate
+                </Button>
+              </div>
+            </div>
             {(() => {
               const routeStops = stops.filter(s => s.name)
               if (routeStops.length === 0) return null
