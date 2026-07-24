@@ -1,7 +1,7 @@
 import { db } from "@/lib/services/db"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { MapPin, ShoppingBag, Map, Mail, Eye, ArrowRight } from "lucide-react"
+import { MapPin, ShoppingBag, Map, Mail, Eye, ArrowRight, ImageIcon } from "lucide-react"
 
 async function getStats() {
   try {
@@ -14,6 +14,25 @@ async function getStats() {
     return { spots: spots || 0, products: products || 0, roadtrips: roadtrips || 0, waitlist: waitlist || 0, views }
   } catch {
     return { spots: 0, products: 0, roadtrips: 0, waitlist: 0, views: 0 }
+  }
+}
+
+async function getCoverStats() {
+  try {
+    const [spotRes, roadtripRes] = await Promise.all([
+      db.from("spots").select("image_url"),
+      db.from("itineraries").select("cover_image"),
+    ])
+    const totalSpots = spotRes.data?.length || 0
+    const spotsWithCover = spotRes.data?.filter((s: any) => s.image_url).length || 0
+    const totalRoadtrips = roadtripRes.data?.length || 0
+    const roadtripsWithCover = roadtripRes.data?.filter((r: any) => r.cover_image).length || 0
+    return {
+      spots: { total: totalSpots, withCover: spotsWithCover, percentage: totalSpots > 0 ? Math.round((spotsWithCover / totalSpots) * 100) : 0 },
+      roadtrips: { total: totalRoadtrips, withCover: roadtripsWithCover, percentage: totalRoadtrips > 0 ? Math.round((roadtripsWithCover / totalRoadtrips) * 100) : 0 },
+    }
+  } catch {
+    return { spots: { total: 0, withCover: 0, percentage: 0 }, roadtrips: { total: 0, withCover: 0, percentage: 0 } }
   }
 }
 
@@ -39,7 +58,7 @@ const statsCards = [
 ]
 
 export default async function AdminDashboard() {
-  const [stats, recentSpots] = await Promise.all([getStats(), getRecentSpots()])
+  const [stats, recentSpots, coverStats] = await Promise.all([getStats(), getRecentSpots(), getCoverStats()])
 
   return (
     <div>
@@ -65,6 +84,38 @@ export default async function AdminDashboard() {
             </Card>
           )
         })}
+      </div>
+
+      {/* Cover Image Progress */}
+      <div className="mt-8">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+              <ImageIcon className="h-4 w-4" />
+              Cover Image Progress
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <div className="flex items-center justify-between text-sm mb-1.5">
+                <span className="font-medium">Spots</span>
+                <span className="text-muted-foreground">{coverStats.spots.withCover}/{coverStats.spots.total} ({coverStats.spots.percentage}%)</span>
+              </div>
+              <div className="h-2.5 rounded-full bg-muted overflow-hidden">
+                <div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: `${coverStats.spots.percentage}%` }} />
+              </div>
+            </div>
+            <div>
+              <div className="flex items-center justify-between text-sm mb-1.5">
+                <span className="font-medium">Roadtrips</span>
+                <span className="text-muted-foreground">{coverStats.roadtrips.withCover}/{coverStats.roadtrips.total} ({coverStats.roadtrips.percentage}%)</span>
+              </div>
+              <div className="h-2.5 rounded-full bg-muted overflow-hidden">
+                <div className="h-full rounded-full bg-rose-500 transition-all" style={{ width: `${coverStats.roadtrips.percentage}%` }} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
