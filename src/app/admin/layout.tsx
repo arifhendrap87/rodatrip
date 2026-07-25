@@ -76,7 +76,7 @@ export default function AdminLayout({
   const [mobileOpen, setMobileOpen] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
-  if (pathname === "/admin/login" || pathname.startsWith("/admin/auth")) {
+  if (pathname.includes("/login") || pathname.includes("/auth")) {
     return <>{children}</>
   }
 
