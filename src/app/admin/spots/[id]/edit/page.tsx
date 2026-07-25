@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { ArrowLeft, Save, Loader2, Trash2, Copy, Check, ImageIcon } from "lucide-react"
+import { ArrowLeft, Save, Loader2, Trash2, Copy, Check, ImageIcon, Sparkles } from "lucide-react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import TiptapEditor from "@/components/ui/tiptap/tiptap-editor"
@@ -45,6 +45,7 @@ export default function EditSpotPage() {
   const [generatingImage, setGeneratingImage] = useState(false)
   const [imagePrompt, setImagePrompt] = useState("")
   const [copiedPrompt, setCopiedPrompt] = useState(false)
+  const [generatingDesc, setGeneratingDesc] = useState(false)
   const [provinceList, setProvinceList] = useState<{ code: string; name: string }[]>([])
   const [cityList, setCityList] = useState<{ code: string; name: string }[]>([])
   const [provCode, setProvCode] = useState("")
@@ -214,6 +215,31 @@ export default function EditSpotPage() {
     setGeneratingImage(false)
   }
 
+  async function handleGenerateDescription() {
+    if (!form.name) { toast.error("Nama spot harus diisi"); return }
+    setGeneratingDesc(true)
+    try {
+      const res = await fetch("/api/ai/generate-spot-description", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          category: form.category,
+          province: provCode ? provinceList.find(p => p.code === provCode)?.name : "",
+          city: form.city || "",
+          existingDescription: form.description,
+        }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json?.error?.message || "Gagal generate deskripsi")
+      setForm((f: any) => ({ ...f, description: json.data.text }))
+      toast.success("Deskripsi berhasil digenerate!")
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Gagal generate deskripsi")
+    }
+    setGeneratingDesc(false)
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -336,7 +362,14 @@ export default function EditSpotPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label>Description</Label>
+              <div className="flex items-center justify-between">
+                <Label>Description</Label>
+                <Button type="button" variant="outline" size="sm" className="gap-1.5"
+                  onClick={handleGenerateDescription} disabled={generatingDesc || !form.name}>
+                  {generatingDesc ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+                  {generatingDesc ? "Generating..." : "✨ Generate SEO"}
+                </Button>
+              </div>
               <TiptapEditor content={form.description || ""}
                 onChange={(html) => setForm((f: any) => ({ ...f, description: html }))} />
             </div>
