@@ -98,11 +98,15 @@ export function SpotDetailClient({ spot, relatedItineraries, allSpots }: SpotDet
                 const nh = (spot as any).nearby_hotels_jsonb as Array<{name:string;distance?:string;price?:string;maps_url?:string;nearby_restaurants?:Array<{name:string;distance?:string;price?:string;maps_url?:string}>}>
                 if (!nh || nh.length === 0) return null
                 return (
-                  <div>
-                    <h3 className="text-lg font-bold font-heading flex items-center gap-2"><span>🏨</span><span>Hotel & Penginapan Terdekat</span></h3>
-                    <div className="mt-3 space-y-3">
-                      {nh.map((h, i) => (
-                        <div key={i} className="rounded-2xl border border-blue-100 bg-blue-50/50 p-4">
+                  <details className="group rounded-2xl border border-blue-100 bg-blue-50/50 overflow-hidden [&>summary]:list-none">
+                    <summary className="p-4 cursor-pointer flex items-center gap-2">
+                      <span className="text-lg shrink-0">🏨</span>
+                      <h3 className="text-lg font-bold font-heading flex-1">Hotel & Penginapan Terdekat</h3>
+                      <span className="text-xs text-blue-400 font-medium">{nh.length}</span>
+                      <span className="text-blue-400 transition-transform group-open:rotate-180">▾</span>
+                    </summary>
+                    <div className="px-4 pb-4 space-y-3">{nh.map((h, i) => (
+                        <div key={i} className="rounded-2xl border border-blue-100 bg-white/80 p-4">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-semibold">{h.name}</p>
@@ -128,9 +132,8 @@ export function SpotDetailClient({ spot, relatedItineraries, allSpots }: SpotDet
                             </div>
                           )}
                         </div>
-                      ))}
-                    </div>
-                  </div>
+                      ))}</div>
+                  </details>
                 )
               })()}
 
@@ -138,11 +141,15 @@ export function SpotDetailClient({ spot, relatedItineraries, allSpots }: SpotDet
                 const nr = (spot as any).nearby_restaurants_jsonb as Array<{name:string;distance?:string;price?:string;maps_url?:string}>
                 if (!nr || nr.length === 0) return null
                 return (
-                  <div>
-                    <h3 className="text-lg font-bold font-heading flex items-center gap-2"><span>🍜</span><span>Kuliner Terdekat</span></h3>
-                    <div className="mt-3 space-y-2">
-                      {nr.map((r, i) => (
-                        <div key={i} className="flex items-start justify-between gap-2 rounded-2xl border border-orange-100 bg-orange-50/50 p-3">
+                  <details className="group rounded-2xl border border-orange-100 bg-orange-50/50 overflow-hidden [&>summary]:list-none">
+                    <summary className="p-4 cursor-pointer flex items-center gap-2">
+                      <span className="text-lg shrink-0">🍜</span>
+                      <h3 className="text-lg font-bold font-heading flex-1">Kuliner Terdekat</h3>
+                      <span className="text-xs text-orange-400 font-medium">{nr.length}</span>
+                      <span className="text-orange-400 transition-transform group-open:rotate-180">▾</span>
+                    </summary>
+                    <div className="px-4 pb-4 space-y-2">{nr.map((r, i) => (
+                        <div key={i} className="flex items-start justify-between gap-2 rounded-2xl border border-orange-100 bg-white/80 p-3">
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium">{r.name}</p>
                             <p className="text-xs text-muted-foreground">📍 {r.distance}{r.price ? ` — ${r.price}` : ''}</p>
@@ -152,29 +159,35 @@ export function SpotDetailClient({ spot, relatedItineraries, allSpots }: SpotDet
                               className="shrink-0 text-xs text-orange-600 hover:text-orange-800 font-medium">📍 Petunjuk Arah</a>
                           )}
                         </div>
-                      ))}
-                    </div>
-                  </div>
+                      ))}</div>
+                  </details>
                 )
               })()}
 
               {(spot as any).images && (spot as any).images.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-bold font-heading flex items-center gap-2"><span>📸</span><span>Galeri Foto</span></h3>
-                  <div className="mt-3 grid grid-cols-3 gap-2">
-                    {((spot as any).images as Array<{url:string;alt?:string}>).slice(0, 5).map((img: {url:string;alt?:string}, i: number) => (
-                      <a key={i} href={img.url} target="_blank" rel="noopener noreferrer"
-                        className={`relative aspect-[4/3] rounded-xl overflow-hidden border border-border/30 bg-muted hover:opacity-90 transition-opacity ${i === 0 ? 'col-span-2 row-span-2' : ''}`}>
-                        <img src={img.url} alt={img.alt || ""} className="w-full h-full object-cover" loading="lazy" />
-                        {i === 4 && (spot as any).images.length > 5 && (
-                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl">
-                            <span className="text-white font-bold text-lg">+{(spot as any).images.length - 5}</span>
-                          </div>
-                        )}
-                      </a>
-                    ))}
+                <details className="group rounded-2xl border border-border/50 overflow-hidden [&>summary]:list-none">
+                  <summary className="p-4 cursor-pointer flex items-center gap-2">
+                    <span className="text-lg shrink-0">📸</span>
+                    <h3 className="text-lg font-bold font-heading flex-1">Galeri Foto</h3>
+                    <span className="text-xs text-muted-foreground font-medium">{(spot as any).images.length}</span>
+                    <span className="text-muted-foreground transition-transform group-open:rotate-180">▾</span>
+                  </summary>
+                  <div className="px-4 pb-4">
+                    <div className="grid grid-cols-3 gap-2">
+                      {((spot as any).images as Array<{url:string;alt?:string}>).slice(0, 5).map((img: {url:string;alt?:string}, i: number) => (
+                        <a key={i} href={img.url} target="_blank" rel="noopener noreferrer"
+                          className={`relative aspect-[4/3] rounded-xl overflow-hidden border border-border/30 bg-muted hover:opacity-90 transition-opacity ${i === 0 ? 'col-span-2 row-span-2' : ''}`}>
+                          <img src={img.url} alt={img.alt || ""} className="w-full h-full object-cover" loading="lazy" />
+                          {i === 4 && (spot as any).images.length > 5 && (
+                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl">
+                              <span className="text-white font-bold text-lg">+{(spot as any).images.length - 5}</span>
+                            </div>
+                          )}
+                        </a>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                </details>
               )}
 
               {(spot as any).spot_important_note && (
