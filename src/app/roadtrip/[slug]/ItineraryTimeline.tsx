@@ -123,9 +123,13 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
               {isOpen && (
                 <div className="space-y-4 mt-4">
 
-              {stop.description && (
-                <div className="text-sm text-muted-foreground leading-relaxed" dangerouslySetInnerHTML={{ __html: stop.description }} />
-              )}
+              {stop.description && (() => {
+                const match = stop.description.match(/<p[^>]*>([\s\S]*?)<\/p>/)
+                if (!match) return null
+                return (
+                  <div className="text-sm text-muted-foreground leading-relaxed" dangerouslySetInnerHTML={{ __html: match[0] }} />
+                )
+              })()}
 
               {(stop.ticketPrice || stop.parkingFee || stop.additionalCost) && (
                 <div className="rounded-xl border border-border/40 bg-white/60 p-4 space-y-2">

@@ -46,6 +46,7 @@ export default function EditSpotPage() {
   const [imagePrompt, setImagePrompt] = useState("")
   const [copiedPrompt, setCopiedPrompt] = useState(false)
   const [generatingDesc, setGeneratingDesc] = useState(false)
+  const [descKey, setDescKey] = useState(0)
   const [provinceList, setProvinceList] = useState<{ code: string; name: string }[]>([])
   const [cityList, setCityList] = useState<{ code: string; name: string }[]>([])
   const [provCode, setProvCode] = useState("")
@@ -246,6 +247,7 @@ export default function EditSpotPage() {
         meta_description: data.meta_description || f.meta_description,
       }))
       toast.success("Konten SEO berhasil digenerate!")
+      setDescKey(k => k + 1)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Gagal generate deskripsi")
     }
@@ -384,7 +386,7 @@ export default function EditSpotPage() {
                   {generatingDesc ? "Generating..." : "✨ Generate Konten SEO"}
                 </Button>
               </div>
-              <TiptapEditor content={form.description || ""}
+              <TiptapEditor key={descKey} content={form.description || ""}
                 onChange={(html) => setForm((f: any) => ({ ...f, description: html }))} />
             </div>
             <div className="space-y-2">
