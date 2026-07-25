@@ -50,13 +50,22 @@ Deskripsi saat ini: ${cleanExisting || "(kosong)"}
 
 Output HANYA JSON valid (tanpa markdown, tanpa teks lain):
 {
-  "description": "2-3 paragraf HTML (<p>...</p><p>...</p>) yang informatif, engaging, sertakan keunikan tempat dan aktivitas. 150-300 kata.",
+  "description": "Artikel HTML lengkap minimal 5 paragraf (400-600 kata)",
   "seo_title": "Judul SEO max 60 karakter, sertakan nama tempat dan kata kunci utama.",
   "meta_description": "Meta deskripsi max 160 karakter, deskripsi menarik untuk hasil pencarian Google."
 }
 
-Aturan:
-- description: Bahasa Indonesia, gunakan <p> untuk paragraf, <strong> untuk kata kunci
+Aturan description:
+- Buat artikel informatif dengan struktur:
+  1. Opening paragraf — perkenalan tempat (di mana, kenapa terkenal)
+  2. Daya tarik & keunikan — apa yang membuat tempat ini spesial
+  3. Aktivitas yang bisa dilakukan — apa yang bisa dinikmati pengunjung
+  4. Suasana & lingkungan — gambaran visual tempat
+  5. Closing — ajakan atau rekomendasi
+- Gunakan <p> untuk paragraf, <h3> untuk sub-heading, <ul>/<li> untuk daftar, <strong> untuk kata kunci
+- Bahasa Indonesia natural dan mengalir
+- Minimal 5 paragraf, 400-600 kata
+- SEO friendly: sertakan kata kunci "${name}" secara natural di seluruh artikel
 - seo_title: max 60 karakter, contoh: "${name} — Destinasi Wisata ${province || ""} Terbaik"
 - meta_description: max 160 karakter, contoh: "Nikmati keindahan ${name} di ${province || ""}. [daya tarik singkat]. [aktivitas]."`
 
