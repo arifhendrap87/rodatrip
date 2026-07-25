@@ -232,7 +232,7 @@ export default function EditSpotPage() {
         body: JSON.stringify({
           name: form.name,
           category: form.category,
-          province: provCode ? provinceList.find(p => p.code === provCode)?.name : "",
+          province: form.province || "",
           city: form.city || "",
           existingDescription: form.description,
         }),
@@ -240,9 +240,11 @@ export default function EditSpotPage() {
       const json = await res.json()
       if (!res.ok) throw new Error(json?.error?.message || "Gagal generate")
       const data = json.data || {}
+      const hasChanges = data.description || data.seo_title || data.meta_description
+      if (!hasChanges) throw new Error("AI tidak menghasilkan konten. Coba lagi.")
       setForm((f: any) => ({
         ...f,
-        description: data.description || data.text || f.description,
+        description: data.description || f.description,
         seo_title: data.seo_title || f.seo_title,
         meta_description: data.meta_description || f.meta_description,
       }))

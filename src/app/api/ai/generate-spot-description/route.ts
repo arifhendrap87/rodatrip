@@ -80,12 +80,16 @@ Aturan description:
       if (jsonMatch) json = JSON.parse(jsonMatch[0])
       else json = JSON.parse(raw)
     } catch {
-      // Fallback: return raw text as description
-      return success({ text: raw, seo_title: name, meta_description: name })
+      // Fallback: return raw text as description if available
+      return success({
+        description: raw ? raw : "",
+        seo_title: name,
+        meta_description: name,
+      })
     }
 
     return success({
-      description: json.description || raw,
+      description: json.description || (raw ? raw : ""),
       seo_title: json.seo_title || name,
       meta_description: json.meta_description || name,
     })
