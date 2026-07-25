@@ -20,7 +20,7 @@ async function callDeepSeek(prompt: string): Promise<string> {
         { role: "user", content: prompt },
       ],
       temperature: 0.7,
-      max_tokens: 1500,
+      max_tokens: 2048,
     }),
   })
 
@@ -56,15 +56,16 @@ Output HANYA JSON valid (tanpa markdown, tanpa teks lain):
 }
 
 Aturan description:
-- Buat artikel informatif dengan struktur:
-  1. Opening paragraf — perkenalan tempat (di mana, kenapa terkenal)
-  2. Daya tarik & keunikan — apa yang membuat tempat ini spesial
-  3. Aktivitas yang bisa dilakukan — apa yang bisa dinikmati pengunjung
-  4. Suasana & lingkungan — gambaran visual tempat
-  5. Closing — ajakan atau rekomendasi
+- Output HARUS 5-6 paragraf dengan struktur WAJIB:
+  1. Opening — pengenalan tempat (lokasi, status, keunikan utama)
+  2. Daya Tarik & Keunikan — apa yang membuat tempat ini spesial, nilai sejarah/budaya/alam
+  3. Aktivitas Wisata — minimal 4 poin aktivitas, gunakan <ul>/<li>
+  4. Suasana & Lingkungan — gambaran visual, cuaca, waktu terbaik, tips foto
+  5. Fasilitas & Akses — informasi praktis: parkir, toilet, warung, tiket
+  6. Closing — ajakan atau rekomendasi
 - Gunakan <p> untuk paragraf, <h3> untuk sub-heading, <ul>/<li> untuk daftar, <strong> untuk kata kunci
-- Bahasa Indonesia natural dan mengalir
-- Minimal 5 paragraf, 400-600 kata
+- Bahasa Indonesia natural dan mengalir seperti artikel blog traveling
+- Minimal 500-700 kata
 - SEO friendly: sertakan kata kunci "${name}" secara natural di seluruh artikel
 - seo_title: max 60 karakter, contoh: "${name} — Destinasi Wisata ${province || ""} Terbaik"
 - meta_description: max 160 karakter, contoh: "Nikmati keindahan ${name} di ${province || ""}. [daya tarik singkat]. [aktivitas]."`
