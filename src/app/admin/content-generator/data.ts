@@ -32,6 +32,8 @@ export interface ContentSource {
   totalDistance?: string
   estimatedCost?: string
   stops?: { name: string; category?: string }[]
+  seoTitle?: string
+  metaDescription?: string
 }
 
 function formatCurrency(amount: string): string {
@@ -794,6 +796,8 @@ export function generateViralPrompt(source: ContentSource): string {
     ["Tingkat Fisik", source.physicalEffort],
     ["Tips", source.tips],
     ["Fasilitas", source.facilities?.join(", ")],
+    ["SEO Title", source.seoTitle],
+    ["Meta Description", source.metaDescription],
   ].filter(([_, v]) => v && v !== "" && v !== "—" && String(v) !== "undefined")
 
   const spotDataList = spotFields.map(([label, value]) => `- ${label}: ${value}`).join("\n")
@@ -834,7 +838,7 @@ ${isSpot ? spotDataList : `- Judul: ${source.title}
     "Prompt untuk SLIDE 3 — harus SAMA DESTINASINYA dengan text_overlays[2]",
     "... (sama jumlah dan urutannya dengan text_overlays)"
   ],
-  "caption": "Caption informatif 300-500 karakter. Hook 1 kalimat → info detail 2-3 kalimat → tips 1 kalimat → ajakan interaksi ringan. Bahasa Indonesia.",
+  "caption": "Untuk SPOT: Gunakan Meta Description sebagai dasar caption, perluas jadi 300-500 karakter dengan info tambahan (harga, jam, tips, fasilitas). Untuk roadtrip/blog: caption informatif 300-500 karakter. Hook 1 kalimat → info detail 2-3 kalimat → tips 1 kalimat → ajakan interaksi ringan. Bahasa Indonesia.",
   "hashtags": "3-5 hashtag relevan dipisah spasi"
 }
 
@@ -851,7 +855,7 @@ ${isSpot ? spotDataList : `- Judul: ${source.title}
 - text_overlays pakai Title Case (kapital awal kata utama), JANGAN semua UPPERCASE. Contoh benar: "Tiket Rp 28.000, View Seperti Ini"
 - image_prompts: Bahasa Inggris, deskriptif, realistic photo, WAJIB sebut NAMA DESTINASI SPESIFIK dari data, SERTAKAN --ar 1:1 di akhir
 - text_overlays dan image_prompts HARUS sinkron per index. Contoh: text_overlays[2] tentang "Bukit Sikunir", maka image_prompts[2] WAJIB tentang "Bukit Sikunir" juga, bukan destinasi lain.
-- caption: Informatif, 300-500 karakter. Hook 1 kalimat → info detail 2-3 kalimat → tips 1 kalimat → ajakan interaksi ringan di akhir
+- caption: Untuk SPOT: Gunakan Meta Description sebagai dasar caption, perluas jadi 300-500 karakter dengan info tambahan (harga, jam, tips, fasilitas). Untuk roadtrip/blog: caption informatif 300-500 karakter. Hook 1 kalimat → info detail 2-3 kalimat → tips 1 kalimat → ajakan interaksi ringan di akhir
 - hashtags: 3-5 tag relevan (#NamaTempat #Provinsi #Roadtrip #RodaTrip)
 - HANYA gunakan data yang diberikan. JANGAN menyebut destinasi di luar DATA.
 - Output HANYA JSON, tanpa teks lain`

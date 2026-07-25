@@ -83,6 +83,8 @@ export async function POST(request: Request) {
     nearbyHotels: JSON.stringify(source!.nearby_hotels_jsonb || source!.nearby_hotels || []),
     nearbyRestaurants: JSON.stringify(source!.nearby_restaurants_jsonb || source!.nearby_restaurants || []),
     images: source!.images as { url: string; alt?: string }[],
+    seoTitle: source!.seo_title as string,
+    metaDescription: source!.meta_description as string,
   } : sourceType === "blog" ? {
     type: "spot" as const,
     id: source!.slug as string,

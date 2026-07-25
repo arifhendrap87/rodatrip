@@ -52,6 +52,7 @@ interface SourceItem {
   rating?: number
   excerpt?: string
   author?: string
+  image_url?: string
 }
 
 export default function ContentGeneratorPage() {
@@ -494,9 +495,11 @@ export default function ContentGeneratorPage() {
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div>
-                        <CardTitle className="text-base">🎨 Viral Carousel</CardTitle>
+                        <CardTitle className="text-base">
+                          {sourceType === "spot" ? "📸 Konten Sosial Media" : "🎨 Viral Carousel"}
+                        </CardTitle>
                         <CardDescription>
-                          Text overlay + prompt gambar — otomatis sesuai data
+                          {sourceType === "spot" ? "Postingan siap pakai — gambar + caption" : "Text overlay + prompt gambar — otomatis sesuai data"}
                         </CardDescription>
                       </div>
                       <div className="flex items-center gap-2">
@@ -526,7 +529,49 @@ export default function ContentGeneratorPage() {
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {/* Simplified: for spot — show image + caption */}
+                    {sourceType === "spot" ? (
+                      <div className="space-y-4">
+                        <div className="rounded-xl overflow-hidden border border-border/50 bg-muted">
+                          {selectedItem?.image_url ? (
+                            <img src={selectedItem.image_url} alt="" className="w-full aspect-[4/5] object-cover" />
+                          ) : (
+                            <div className="aspect-[4/5] flex items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10">
+                              <ImageIcon className="h-16 w-16 text-muted-foreground/30" />
+                            </div>
+                          )}
+                          <div className="p-4 bg-gradient-to-t from-black/80 via-black/30 to-transparent relative -mt-20">
+                            <p className="text-white font-bold text-lg leading-snug">{carouselResult.text_overlays[0]}</p>
+                          </div>
+                        </div>
+                        <div className="rounded-xl border border-border/50 p-4 space-y-2">
+                          <p className="text-xs font-semibold text-muted-foreground uppercase">💬 Caption</p>
+                          <p className="text-sm">{carouselResult.caption}</p>
+                          {carouselResult.hashtags && (
+                            <>
+                              <p className="text-xs font-semibold text-muted-foreground uppercase mt-3">🏷️ Hashtag</p>
+                              <p className="text-sm text-muted-foreground">{carouselResult.hashtags}</p>
+                            </>
+                          )}
+                          <div className="flex items-center gap-2 mt-2">
+                            <Button variant="outline" size="sm" className="gap-1.5"
+                              onClick={() => { const text = `${carouselResult.caption}\n\n${carouselResult.hashtags}`; navigator.clipboard.writeText(text); toast.success("Caption + hashtag tersalin!") }}>
+                              {copied === "caption" ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                              Copy Caption + Hashtag
+                            </Button>
+                            <Button variant="default" size="sm" className="gap-1.5"
+                              disabled={saving}
+                              onClick={() => handleSaveCarousel(`${selectedItem?.title || selectedItem?.name || "Carousel"} — Konten Sosmed`)}>
+                              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                              Simpan sebagai Konsep
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      /* Carousel grid for roadtrip/blog */
+                      <>
+                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                       {carouselResult.text_overlays.map((text, i) => {
                         const gradients = [
                           "from-sky-400/80 via-blue-500/80 to-indigo-600/80",
@@ -631,6 +676,8 @@ export default function ContentGeneratorPage() {
                         </Button>
                       </div>
                     </div>
+                    </>
+                  )}
                   </CardContent>
                 </Card>
               ) : carouselGenerating ? (
