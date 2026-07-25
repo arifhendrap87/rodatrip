@@ -277,6 +277,8 @@ export default function EditSpotPage() {
           { label: "Provinsi", ok: !!form.province },
           { label: "Koordinat", ok: !!form.lat && !!form.lng && parseFloat(form.lat) !== 0 },
           { label: "Rating", ok: parseFloat(form.rating) > 0 },
+          { label: "SEO Title", ok: !!form.seo_title },
+          { label: "Meta Desc", ok: !!form.meta_description },
         ]}
       />
 
