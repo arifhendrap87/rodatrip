@@ -35,33 +35,35 @@ import { useState } from "react"
 interface NavItem { href: string; label: string; icon: React.ComponentType<{ className?: string }> }
 interface NavGroup { label: string; items: NavItem[] }
 
+const ADMIN_PATH = process.env.NEXT_PUBLIC_ADMIN_SECRET_PATH || "manage-rodatrip"
+
 const navGroups: NavGroup[] = [
   { label: "Dashboard", items: [
-    { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+    { href: `/${ADMIN_PATH}`, label: "Dashboard", icon: LayoutDashboard },
   ]},
   { label: "Konten", items: [
-    { href: "/admin/spots", label: "Spots", icon: MapPin },
-    { href: "/admin/products", label: "Products", icon: ShoppingBag },
-    { href: "/admin/roadtrips", label: "Roadtrips", icon: Map },
-    { href: "/admin/blog", label: "Blog", icon: FileText },
-    { href: "/admin/media", label: "Media", icon: Image },
-    { href: "/admin/regions", label: "Regions", icon: Globe },
+    { href: `/${ADMIN_PATH}/spots`, label: "Spots", icon: MapPin },
+    { href: `/${ADMIN_PATH}/products`, label: "Products", icon: ShoppingBag },
+    { href: `/${ADMIN_PATH}/roadtrips`, label: "Roadtrips", icon: Map },
+    { href: `/${ADMIN_PATH}/blog`, label: "Blog", icon: FileText },
+    { href: `/${ADMIN_PATH}/media`, label: "Media", icon: Image },
+    { href: `/${ADMIN_PATH}/regions`, label: "Regions", icon: Globe },
   ]},
   { label: "AI & Sosial Media", items: [
-    { href: "/admin/chat", label: "AI Chat", icon: MessageCircle },
-    { href: "/admin/content-generator", label: "Konten Sosmed", icon: Share2 },
-    { href: "/admin/content-generator/drafts", label: "Konsep", icon: FileText },
-    { href: "/admin/content-generator/calendar", label: "Kalender", icon: Calendar },
-    { href: "/admin/prompt-generator", label: "Prompt GPT", icon: Sparkles },
+    { href: `/${ADMIN_PATH}/chat`, label: "AI Chat", icon: MessageCircle },
+    { href: `/${ADMIN_PATH}/content-generator`, label: "Konten Sosmed", icon: Share2 },
+    { href: `/${ADMIN_PATH}/content-generator/drafts`, label: "Konsep", icon: FileText },
+    { href: `/${ADMIN_PATH}/content-generator/calendar`, label: "Kalender", icon: Calendar },
+    { href: `/${ADMIN_PATH}/prompt-generator`, label: "Prompt GPT", icon: Sparkles },
   ]},
   { label: "Data & Analitik", items: [
-    { href: "/admin/content-readiness", label: "Kesiapan", icon: CheckCircle },
-    { href: "/admin/waitlist", label: "Waitlist", icon: Mail },
-    { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
-    { href: "/admin/invoice", label: "Invoice", icon: Receipt },
+    { href: `/${ADMIN_PATH}/content-readiness`, label: "Kesiapan", icon: CheckCircle },
+    { href: `/${ADMIN_PATH}/waitlist`, label: "Waitlist", icon: Mail },
+    { href: `/${ADMIN_PATH}/analytics`, label: "Analytics", icon: BarChart3 },
+    { href: `/${ADMIN_PATH}/invoice`, label: "Invoice", icon: Receipt },
   ]},
   { label: "Pengaturan", items: [
-    { href: "/admin/settings", label: "Settings", icon: Settings },
+    { href: `/${ADMIN_PATH}/settings`, label: "Settings", icon: Settings },
   ]},
 ]
 
@@ -82,7 +84,7 @@ export default function AdminLayout({
 
   const handleLogout = async () => {
     await signOut()
-    router.push("/admin/login")
+    router.push(`/${ADMIN_PATH}/login`)
   }
 
   const SidebarContent = ({ collapsed }: { collapsed?: boolean }) => (
