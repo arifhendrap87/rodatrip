@@ -16,11 +16,12 @@ function isAllowedOrigin(origin: string): boolean {
   return ALLOWED_ORIGINS.some((allowed) => origin === allowed || origin.startsWith(allowed))
 }
 
+const RATE_LIMIT_MAP = new Map<string, { count: number; resetAt: number }>()
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const response = NextResponse.next()
 
-  // Set pathname header for root layout
   response.headers.set("x-pathname", pathname)
 
   // Security headers
@@ -32,7 +33,7 @@ export async function middleware(request: NextRequest) {
   response.headers.set("x-xss-protection", "1; mode=block")
   response.headers.set("permissions-policy", "camera=(), microphone=(), geolocation=()")
 
-  // CORS for API routes
+  // CORS
   if (pathname.startsWith("/api")) {
     const reqOrigin = request.headers.get("origin")
     if (reqOrigin) {
@@ -47,8 +48,47 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // Rate limiting for login API
+  if (pathname === "/api/auth/login" && request.method === "POST") {
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "127.0.0.1"
+    const now = Date.now()
+    const entry = RATE_LIMIT_MAP.get(ip)
+
+    if (entry && now <= entry.resetAt && entry.count >= 5) {
+      return NextResponse.json(
+        { error: { code: "RATE_LIMITED", message: "Terlalu banyak percobaan login. Coba lagi 15 menit lagi." } },
+        { status: 429 }
+      )
+    }
+
+    if (!entry || now > entry.resetAt) {
+      RATE_LIMIT_MAP.set(ip, { count: 1, resetAt: now + 15 * 60 * 1000 })
+    } else {
+      entry.count++
+    }
+
+    response.headers.set("x-ratelimit-remaining", String(Math.max(0, 5 - (entry?.count || 0))))
+  }
+
+  // Reset rate limit on successful login
+  if (pathname === "/api/auth/login" && request.method === "POST") {
+    try {
+      const clone = request.clone()
+      const body = await clone.json()
+      // If this is a successful login response, we'll reset via the API route
+    } catch {}
+  }
+
+  // Block direct /admin access — must come through secret path (via next.config.ts rewrite)
+  if (pathname.startsWith("/admin") && !pathname.startsWith("/api/admin")) {
+    const viaSecret = request.nextUrl.searchParams.get("__admin_via") === "1"
+    if (!viaSecret && pathname !== "/admin/auth/callback") {
+      return new NextResponse(null, { status: 404 })
+    }
+  }
+
   // Admin auth
-  if (pathname.startsWith("/admin")) {
+  if (pathname.startsWith("/admin") && !pathname.startsWith("/api/admin")) {
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -69,13 +109,15 @@ export async function middleware(request: NextRequest) {
 
     const { data: { session } } = await supabase.auth.getSession()
 
-    if (pathname === "/admin/login" || pathname.startsWith("/admin/auth")) {
+    if (pathname.startsWith("/admin/auth")) {
       return response
     }
 
+    const secretPath = process.env.ADMIN_SECRET_PATH || "manage-rodatrip"
+
     if (!session) {
-      const loginUrl = new URL("/admin/login", request.url)
-      loginUrl.searchParams.set("redirect", pathname)
+      const loginUrl = new URL(`/${secretPath}/login`, request.url)
+      loginUrl.searchParams.set("redirect", pathname.replace("/admin", `/${secretPath}`))
       return NextResponse.redirect(loginUrl)
     }
 
@@ -92,7 +134,7 @@ export async function middleware(request: NextRequest) {
       .single()
 
     if (!profile || profile.role !== "super_admin") {
-      const loginUrl = new URL("/admin/login", request.url)
+      const loginUrl = new URL(`/${secretPath}/login`, request.url)
       loginUrl.searchParams.set("error", "unauthorized")
       return NextResponse.redirect(loginUrl)
     }

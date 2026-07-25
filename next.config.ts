@@ -25,6 +25,19 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: process.cwd(),
   },
+  async rewrites() {
+    const secretPath = process.env.ADMIN_SECRET_PATH || "manage-rodatrip"
+    return [
+      {
+        source: `/${secretPath}/:path*`,
+        destination: `/admin/:path*?__admin_via=1`,
+      },
+      {
+        source: `/${secretPath}`,
+        destination: `/admin?__admin_via=1`,
+      },
+    ]
+  },
   async headers() {
     return [
       {
