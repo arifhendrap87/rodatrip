@@ -237,9 +237,15 @@ export default function EditSpotPage() {
         }),
       })
       const json = await res.json()
-      if (!res.ok) throw new Error(json?.error?.message || "Gagal generate deskripsi")
-      setForm((f: any) => ({ ...f, description: json.data.text }))
-      toast.success("Deskripsi berhasil digenerate!")
+      if (!res.ok) throw new Error(json?.error?.message || "Gagal generate")
+      const data = json.data || {}
+      setForm((f: any) => ({
+        ...f,
+        description: data.description || data.text || f.description,
+        seo_title: data.seo_title || f.seo_title,
+        meta_description: data.meta_description || f.meta_description,
+      }))
+      toast.success("Konten SEO berhasil digenerate!")
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Gagal generate deskripsi")
     }
@@ -375,7 +381,7 @@ export default function EditSpotPage() {
                 <Button type="button" variant="outline" size="sm" className="gap-1.5"
                   onClick={handleGenerateDescription} disabled={generatingDesc || !form.name}>
                   {generatingDesc ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
-                  {generatingDesc ? "Generating..." : "✨ Generate SEO"}
+                  {generatingDesc ? "Generating..." : "✨ Generate Konten SEO"}
                 </Button>
               </div>
               <TiptapEditor content={form.description || ""}
