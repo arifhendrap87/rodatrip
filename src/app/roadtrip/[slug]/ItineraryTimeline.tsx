@@ -61,9 +61,11 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
 
             <div className="flex-1 min-w-0">
               <button onClick={() => toggleStop(stop.stopNumber)}
-                className="w-full flex items-center gap-2 text-left mb-1">
+                className="w-full flex items-center gap-2 text-left mb-1 hover:bg-muted/30 rounded-lg px-2 -mx-2 py-1 transition-colors">
                 <h3 className="text-xl font-bold font-heading flex-1">{stop.name}</h3>
-                <span className={`text-muted-foreground text-xs transition-transform ${isOpen ? '' : '-rotate-90'}`}>▼</span>
+                <span className={`text-primary text-lg font-bold transition-transform duration-200 ${isOpen ? '' : '-rotate-90'}`}>
+                  {isOpen ? '▼' : '▶'}
+                </span>
               </button>
 
               <div className="flex flex-wrap items-center gap-2">
@@ -106,6 +108,15 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
               {stop.imageUrl && (
                 <div className="mt-3 rounded-xl overflow-hidden border border-border/30 bg-muted">
                   <img src={stop.imageUrl} alt={stop.name} className="w-full aspect-[16/7] object-cover" loading="lazy" />
+                </div>
+              )}
+
+              {!isOpen && (
+                <div className="mt-2 text-center">
+                  <span className="inline-flex items-center gap-1 text-xs text-primary font-medium cursor-pointer hover:underline"
+                    onClick={() => toggleStop(stop.stopNumber)}>
+                    ▶ Lihat detail destinasi ini
+                  </span>
                 </div>
               )}
 
