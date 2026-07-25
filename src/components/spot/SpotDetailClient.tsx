@@ -71,7 +71,7 @@ export function SpotDetailClient({ spot, relatedItineraries, allSpots }: SpotDet
             <div className="lg:col-span-2 space-y-8">
               <div>
                 <h2 className="text-2xl font-bold font-heading">Tentang Tempat Ini</h2>
-                <p className="mt-3 text-muted-foreground leading-relaxed text-lg">{spot.description}</p>
+                <div className="mt-3 text-muted-foreground leading-relaxed text-lg" dangerouslySetInnerHTML={{ __html: spot.description }} />
               </div>
               {infoGrid.length > 0 && (
                 <div className="grid gap-4 sm:grid-cols-2">

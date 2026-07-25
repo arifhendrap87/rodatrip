@@ -52,7 +52,7 @@ export function SpotCard({ spot }: { spot: any }) {
           <h3 className="text-lg font-bold font-heading leading-tight group-hover:text-primary transition-colors">
             {spot.name}
           </h3>
-          <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{spot.description || spot.tips}</p>
+          <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{spot.description ? spot.description.replace(/<[^>]+>/g, '') : spot.tips}</p>
           <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
               <span>📍</span>

@@ -124,9 +124,7 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
                 <div className="space-y-4 mt-4">
 
               {stop.description && (
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {stop.description}
-                </p>
+                <div className="text-sm text-muted-foreground leading-relaxed" dangerouslySetInnerHTML={{ __html: stop.description }} />
               )}
 
               {(stop.ticketPrice || stop.parkingFee || stop.additionalCost) && (
