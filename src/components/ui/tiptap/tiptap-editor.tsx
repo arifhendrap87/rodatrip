@@ -117,8 +117,12 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
   })
 
   useEffect(() => {
-    if (editor && content && editor.getHTML() !== content) {
-      editor.commands.setContent(content)
+    if (editor && content !== undefined) {
+      const current = editor.getHTML().replace(/\s+</g, '<').replace(/>\s+/g, '>')
+      const incoming = content.replace(/\s+</g, '<').replace(/>\s+/g, '>')
+      if (current !== incoming) {
+        editor.commands.setContent(content, { emitUpdate: false })
+      }
     }
   }, [content, editor])
 
