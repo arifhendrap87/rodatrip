@@ -1,0 +1,2 @@
+ALTER TABLE spots ADD COLUMN IF NOT EXISTS seo_title text DEFAULT '';
+ALTER TABLE spots ADD COLUMN IF NOT EXISTS meta_description text DEFAULT '';

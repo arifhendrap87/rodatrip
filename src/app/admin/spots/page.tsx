@@ -479,7 +479,7 @@ Tambah Spot
                               <div className={`h-full rounded-full ${scoreColor(score)}`} style={{ width: `${score}%` }} />
                             </div>
                             <span className="text-[11px] text-muted-foreground">
-                              {spot.name ? "✅" : "❌"} Nama · {spot.description ? "✅" : "❌"} Deskripsi · {spot.image_url ? "✅" : "❌"} Gambar · {spot.category ? "✅" : "❌"} Kategori · {spot.province ? "✅" : "❌"} Provinsi · {parseLocation(spot.location) ? "✅" : "❌"} Koordinat · {(spot.rating || 0) > 0 ? "✅" : "❌"} Rating
+                              {spot.name ? "✅" : "❌"} Nama · {spot.description ? "✅" : "❌"} Deskripsi · {spot.image_url ? "✅" : "❌"} Gambar · {spot.category ? "✅" : "❌"} Kategori · {spot.province ? "✅" : "❌"} Provinsi · {parseLocation(spot.location) ? "✅" : "❌"} Koordinat · {(spot.rating || 0) > 0 ? "✅" : "❌"} Rating · {spot.seo_title ? "✅" : "❌"} SEO · {spot.meta_description ? "✅" : "❌"} Meta
                             </span>
                           </div>
                         )

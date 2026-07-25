@@ -85,6 +85,8 @@ export default function EditSpotPage() {
     image_prompt: "",
     is_featured: false,
     is_published: true,
+    seo_title: "",
+    meta_description: "",
     images: [],
     nearbyHotels: [] as any[],
     nearbyRestaurants: [] as any[],
@@ -132,6 +134,8 @@ export default function EditSpotPage() {
     image_prompt: (data as any).image_prompt || "",
             is_featured: data.is_featured || false,
             is_published: data.is_published !== undefined ? data.is_published : true,
+            seo_title: data.seo_title || "",
+            meta_description: data.meta_description || "",
             images: data.images || [],
             nearbyHotels: (data as any).nearby_hotels_jsonb || (data as any).nearby_hotels || [],
             nearbyRestaurants: (data as any).nearby_restaurants_jsonb || (data as any).nearby_restaurants || [],
@@ -177,6 +181,8 @@ export default function EditSpotPage() {
       imagePrompt: form.image_prompt || undefined,
       isFeatured: form.is_featured,
       isPublished: form.is_published,
+      seoTitle: form.seo_title || undefined,
+      metaDescription: form.meta_description || undefined,
       nearbyHotels: form.nearbyHotels?.length > 0 ? form.nearbyHotels : undefined,
       nearbyRestaurants: form.nearbyRestaurants?.length > 0 ? form.nearbyRestaurants : undefined,
       images: form.images?.length > 0 ? form.images : undefined,
@@ -475,6 +481,20 @@ export default function EditSpotPage() {
                 <Label>Tags (comma separated)</Label>
                 <Input value={form.tags || ""}
                   onChange={(e) => setForm((f: any) => ({ ...f, tags: e.target.value }))} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>SEO Title (optional)</Label>
+                <Input value={form.seo_title || ""}
+                  onChange={(e) => setForm((f: any) => ({ ...f, seo_title: e.target.value }))}
+                  placeholder="Auto dari nama spot" />
+              </div>
+              <div className="space-y-2">
+                <Label>Meta Description (optional)</Label>
+                <Input value={form.meta_description || ""}
+                  onChange={(e) => setForm((f: any) => ({ ...f, meta_description: e.target.value }))}
+                  placeholder="Auto dari deskripsi" />
               </div>
             </div>
             <ImageUpload value={form.image_url} onChange={(v) => setForm((f: any) => ({ ...f, image_url: v }))} label="🖼️ Image" folder="spots" />

@@ -15,9 +15,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const spot = await getSpotBySlug(slug)
   if (!spot) return {}
-  const metaDesc = spot.description || `${spot.name} — ${spot.category} di ${spot.province}. Temukan spot istimewa ini di ${SITE_NAME}.`
+  const cleanDesc = spot.description?.replace(/<[^>]+>/g, '') || ''
+  const metaTitle = spot.seo_title || `${spot.name} — Spot Istimewa`
+  const metaDesc = spot.meta_description || cleanDesc || `${spot.name} — ${spot.category} di ${spot.province}. Temukan spot istimewa ini di ${SITE_NAME}.`
   return {
-    title: `${spot.name} — Spot Istimewa`,
+    title: metaTitle,
     description: metaDesc,
     alternates: { canonical: `${SITE_URL}/spot-istimewa/${slug}` },
     robots: { index: true, follow: true },

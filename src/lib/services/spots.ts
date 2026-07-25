@@ -28,6 +28,8 @@ export interface SpotData {
   visit_duration?: string
   best_visit_hour?: string
   spot_important_note?: string
+  seo_title?: string
+  meta_description?: string
   road_access: string
   facilities: string[]
   distance_from_city: string
