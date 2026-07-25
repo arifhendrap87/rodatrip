@@ -70,17 +70,35 @@ Aturan description:
 - seo_title: max 60 karakter, contoh: "${name} — Destinasi Wisata ${province || ""} Terbaik"
 - meta_description: max 160 karakter, contoh: "Nikmati keindahan ${name} di ${province || ""}. [daya tarik singkat]. [aktivitas]."`
 
-    const raw = await callDeepSeek(prompt)
+    let raw = await callDeepSeek(prompt)
+
+    // Retry once if empty
+    if (!raw) {
+      raw = await callDeepSeek(prompt)
+    }
 
     // Try to parse JSON from response
     let json: { description?: string; seo_title?: string; meta_description?: string } = {}
+    let parsed = false
     try {
-      // Find JSON block in response (handle markdown wrapping)
       const jsonMatch = raw.match(/\{[\s\S]*\}/)
       if (jsonMatch) json = JSON.parse(jsonMatch[0])
       else json = JSON.parse(raw)
+      parsed = true
     } catch {
-      // Fallback: return raw text as description if available
+      // Retry once if JSON parsing failed
+      try {
+        const retryRaw = await callDeepSeek(prompt)
+        const jsonMatch = retryRaw.match(/\{[\s\S]*\}/)
+        if (jsonMatch) json = JSON.parse(jsonMatch[0])
+        else json = JSON.parse(retryRaw)
+        parsed = true
+      } catch {
+        // fallback
+      }
+    }
+
+    if (!parsed) {
       return success({
         description: raw ? raw : "",
         seo_title: name,
