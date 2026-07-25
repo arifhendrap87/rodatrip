@@ -183,6 +183,47 @@ export default function SpotsPage() {
     setBatchLoading(false)
   }
 
+  async function handleBatchGenerateSEO() {
+    if (selectedSlugs.size === 0) return
+    if (!confirm(`Generate SEO untuk ${selectedSlugs.size} spot? Proses ini berjalan untuk setiap spot secara bergantian.`)) return
+    setBatchLoading(true)
+    let success = 0
+    for (const slug of selectedSlugs) {
+      try {
+        const spotRes = await fetch(`/api/spots/${slug}`)
+        const spotJson = await spotRes.json()
+        const spot = spotJson.data
+        if (!spot) continue
+
+        const res = await fetch("/api/ai/generate-spot-description", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: spot.name,
+            category: spot.category,
+            province: spot.province,
+            city: spot.city || "",
+            existingDescription: spot.description || "",
+          }),
+        })
+        const json = await res.json()
+        if (!res.ok) continue
+        const data = json.data || {}
+
+        await api.spots.update(slug, {
+          description: data.description || undefined,
+          seoTitle: data.seo_title || undefined,
+          metaDescription: data.meta_description || undefined,
+        } as Record<string, unknown>)
+        success++
+      } catch { continue }
+    }
+    setSelectedSlugs(new Set())
+    fetchSpots(offset)
+    toast.success(`${success}/${selectedSlugs.size} spot berhasil di-SEO-kan`)
+    setBatchLoading(false)
+  }
+
   async function handleDelete(slug: string, name: string) {
     if (!confirm(`Hapus "${name}"?`)) return
     await api.spots.delete(slug)
@@ -335,6 +376,10 @@ export default function SpotsPage() {
           <span className="text-sm font-medium">{selectedSlugs.size} terpilih</span>
           <Button size="sm" variant="default" onClick={() => handleBatch("publish")} disabled={batchLoading}>Publish</Button>
           <Button size="sm" variant="secondary" onClick={() => handleBatch("unpublish")} disabled={batchLoading}>Unpublish</Button>
+          <Button size="sm" variant="outline" onClick={handleBatchGenerateSEO} disabled={batchLoading}>
+            {batchLoading ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Sparkles className="mr-1 h-3 w-3" />}
+            Generate SEO
+          </Button>
           <Button size="sm" variant="destructive" onClick={() => handleBatch("delete")} disabled={batchLoading}>Hapus</Button>
         </div>
       )}
