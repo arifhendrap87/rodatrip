@@ -22,7 +22,7 @@ interface ItineraryTimelineProps {
 }
 
 export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
-  const [expanded, setExpanded] = useState<Set<number>>(new Set(stops.map(s => s.stopNumber)))
+  const [expanded, setExpanded] = useState<Set<number>>(new Set())
 
   function toggleStop(num: number) {
     setExpanded(prev => {
