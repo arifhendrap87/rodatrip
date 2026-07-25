@@ -287,6 +287,7 @@ export default function EditSpotPage() {
           { label: "Rating", ok: parseFloat(form.rating) > 0 },
           { label: "SEO Title", ok: !!form.seo_title },
           { label: "Meta Desc", ok: !!form.meta_description },
+          { label: "Konten SEO", ok: !!form.description && form.description.length > 300 && form.description.includes('<h3>') },
         ]}
       />
 
