@@ -5,6 +5,7 @@ import { useParams } from "next/navigation"
 import Link from "next/link"
 import { Loader2, ArrowLeft, ExternalLink, Check } from "lucide-react"
 import { toast } from "sonner"
+import DOMPurify from "dompurify"
 
 interface BlogPost {
   id: string
@@ -135,7 +136,7 @@ export default function BlogPreviewPage() {
         )}
 
         {/* Content */}
-        <div className="prose prose-lg max-w-none text-[#1E232A]" dangerouslySetInnerHTML={{ __html: post.content }} />
+        <div className="prose prose-lg max-w-none text-[#1E232A]" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }} />
 
         {/* Tags */}
         {post.tags && post.tags.length > 0 && (

@@ -1,4 +1,5 @@
-import { success, badRequest, internalError } from "@/lib/api/response"
+import { getServerAdmin } from "@/lib/api/auth"
+import { success, badRequest, internalError, unauthorized } from "@/lib/api/response"
 
 const API_KEY = process.env.DEEPSEEK_API_KEY
 const API_URL = "https://api.deepseek.com/chat/completions"
@@ -32,6 +33,9 @@ async function callDeepSeek(prompt: string): Promise<string> {
 
 export async function POST(request: Request) {
   try {
+    const admin = await getServerAdmin()
+    if (!admin) return unauthorized()
+
     const { type, title, category, description } = await request.json()
     if (!type || !title) return badRequest("type dan title wajib diisi")
 

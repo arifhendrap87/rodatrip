@@ -7,7 +7,23 @@ const adminClient = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 )
 
+const ipLimit = new Map<string, number>()
+const WINDOW_MS = 60 * 1000 // 1 menit
+const MAX_PER_WINDOW = 30
+
 export async function POST(request: Request) {
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown"
+  const now = Date.now()
+
+  const lastReset = ipLimit.get(ip) || 0
+  if (now - lastReset < WINDOW_MS && lastReset > 0) {
+    return success({ ok: true, throttled: true })
+  }
+  // Reset counter periodically
+  if (now - lastReset > WINDOW_MS) {
+    ipLimit.delete(ip)
+  }
+
   const body = await request.json()
   const { eventType, entityType, entityId, metadata } = body
 
@@ -25,5 +41,6 @@ export async function POST(request: Request) {
     .single()
 
   if (error) return internalError(error.message)
+  ipLimit.set(ip, now)
   return success({ eventId: data?.id })
 }

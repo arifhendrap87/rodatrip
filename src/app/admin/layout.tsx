@@ -35,38 +35,6 @@ import { useState } from "react"
 interface NavItem { href: string; label: string; icon: React.ComponentType<{ className?: string }> }
 interface NavGroup { label: string; items: NavItem[] }
 
-const ADMIN_PATH = process.env.NEXT_PUBLIC_ADMIN_SECRET_PATH || "manage-rodatrip"
-
-const navGroups: NavGroup[] = [
-  { label: "Dashboard", items: [
-    { href: `/${ADMIN_PATH}`, label: "Dashboard", icon: LayoutDashboard },
-  ]},
-  { label: "Konten", items: [
-    { href: `/${ADMIN_PATH}/spots`, label: "Spots", icon: MapPin },
-    { href: `/${ADMIN_PATH}/products`, label: "Products", icon: ShoppingBag },
-    { href: `/${ADMIN_PATH}/roadtrips`, label: "Roadtrips", icon: Map },
-    { href: `/${ADMIN_PATH}/blog`, label: "Blog", icon: FileText },
-    { href: `/${ADMIN_PATH}/media`, label: "Media", icon: Image },
-    { href: `/${ADMIN_PATH}/regions`, label: "Regions", icon: Globe },
-  ]},
-  { label: "AI & Sosial Media", items: [
-    { href: `/${ADMIN_PATH}/chat`, label: "AI Chat", icon: MessageCircle },
-    { href: `/${ADMIN_PATH}/content-generator`, label: "Konten Sosmed", icon: Share2 },
-    { href: `/${ADMIN_PATH}/content-generator/drafts`, label: "Konsep", icon: FileText },
-    { href: `/${ADMIN_PATH}/content-generator/calendar`, label: "Kalender", icon: Calendar },
-    { href: `/${ADMIN_PATH}/prompt-generator`, label: "Prompt GPT", icon: Sparkles },
-  ]},
-  { label: "Data & Analitik", items: [
-    { href: `/${ADMIN_PATH}/content-readiness`, label: "Kesiapan", icon: CheckCircle },
-    { href: `/${ADMIN_PATH}/waitlist`, label: "Waitlist", icon: Mail },
-    { href: `/${ADMIN_PATH}/analytics`, label: "Analytics", icon: BarChart3 },
-    { href: `/${ADMIN_PATH}/invoice`, label: "Invoice", icon: Receipt },
-  ]},
-  { label: "Pengaturan", items: [
-    { href: `/${ADMIN_PATH}/settings`, label: "Settings", icon: Settings },
-  ]},
-]
-
 export default function AdminLayout({
   children,
 }: {
@@ -78,14 +46,47 @@ export default function AdminLayout({
   const [mobileOpen, setMobileOpen] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
+  // Derive admin prefix from current pathname — no env var exposed to client
+  const ADMIN_PATH = pathname.startsWith("/admin") ? "" : "/manage-rodatrip"
+
   if (pathname.includes("/login") || pathname.includes("/auth")) {
     return <>{children}</>
   }
 
   const handleLogout = async () => {
     await signOut()
-    router.push(`/${ADMIN_PATH}/login`)
+    router.push(`${ADMIN_PATH || ""}/login`)
   }
+
+  const navGroups: NavGroup[] = [
+  { label: "Dashboard", items: [
+    { href: `${ADMIN_PATH ? ADMIN_PATH : "/admin"}`, label: "Dashboard", icon: LayoutDashboard },
+  ]},
+  { label: "Konten", items: [
+    { href: `${ADMIN_PATH ? ADMIN_PATH + "/spots" : "/admin/spots"}`, label: "Spots", icon: MapPin },
+    { href: `${ADMIN_PATH ? ADMIN_PATH + "/products" : "/admin/products"}`, label: "Products", icon: ShoppingBag },
+    { href: `${ADMIN_PATH ? ADMIN_PATH + "/roadtrips" : "/admin/roadtrips"}`, label: "Roadtrips", icon: Map },
+    { href: `${ADMIN_PATH ? ADMIN_PATH + "/blog" : "/admin/blog"}`, label: "Blog", icon: FileText },
+    { href: `${ADMIN_PATH ? ADMIN_PATH + "/media" : "/admin/media"}`, label: "Media", icon: Image },
+    { href: `${ADMIN_PATH ? ADMIN_PATH + "/regions" : "/admin/regions"}`, label: "Regions", icon: Globe },
+  ]},
+  { label: "AI & Sosial Media", items: [
+    { href: `${ADMIN_PATH ? ADMIN_PATH + "/chat" : "/admin/chat"}`, label: "AI Chat", icon: MessageCircle },
+    { href: `${ADMIN_PATH ? ADMIN_PATH + "/content-generator" : "/admin/content-generator"}`, label: "Konten Sosmed", icon: Share2 },
+    { href: `${ADMIN_PATH ? ADMIN_PATH + "/content-generator/drafts" : "/admin/content-generator/drafts"}`, label: "Konsep", icon: FileText },
+    { href: `${ADMIN_PATH ? ADMIN_PATH + "/content-generator/calendar" : "/admin/content-generator/calendar"}`, label: "Kalender", icon: Calendar },
+    { href: `${ADMIN_PATH ? ADMIN_PATH + "/prompt-generator" : "/admin/prompt-generator"}`, label: "Prompt GPT", icon: Sparkles },
+  ]},
+  { label: "Data & Analitik", items: [
+    { href: `${ADMIN_PATH ? ADMIN_PATH + "/content-readiness" : "/admin/content-readiness"}`, label: "Kesiapan", icon: CheckCircle },
+    { href: `${ADMIN_PATH ? ADMIN_PATH + "/waitlist" : "/admin/waitlist"}`, label: "Waitlist", icon: Mail },
+    { href: `${ADMIN_PATH ? ADMIN_PATH + "/analytics" : "/admin/analytics"}`, label: "Analytics", icon: BarChart3 },
+    { href: `${ADMIN_PATH ? ADMIN_PATH + "/invoice" : "/admin/invoice"}`, label: "Invoice", icon: Receipt },
+  ]},
+  { label: "Pengaturan", items: [
+    { href: `${ADMIN_PATH ? ADMIN_PATH + "/settings" : "/admin/settings"}`, label: "Settings", icon: Settings },
+  ]},
+]
 
   const SidebarContent = ({ collapsed }: { collapsed?: boolean }) => (
     <div className="flex h-full flex-col">

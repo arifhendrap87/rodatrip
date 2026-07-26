@@ -29,5 +29,7 @@ export async function GET(request: Request) {
   }
 
   const redirectTo = requestUrl.searchParams.get("redirect") || "/"
-  return NextResponse.redirect(new URL(redirectTo, requestUrl.origin))
+  // Only allow internal redirects
+  const safeRedirect = redirectTo.startsWith("/") ? redirectTo : "/"
+  return NextResponse.redirect(new URL(safeRedirect, requestUrl.origin))
 }

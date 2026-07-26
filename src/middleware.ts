@@ -12,8 +12,17 @@ const ALLOWED_ORIGINS = [
   "http://localhost",
 ]
 
+const ALLOWED_HOSTS = ALLOWED_ORIGINS.map((o) => {
+  try { return new URL(o).host } catch { return null }
+}).filter(Boolean) as string[]
+
 function isAllowedOrigin(origin: string): boolean {
-  return ALLOWED_ORIGINS.some((allowed) => origin === allowed || origin.startsWith(allowed))
+  try {
+    const host = new URL(origin).host
+    return ALLOWED_HOSTS.includes(host)
+  } catch {
+    return false
+  }
 }
 
 const RATE_LIMIT_MAP = new Map<string, { count: number; resetAt: number }>()

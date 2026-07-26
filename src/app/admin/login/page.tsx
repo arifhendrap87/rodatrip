@@ -16,8 +16,7 @@ function LoginForm() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const ADMIN_PATH = process.env.NEXT_PUBLIC_ADMIN_SECRET_PATH || "manage-rodatrip"
-  const redirect = searchParams.get("redirect") || `/${ADMIN_PATH}`
+  const redirect = searchParams.get("redirect") || "/manage-rodatrip"
   const authError = searchParams.get("error")
 
   const handleLogin = async (e: React.FormEvent) => {

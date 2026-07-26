@@ -10,6 +10,7 @@ import { RoadtripCard } from "@/components/roadtrip/RoadtripCard"
 import { getSpots } from "@/lib/services/spots"
 import { getItineraries } from "@/lib/services/itineraries"
 import type { Itinerary } from "@/types"
+import DOMPurify from "isomorphic-dompurify"
 
 function isHtmlContent(str: string): boolean {
   return /<[a-z][\s\S]*>/i.test(str)
@@ -112,7 +113,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
         <div className="mt-10 prose prose-gray max-w-none">
           {isHtmlContent(post.content) ? (
-            <div dangerouslySetInnerHTML={{ __html: post.content }} />
+            <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }} />
           ) : (
             post.content.split("\n").map((line, i) => {
               if (line.startsWith("## ")) return <h2 key={i} className="text-xl font-bold font-heading mt-8 mb-3">{line.replace("## ", "")}</h2>

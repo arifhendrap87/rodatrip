@@ -7,7 +7,18 @@ const adminClient = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 )
 
-export async function POST(_request: Request, { params }: { params: Promise<{ slug: string }> }) {
+const ipLimit = new Map<string, number>()
+const WINDOW_MS = 60 * 1000
+const MAX_PER_WINDOW = 10
+
+export async function POST(request: Request, { params }: { params: Promise<{ slug: string }> }) {
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown"
+  const now = Date.now()
+  const lastHit = ipLimit.get(ip) || 0
+  if (now - lastHit < WINDOW_MS) {
+    ipLimit.set(ip, now)
+  }
+
   const { slug } = await params
 
   const { data: spot } = await adminClient

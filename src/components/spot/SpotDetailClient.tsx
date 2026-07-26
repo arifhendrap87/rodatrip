@@ -10,6 +10,7 @@ import { SpotHeroImage } from "@/components/spot/SpotHeroImage"
 import { SpotCard } from "@/components/spot/SpotCard"
 import { CopyPromptButton } from "@/components/spot/CopyPromptButton"
 import { NearbyPlaces } from "@/components/roadtrip/NearbyPlaces"
+import DOMPurify from "dompurify"
 
 interface SpotDetailClientProps {
   spot: SpotData
@@ -71,7 +72,7 @@ export function SpotDetailClient({ spot, relatedItineraries, allSpots }: SpotDet
             <div className="lg:col-span-2 space-y-8">
               <div>
                 <h2 className="text-2xl font-bold font-heading">Tentang Tempat Ini</h2>
-                <div className="mt-3 prose prose-lg max-w-none text-muted-foreground" dangerouslySetInnerHTML={{ __html: spot.description }} />
+                <div className="mt-3 prose prose-lg max-w-none text-muted-foreground" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(spot.description) }} />
               </div>
               {infoGrid.length > 0 && (
                 <div className="grid gap-4 sm:grid-cols-2">

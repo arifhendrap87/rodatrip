@@ -7,6 +7,7 @@ import { NearbyPlaces } from "@/components/roadtrip/NearbyPlaces"
 import { SPOT_CATEGORY_DISPLAY } from "@/lib/constants"
 import { Copy } from "lucide-react"
 import { toast } from "sonner"
+import DOMPurify from "dompurify"
 
 function fixMapsUrl(url?: string): string {
   if (!url || !url.includes("maps/")) return url || ""
@@ -127,7 +128,7 @@ export function ItineraryTimeline({ stops }: ItineraryTimelineProps) {
                 const match = stop.description.match(/<p[^>]*>([\s\S]*?)<\/p>/)
                 if (!match) return null
                 return (
-                  <div className="text-sm text-muted-foreground leading-relaxed" dangerouslySetInnerHTML={{ __html: match[0] }} />
+                  <div className="text-sm text-muted-foreground leading-relaxed" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(match[0]) }} />
                 )
               })()}
 
