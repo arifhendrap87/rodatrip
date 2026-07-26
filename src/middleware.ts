@@ -27,11 +27,42 @@ function isAllowedOrigin(origin: string): boolean {
 
 const RATE_LIMIT_MAP = new Map<string, { count: number; resetAt: number }>()
 
+function buildCsp(nonce: string): string {
+  const isDev = process.env.NODE_ENV === "development"
+  return [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
+    `style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com`,
+    "img-src 'self' data: blob: https://*.supabase.co https://*.r2.dev https://images.gaskuy.id https://images.unsplash.com https://*.tile.openstreetmap.org",
+    "font-src 'self' data: https://fonts.gstatic.com",
+    "connect-src 'self' https://*.supabase.co https://api.deepseek.com https://overpass-api.de",
+    "frame-src 'self' https://www.google.com https://maps.google.com",
+    "worker-src 'self' blob:",
+    "media-src 'self'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+  ].join("; ")
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const nonce = Buffer.from(crypto.randomUUID()).toString("base64")
   const response = NextResponse.next()
 
   response.headers.set("x-pathname", pathname)
+  response.headers.set("x-nonce", nonce)
+
+  // CSP header with nonce (skip API and static routes)
+  if (
+    !pathname.startsWith("/api") &&
+    !pathname.startsWith("/_next") &&
+    !pathname.startsWith("/favicon") &&
+    !pathname.startsWith("/robots.txt") &&
+    !pathname.startsWith("/sitemap.xml")
+  ) {
+    response.headers.set("content-security-policy", buildCsp(nonce))
+  }
 
   // Security headers
   response.headers.set("x-frame-options", "DENY")
