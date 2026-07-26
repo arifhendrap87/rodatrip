@@ -19,6 +19,9 @@ export const metadata: Metadata = {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
   },
+  verification: {
+    google: "tXxWuZ6oM4Q4qDpy3d_ezqhSnXt_TU6KX1Qj_jDXGA4",
+  },
   openGraph: {
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
