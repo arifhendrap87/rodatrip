@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/", "/admin/"],
+        disallow: ["/api/"],
       },
     ],
     sitemap: `${process.env.NEXT_PUBLIC_APP_URL || "https://rodatrip.id"}/sitemap.xml`,
