@@ -30,7 +30,7 @@ const RATE_LIMIT_MAP = new Map<string, { count: number; resetAt: number }>()
 function buildCsp(nonce: string): string {
   const isDev = process.env.NODE_ENV === "development"
   return [
-    "default-src 'self'",
+    "default-src 'none'",
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
     `style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com`,
     "img-src 'self' data: blob: https://*.supabase.co https://*.r2.dev https://images.gaskuy.id https://images.unsplash.com https://*.tile.openstreetmap.org",
@@ -40,8 +40,10 @@ function buildCsp(nonce: string): string {
     "worker-src 'self' blob:",
     "media-src 'self'",
     "object-src 'none'",
-    "base-uri 'self'",
-    "form-action 'self'",
+    "base-uri 'none'",
+    "form-action 'none'",
+    "frame-ancestors 'none'",
+    "prefetch-src 'self'",
   ].join("; ")
 }
 
