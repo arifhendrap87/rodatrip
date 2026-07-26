@@ -74,12 +74,7 @@ export function NearbyPlaces({
   }
 
   if (error) {
-    return (
-      <div className="rounded-2xl border border-border/50 bg-muted/30 p-6 text-center">
-        <p className="text-sm text-muted-foreground">Gagal memuat data tempat terdekat</p>
-        <p className="text-xs text-muted-foreground/60 mt-1">{error}</p>
-      </div>
-    )
+    return null
   }
 
   if (places.length === 0) {
