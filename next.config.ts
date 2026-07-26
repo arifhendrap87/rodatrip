@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const ContentSecurityPolicy = `
   default-src 'self';
-  script-src 'self' 'unsafe-eval' 'unsafe-inline';
+  script-src 'self' 'unsafe-inline';
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   img-src 'self' data: blob: https://*.supabase.co https://*.r2.dev https://images.gaskuy.id https://images.unsplash.com https://*.tile.openstreetmap.org;
   font-src 'self' data: https://fonts.gstatic.com;
@@ -10,6 +10,9 @@ const ContentSecurityPolicy = `
   frame-src 'self' https://www.google.com https://maps.google.com;
   worker-src 'self' blob:;
   media-src 'self';
+  object-src 'none';
+  base-uri 'self';
+  form-action 'self';
 `.replace(/\s{2,}/g, " ").trim()
 
 const securityHeaders = [
