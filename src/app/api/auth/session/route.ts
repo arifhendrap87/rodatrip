@@ -17,7 +17,7 @@ export async function GET() {
   )
 
   const { data: { session } } = await supabase.auth.getSession()
-  if (!session) return unauthorized("No active session")
+  if (!session) return success({ user: null, session: null })
 
   const adminClient = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
