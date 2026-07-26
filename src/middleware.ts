@@ -121,10 +121,33 @@ export async function middleware(request: NextRequest) {
     } catch {}
   }
 
-  // Block direct /admin access — must come through secret path (via next.config.ts rewrite)
+  // Block or redirect direct /admin access — must come through secret path
   if (pathname.startsWith("/admin") && !pathname.startsWith("/api/admin")) {
     const viaSecret = request.nextUrl.searchParams.get("__admin_via") === "1"
-    if (!viaSecret && pathname !== "/admin/auth/callback") {
+    if (viaSecret || pathname.startsWith("/admin/auth")) {
+      // Allowed — proceed to auth check below
+    } else {
+      // Check if user has a valid session — if so, redirect to secret path
+      const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          cookies: {
+            getAll() { return request.cookies.getAll() },
+            setAll() {},
+          },
+        }
+      )
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        // User is logged in but accessed /admin directly — redirect to secret path
+        const secretPath = process.env.ADMIN_SECRET_PATH || "manage-rodatrip"
+        const url = request.nextUrl.clone()
+        url.pathname = pathname.replace("/admin", `/${secretPath}`)
+        url.searchParams.delete("__admin_via")
+        return NextResponse.redirect(url)
+      }
+      // No session — return 404 to hide admin existence
       return new NextResponse(null, { status: 404 })
     }
   }
