@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js"
-import { success, paginated, badRequest, internalError, unauthorized } from "@/lib/api/response"
-import { adminLimiter } from "@/lib/api/rate-limit"
+import { success, paginated, badRequest, internalError, unauthorized, rateLimited } from "@/lib/api/response"
+import { publicLimiter, adminLimiter } from "@/lib/api/rate-limit"
 import { createProductSchema, updateProductSchema } from "@/lib/validators/product"
 import { getServerAdmin } from "@/lib/api/auth"
 
@@ -10,14 +10,24 @@ const adminClient = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 )
 
+const publicClient = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  { auth: { autoRefreshToken: false, persistSession: false } }
+)
+
 export async function GET(request: Request) {
+  const ip = request.headers.get("x-forwarded-for") || "unknown"
+  const { allowed } = await publicLimiter(`products:${ip}`)
+  if (!allowed) return rateLimited(30)
+
   const { searchParams } = new URL(request.url)
   const category = searchParams.get("category")
   const search = searchParams.get("search")
   const limit = Math.min(Number(searchParams.get("limit")) || 20, 100)
   const offset = Number(searchParams.get("offset")) || 0
 
-  let query = adminClient.from("products").select("*", { count: "exact" }).order("created_at", { ascending: false })
+  let query = publicClient.from("products").select("id, name, slug, price, image_url, category, description, stock_quantity, created_at", { count: "exact" }).order("created_at", { ascending: false })
   if (category) query = query.eq("category", category)
   if (search) query = query.ilike("name", `%${search}%`)
 
