@@ -16,6 +16,9 @@ function camelToSnake(obj: Record<string, unknown>): Record<string, unknown> {
 }
 
 export async function GET(_request: Request, { params }: { params: Promise<{ slug: string }> }) {
+  const admin = await getServerAdmin()
+  if (!admin) return unauthorized()
+
   const { slug } = await params
   const spot = await getSpotBySlug(slug)
   if (!spot) return notFound("Spot")

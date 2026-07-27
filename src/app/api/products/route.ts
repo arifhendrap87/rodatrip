@@ -17,6 +17,9 @@ const publicClient = createClient(
 )
 
 export async function GET(request: Request) {
+  const admin = await getServerAdmin()
+  if (!admin) return unauthorized()
+
   const ip = request.headers.get("x-forwarded-for") || "unknown"
   const { allowed } = await publicLimiter(`products:${ip}`)
   if (!allowed) return rateLimited(30)

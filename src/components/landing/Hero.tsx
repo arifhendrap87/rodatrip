@@ -35,22 +35,12 @@ function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: strin
   )
 }
 
-export function Hero() {
-  const [stats, setStats] = useState({ roadtrips: 3, spots: 50 })
-  const [loaded, setLoaded] = useState(false)
+interface HeroProps {
+  initialStats: { roadtrips: number; spots: number }
+}
 
-  useEffect(() => {
-    Promise.all([
-      fetch("/api/itineraries").then((r) => r.json()).catch(() => ({ data: [] })),
-      fetch("/api/spots?limit=1").then((r) => r.json()).catch(() => ({ pagination: { total: 0 } })),
-    ]).then(([itinRes, spotRes]) => {
-      setStats({
-        roadtrips: (itinRes.data || []).length,
-        spots: spotRes.pagination?.total || spotRes.data?.length || 0,
-      })
-      setLoaded(true)
-    })
-  }, [])
+export function Hero({ initialStats }: HeroProps) {
+  const stats = initialStats
 
   return (
     <section className="relative min-h-[85vh] flex items-center overflow-hidden">

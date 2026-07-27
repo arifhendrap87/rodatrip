@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useMemo, useRef } from "react"
+import { useState, useEffect, useMemo, useRef } from "react"
 import {
   MapContainer,
   TileLayer,
@@ -42,7 +42,7 @@ const FALLBACK_SPOTS: Spot[] = [
 
 function MapBoundsUpdater({ spots }: { spots: Spot[] }) {
   const map = useMap()
-  useEffect(() => {
+  useMemo(() => {
     if (spots.length === 0) return
     const bounds = L.latLngBounds(spots.map((s) => [s.lat, s.lng]))
     map.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 })
@@ -50,33 +50,12 @@ function MapBoundsUpdater({ spots }: { spots: Spot[] }) {
   return null
 }
 
-export default function MapSection() {
-  const [spots, setSpots] = useState<Spot[]>([])
-  const [loading, setLoading] = useState(true)
+interface MapSectionProps {
+  spots?: Spot[]
+}
 
-  useEffect(() => {
-    fetch("/api/spots?limit=50")
-      .then((r) => r.json())
-      .then((json) => {
-        const data = json.data || []
-        const valid = data
-          .filter((s: any) => {
-            const coords = s.location?.coordinates
-            return coords && coords[0] !== 0 && coords[1] !== 0
-          })
-          .map((s: any) => ({
-            slug: s.slug,
-            name: s.name,
-            lat: s.location.coordinates[1],
-            lng: s.location.coordinates[0],
-            category: s.category,
-            province: s.province,
-          }))
-        setSpots(valid.length >= 2 ? valid : FALLBACK_SPOTS)
-      })
-      .catch(() => setSpots(FALLBACK_SPOTS))
-      .finally(() => setLoading(false))
-  }, [])
+export default function MapSection({ spots: initialSpots }: MapSectionProps) {
+  const spots = initialSpots && initialSpots.length >= 2 ? initialSpots : FALLBACK_SPOTS
 
   const routePoints = useMemo(() => {
     if (spots.length < 2) return []
@@ -199,12 +178,6 @@ export default function MapSection() {
       : phase === "done" && routePoints.length > 0
         ? routePoints[routePoints.length - 1]
         : null
-
-  if (loading) {
-    return (
-      <div className="h-full w-full bg-[#F0EDE8] animate-pulse" />
-    )
-  }
 
   const center: [number, number] =
     spots.length > 0 ? [spots[0].lat, spots[0].lng] : [-7.5, 110]

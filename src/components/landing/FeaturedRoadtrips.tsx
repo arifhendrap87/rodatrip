@@ -1,22 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import Link from "next/link"
 import { RoadtripCard } from "@/components/roadtrip/RoadtripCard"
 import type { Itinerary } from "@/types"
 
-export function FeaturedRoadtrips() {
-  const [roadtrips, setRoadtrips] = useState<Itinerary[]>([])
-  const [loading, setLoading] = useState(true)
+interface FeaturedRoadtripsProps {
+  roadtrips: Itinerary[]
+}
 
-  useEffect(() => {
-    fetch("/api/itineraries?limit=6")
-      .then((r) => r.json())
-      .then((json) => setRoadtrips(json.data || []))
-      .catch(() => setRoadtrips([]))
-      .finally(() => setLoading(false))
-  }, [])
-
+export function FeaturedRoadtrips({ roadtrips }: FeaturedRoadtripsProps) {
   return (
     <section className="relative py-24 sm:py-32 overflow-hidden bg-[#FDFBF7]">
       <div className="absolute inset-0 bg-gradient-to-b from-accent/[0.03] via-transparent to-primary/[0.03]" />
@@ -36,29 +28,14 @@ export function FeaturedRoadtrips() {
         </div>
 
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {loading ? (
-            Array.from({ length: 6 }).map((_, i) => (
-              <div
-                key={i}
-                className="animate-pulse rounded-[2rem] border border-border/50 bg-white overflow-hidden"
-              >
-                <div className="aspect-[16/9] bg-muted" />
-                <div className="p-5 space-y-3">
-                  <div className="h-3 w-16 rounded-full bg-muted" />
-                  <div className="h-5 w-3/4 rounded bg-muted" />
-                  <div className="h-3 w-1/2 rounded bg-muted" />
-                  <div className="h-3 w-full rounded bg-muted" />
-                </div>
-              </div>
-            ))
-          ) : roadtrips.length === 0 ? null : (
+          {roadtrips.length === 0 ? null : (
             roadtrips.map((itinerary) => (
               <RoadtripCard key={itinerary.id} itinerary={itinerary} />
             ))
           )}
         </div>
 
-        {!loading && roadtrips.length > 0 && (
+        {roadtrips.length > 0 && (
           <div className="mt-12 text-center">
             <Link
               href="/roadtrip"

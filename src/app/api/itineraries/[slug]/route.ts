@@ -1,4 +1,5 @@
-import { success, notFound } from "@/lib/api/response"
+import { success, notFound, unauthorized } from "@/lib/api/response"
+import { getServerAdmin } from "@/lib/api/auth"
 import { getItineraryBySlug } from "@/lib/services/itineraries"
 import { db } from "@/lib/services/db"
 
@@ -6,6 +7,8 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  const admin = await getServerAdmin()
+  if (!admin) return unauthorized()
   const { slug } = await params
   const itinerary = await getItineraryBySlug(slug)
 

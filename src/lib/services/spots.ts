@@ -9,6 +9,7 @@ export interface SpotData {
   name: string
   category: string
   province: string
+  city?: string
   region: string
   description: string
   why_special: string

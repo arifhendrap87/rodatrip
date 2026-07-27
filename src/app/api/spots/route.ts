@@ -7,6 +7,9 @@ import { db } from "@/lib/services/db"
 import { findDuplicateSpot } from "@/lib/utils/detect-duplicate-spot"
 
 export async function GET(request: Request) {
+  const admin = await getServerAdmin()
+  if (!admin) return unauthorized()
+
   const ip = request.headers.get("x-forwarded-for") || "unknown"
   const { allowed } = await publicLimiter(`spots:${ip}`)
   if (!allowed) return rateLimited(30)

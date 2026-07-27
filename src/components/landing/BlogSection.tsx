@@ -1,24 +1,15 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import Link from "next/link"
-import { api } from "@/lib/api/client"
 import type { BlogPostData } from "@/lib/services/blog"
 import { BlogImage } from "@/components/ui/BlogImage"
 
-export function BlogSection() {
-  const [posts, setPosts] = useState<BlogPostData[]>([])
-  const [loading, setLoading] = useState(true)
+interface BlogSectionProps {
+  posts: BlogPostData[]
+}
 
-  useEffect(() => {
-    api.blog
-      .list({ limit: "6" })
-      .then((res: any) => setPosts(res?.data || []))
-      .catch(() => setPosts([]))
-      .finally(() => setLoading(false))
-  }, [])
-
-  if (posts.length === 0 && !loading) return null
+export function BlogSection({ posts }: BlogSectionProps) {
+  if (posts.length === 0) return null
 
   return (
     <section className="relative py-24 sm:py-32 overflow-hidden">
@@ -37,64 +28,49 @@ export function BlogSection() {
         </div>
 
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {loading
-            ? Array.from({ length: 6 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="animate-pulse rounded-2xl border border-border/50 bg-white overflow-hidden"
-                >
-                  <div className="aspect-[16/9] bg-muted" />
-                  <div className="p-5 space-y-3">
-                    <div className="h-4 w-20 rounded-full bg-muted" />
-                    <div className="h-5 w-3/4 rounded bg-muted" />
-                    <div className="h-3 w-full rounded bg-muted" />
-                    <div className="h-3 w-1/3 rounded bg-muted" />
-                  </div>
+          {posts.map((post) => (
+            <Link
+              key={post.slug}
+              href={`/blog/${post.slug}`}
+              className="group block rounded-2xl border border-border/50 bg-white overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+            >
+              <div className="relative aspect-[16/9] overflow-hidden">
+                <BlogImage src={post.image_url} alt={post.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                <div className="absolute top-3 left-3">
+                  <span className="inline-flex items-center rounded-full bg-white/90 backdrop-blur-sm px-2.5 py-0.5 text-xs font-medium text-foreground shadow-sm">
+                    {post.category}
+                  </span>
                 </div>
-              ))
-            : posts.map((post) => (
-                <Link
-                  key={post.slug}
-                  href={`/blog/${post.slug}`}
-                  className="group block rounded-2xl border border-border/50 bg-white overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
-                >
-                  <div className="relative aspect-[16/9] overflow-hidden">
-                    <BlogImage src={post.image_url} alt={post.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                    <div className="absolute top-3 left-3">
-                      <span className="inline-flex items-center rounded-full bg-white/90 backdrop-blur-sm px-2.5 py-0.5 text-xs font-medium text-foreground shadow-sm">
-                        {post.category}
-                      </span>
+              </div>
+
+              <div className="p-5">
+                <h3 className="font-bold font-heading leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                  {post.title}
+                </h3>
+
+                {post.excerpt && (
+                  <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+                    {post.excerpt}
+                  </p>
+                )}
+
+                <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
+                      {post.author?.charAt(0) || "R"}
                     </div>
+                    <span className="truncate max-w-[100px]">
+                      {post.author || "RodaTrip"}
+                    </span>
                   </div>
-
-                  <div className="p-5">
-                    <h3 className="font-bold font-heading leading-snug group-hover:text-primary transition-colors line-clamp-2">
-                      {post.title}
-                    </h3>
-
-                    {post.excerpt && (
-                      <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
-                        {post.excerpt}
-                      </p>
-                    )}
-
-                    <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
-                          {post.author?.charAt(0) || "R"}
-                        </div>
-                        <span className="truncate max-w-[100px]">
-                          {post.author || "RodaTrip"}
-                        </span>
-                      </div>
-                      <span>{post.read_time}</span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
+                  <span>{post.read_time}</span>
+                </div>
+              </div>
+            </Link>
+          ))}
         </div>
 
-        {!loading && posts.length > 0 && (
+        {posts.length > 0 && (
           <div className="mt-12 text-center">
             <Link
               href="/blog"

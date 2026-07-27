@@ -1,4 +1,5 @@
-import { success } from "@/lib/api/response"
+import { success, unauthorized } from "@/lib/api/response"
+import { getServerAdmin } from "@/lib/api/auth"
 import { db } from "@/lib/services/db"
 
 export const dynamic = "force-dynamic"
@@ -7,6 +8,8 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ code: string }> }
 ) {
+  const admin = await getServerAdmin()
+  if (!admin) return unauthorized()
   const { code } = await params
   if (!code) return success([])
 

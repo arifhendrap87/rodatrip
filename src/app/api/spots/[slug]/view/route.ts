@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js"
-import { success, internalError } from "@/lib/api/response"
+import { success, internalError, unauthorized } from "@/lib/api/response"
+import { getServerAdmin } from "@/lib/api/auth"
 
 const adminClient = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -12,6 +13,9 @@ const WINDOW_MS = 60 * 1000
 const MAX_PER_WINDOW = 10
 
 export async function POST(request: Request, { params }: { params: Promise<{ slug: string }> }) {
+  const admin = await getServerAdmin()
+  if (!admin) return unauthorized()
+
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown"
   const now = Date.now()
   const lastHit = ipLimit.get(ip) || 0

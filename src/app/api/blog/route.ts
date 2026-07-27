@@ -1,8 +1,11 @@
-import { success, badRequest, rateLimited } from "@/lib/api/response"
+import { success, badRequest, rateLimited, unauthorized } from "@/lib/api/response"
 import { publicLimiter } from "@/lib/api/rate-limit"
+import { getServerAdmin } from "@/lib/api/auth"
 import { getPosts } from "@/lib/services/blog"
 
 export async function GET(request: Request) {
+  const admin = await getServerAdmin()
+  if (!admin) return unauthorized()
   const ip = request.headers.get("x-forwarded-for") || "unknown"
   const { allowed } = await publicLimiter(`blog:${ip}`)
   if (!allowed) return rateLimited(30)

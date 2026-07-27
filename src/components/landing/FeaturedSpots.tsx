@@ -1,23 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import Link from "next/link"
 import { SpotCard } from "@/components/spot/SpotCard"
-import { api } from "@/lib/api/client"
 
-export function FeaturedSpots() {
-  const [spots, setSpots] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+interface FeaturedSpotsProps {
+  spots: any[]
+}
 
-  useEffect(() => {
-    api.spots
-      .list({ limit: "8" })
-      .then((res) => setSpots(res.data || []))
-      .catch(() => setSpots([]))
-      .finally(() => setLoading(false))
-  }, [])
-
-  if (spots.length === 0 && !loading) return null
+export function FeaturedSpots({ spots }: FeaturedSpotsProps) {
+  if (spots.length === 0) return null
 
   return (
     <section className="relative py-24 sm:py-32 overflow-hidden bg-[#F0EDE8]">
@@ -37,25 +28,12 @@ export function FeaturedSpots() {
         </div>
 
         <div className="mt-12 grid gap-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-          {loading
-            ? Array.from({ length: 8 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="animate-pulse rounded-[2rem] border border-border/50 bg-white overflow-hidden"
-                >
-                  <div className="aspect-[4/3] bg-muted" />
-                  <div className="p-4 space-y-2">
-                    <div className="h-4 w-3/4 rounded bg-muted" />
-                    <div className="h-3 w-1/2 rounded bg-muted" />
-                  </div>
-                </div>
-              ))
-            : spots.map((spot) => (
-                <SpotCard key={spot.slug} spot={spot} />
-              ))}
+          {spots.map((spot) => (
+            <SpotCard key={spot.slug} spot={spot} />
+          ))}
         </div>
 
-        {!loading && spots.length > 0 && (
+        {spots.length > 0 && (
           <div className="mt-12 text-center">
             <Link
               href="/spot-istimewa"

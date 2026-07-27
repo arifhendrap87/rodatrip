@@ -6,6 +6,15 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 
+interface MapSpot {
+  slug: string
+  name: string
+  lat: number
+  lng: number
+  category: string
+  province: string
+}
+
 const MapSection = dynamic(() => import("./MapSection"), {
   ssr: false,
   loading: () => (
@@ -34,12 +43,16 @@ const BENEFITS = [
   },
 ]
 
-export function LandingMap() {
+interface LandingMapProps {
+  spots?: MapSpot[]
+}
+
+export function LandingMap({ spots }: LandingMapProps) {
   return (
     <section className="relative min-h-[550px] sm:min-h-[600px] overflow-hidden bg-[#F0EDE8]">
       {/* Map background — full width */}
       <div className="absolute inset-0 z-0">
-        <MapSection />
+        <MapSection spots={spots} />
       </div>
 
       {/* Content */}

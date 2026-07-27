@@ -1,9 +1,12 @@
-import { success, rateLimited } from "@/lib/api/response"
+import { success, rateLimited, unauthorized } from "@/lib/api/response"
 import { publicLimiter } from "@/lib/api/rate-limit"
+import { getServerAdmin } from "@/lib/api/auth"
 import { db } from "@/lib/services/db"
 import { getItineraries } from "@/lib/services/itineraries"
 
 export async function GET(request: Request) {
+  const admin = await getServerAdmin()
+  if (!admin) return unauthorized()
   const ip = request.headers.get("x-forwarded-for") || "unknown"
   const { allowed } = await publicLimiter(`itineraries:${ip}`)
   if (!allowed) return rateLimited(30)
