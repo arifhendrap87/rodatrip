@@ -30,6 +30,23 @@ export async function POST(request: Request) {
 
   const { items, total, customerName, customerPhone, customerAddress } = parsed.data
 
+  // Validate prices against database
+  const productIds = items.map((i) => i.id).filter(Boolean)
+  if (productIds.length > 0) {
+    const { data: products } = await db
+      .from("products")
+      .select("id, price")
+      .in("id", productIds)
+
+    const priceMap = new Map((products || []).map((p: any) => [p.id, p.price]))
+    for (const item of items) {
+      if (!priceMap.has(item.id)) continue // unknown product, skip validation
+      if (item.price !== priceMap.get(item.id)) {
+        return badRequest(`Harga ${item.name} tidak sesuai. Harap refresh halaman.`)
+      }
+    }
+  }
+
   const waMessage = items
     .map((item, i) => `${i + 1}. ${item.name} - Rp ${item.price.toLocaleString()}`)
     .join("\n")

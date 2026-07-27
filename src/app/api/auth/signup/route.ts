@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr"
-import { success, badRequest, internalError } from "@/lib/api/response"
+import { success, badRequest, rateLimited, internalError } from "@/lib/api/response"
+import { publicLimiter } from "@/lib/api/rate-limit"
 import { z } from "zod"
 
 const signupSchema = z.object({
@@ -10,6 +11,10 @@ const signupSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    const ip = request.headers.get("x-forwarded-for") || "unknown"
+    const { allowed } = await publicLimiter(`signup:${ip}`)
+    if (!allowed) return rateLimited(30)
+
     const body = await request.json()
     const parsed = signupSchema.safeParse(body)
     if (!parsed.success) {

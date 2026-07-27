@@ -16,6 +16,16 @@ export async function POST(request: Request) {
     return badRequest("Role harus 'user' atau 'assistant'")
   }
 
+  // Verify session belongs to this admin (IDOR protection)
+  const { data: session } = await db
+    .from("chat_sessions")
+    .select("id")
+    .eq("id", session_id)
+    .eq("user_id", admin.id)
+    .maybeSingle()
+
+  if (!session) return unauthorized()
+
   const { data, error } = await db
     .from("chat_messages")
     .insert({ session_id, role, content })

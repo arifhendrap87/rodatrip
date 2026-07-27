@@ -24,8 +24,25 @@ function parseStatus(status: string): number {
   return 10
 }
 
+function isValidScrapeUrl(link: string): boolean {
+  try {
+    const url = new URL(link)
+    // Only allow HTTPS
+    if (url.protocol !== "https:") return false
+    // Only allow known domains
+    const allowedHosts = ["jakmall.com", "www.jakmall.com", "static.jakmall.id"]
+    if (!allowedHosts.includes(url.hostname)) return false
+    // Block private/internal IPs just in case DNS resolves to them
+    const blockedPatterns = ["169.254.", "127.", "10.", "172.16.", "192.168.", "0.0.0.0", "localhost"]
+    if (blockedPatterns.some((p) => url.hostname.startsWith(p) || url.hostname === "localhost")) return false
+    return true
+  } catch {
+    return false
+  }
+}
+
 async function scrapeImage(link: string): Promise<string> {
-  if (!link) return ""
+  if (!link || !isValidScrapeUrl(link)) return ""
   try {
     const res = await fetch(link, { signal: AbortSignal.timeout(5000) })
     const html = await res.text()
@@ -39,7 +56,7 @@ async function scrapeImage(link: string): Promise<string> {
 
 async function scrapeDetail(link: string): Promise<{ image_url: string; description: string }> {
   const result = { image_url: "", description: "" }
-  if (!link) return result
+  if (!link || !isValidScrapeUrl(link)) return result
   try {
     const res = await fetch(link, { signal: AbortSignal.timeout(8000) })
     const html = await res.text()
