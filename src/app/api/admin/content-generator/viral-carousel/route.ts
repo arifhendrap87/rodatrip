@@ -1,4 +1,5 @@
-import { success, badRequest, unauthorized, internalError } from "@/lib/api/response"
+import { success, badRequest, unauthorized, internalError, rateLimited } from "@/lib/api/response"
+import { adminLimiter } from "@/lib/api/rate-limit"
 import { getServerAdmin } from "@/lib/api/auth"
 import { db } from "@/lib/services/db"
 import { generateViralPrompt } from "@/app/admin/content-generator/data"
@@ -30,6 +31,10 @@ async function callDeepSeek(prompt: string): Promise<string> {
 export async function POST(request: Request) {
   const admin = await getServerAdmin()
   if (!admin) return unauthorized()
+
+  const ip = request.headers.get("x-forwarded-for") || "unknown"
+  const { allowed } = await adminLimiter(`admin-func:${ip}`)
+  if (!allowed) return rateLimited(30)
 
   const body = await request.json()
   const { sourceType, sourceId } = body

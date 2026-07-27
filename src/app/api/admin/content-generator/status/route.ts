@@ -1,10 +1,15 @@
-import { success, unauthorized, internalError } from "@/lib/api/response"
+import { success, unauthorized, internalError, rateLimited } from "@/lib/api/response"
+import { adminLimiter } from "@/lib/api/rate-limit"
 import { getServerAdmin } from "@/lib/api/auth"
 import { db } from "@/lib/services/db"
 
 export async function GET(request: Request) {
   const admin = await getServerAdmin()
   if (!admin) return unauthorized()
+
+  const ip = request.headers.get("x-forwarded-for") || "unknown"
+  const { allowed } = await adminLimiter(`admin-func:${ip}`)
+  if (!allowed) return rateLimited(30)
 
   const { searchParams } = new URL(request.url)
   const contentType = searchParams.get("content_type") || "spot"

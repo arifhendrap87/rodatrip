@@ -1,10 +1,15 @@
-import { success, created, badRequest, unauthorized, internalError } from "@/lib/api/response"
+import { success, created, badRequest, unauthorized, internalError, rateLimited } from "@/lib/api/response"
+import { adminLimiter } from "@/lib/api/rate-limit"
 import { getServerAdmin } from "@/lib/api/auth"
 import { db } from "@/lib/services/db"
 
 export async function GET(request: Request) {
   const admin = await getServerAdmin()
   if (!admin) return unauthorized()
+
+  const ip = request.headers.get("x-forwarded-for") || "unknown"
+  const { allowed } = await adminLimiter(`admin-func:${ip}`)
+  if (!allowed) return rateLimited(30)
 
   const { searchParams } = new URL(request.url)
   const platform = searchParams.get("platform")
@@ -53,6 +58,10 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const admin = await getServerAdmin()
   if (!admin) return unauthorized()
+
+  const ip = request.headers.get("x-forwarded-for") || "unknown"
+  const { allowed } = await adminLimiter(`admin-func:${ip}`)
+  if (!allowed) return rateLimited(30)
 
   const body = await request.json()
   const { title, platform, tone, content_type, source_id, source_title, caption, hashtags, skrip_tiktok, concept_type, text_overlays, image_prompts, source_type, scheduled_at, slide_images } = body
@@ -105,6 +114,10 @@ export async function PUT(request: Request) {
   const admin = await getServerAdmin()
   if (!admin) return unauthorized()
 
+  const ip = request.headers.get("x-forwarded-for") || "unknown"
+  const { allowed } = await adminLimiter(`admin-func:${ip}`)
+  if (!allowed) return rateLimited(30)
+
   const body = await request.json()
   const { id, ...fields } = body
 
@@ -137,6 +150,10 @@ export async function PUT(request: Request) {
 export async function DELETE(request: Request) {
   const admin = await getServerAdmin()
   if (!admin) return unauthorized()
+
+  const ip = request.headers.get("x-forwarded-for") || "unknown"
+  const { allowed } = await adminLimiter(`admin-func:${ip}`)
+  if (!allowed) return rateLimited(30)
 
   const { searchParams } = new URL(request.url)
   const id = searchParams.get("id")
