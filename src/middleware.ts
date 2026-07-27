@@ -32,7 +32,7 @@ function buildCsp(nonce: string): string {
   return [
     "default-src 'none'",
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
-    `style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com`,
+    `style-src 'self' 'unsafe-inline' 'nonce-${nonce}' https://fonts.googleapis.com`,
     "img-src 'self' data: blob: https://*.supabase.co https://*.r2.dev https://images.gaskuy.id https://images.unsplash.com https://*.tile.openstreetmap.org",
     "font-src 'self' data: https://fonts.gstatic.com",
     "connect-src 'self' https://*.supabase.co https://api.deepseek.com https://overpass-api.de",
@@ -43,7 +43,6 @@ function buildCsp(nonce: string): string {
     "base-uri 'none'",
     "form-action 'none'",
     "frame-ancestors 'none'",
-    "prefetch-src 'self'",
   ].join("; ")
 }
 
