@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr"
 import { createClient } from "@supabase/supabase-js"
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
+import { publicLimiter } from "@/lib/api/rate-limit"
 
 const ALLOWED_ORIGINS = [
   "https://rodatrip.id",
@@ -86,6 +87,18 @@ export async function middleware(request: NextRequest) {
       } else {
         return new NextResponse(null, { status: 403, statusText: "Forbidden" })
       }
+    }
+  }
+
+  // Global rate limiting for public API routes (not admin, not auth)
+  if (pathname.startsWith("/api") && !pathname.startsWith("/api/admin") && !pathname.startsWith("/api/auth") && request.method !== "OPTIONS") {
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "127.0.0.1"
+    const { allowed, retryAfter } = await publicLimiter(`api:${ip}`)
+    if (!allowed) {
+      return NextResponse.json(
+        { error: { code: "RATE_LIMITED", message: "Terlalu banyak permintaan. Coba lagi nanti." } },
+        { status: 429, headers: { "Retry-After": String(retryAfter) } }
+      )
     }
   }
 
