@@ -61,15 +61,14 @@ export function Hero({ initialStats }: HeroProps) {
               </div>
             </motion.div>
 
-            <motion.h1
-              variants={heroItem}
+            <h1
               className="mt-6 text-5xl font-black leading-tight tracking-tight sm:text-6xl lg:text-7xl text-white"
               style={{ fontFamily: "Montserrat, sans-serif" }}
             >
               Rencanakan
               <br />
               <span className="text-[#D95D39]">Roadtrip</span> Impianmu
-            </motion.h1>
+            </h1>
 
             <motion.p
               variants={heroItem}
