@@ -48,7 +48,7 @@ Lokasi: ${city ? `${city}, ` : ""}${province || "-"}
 
 Deskripsi saat ini: ${cleanExisting || "(kosong)"}
 
-Output HANYA JSON valid (tanpa markdown, tanpa teks lain):
+Output HANYA JSON valid (tanpa markdown, tanpa teks lain, tanpa baris baru di dalam string values):
 {
   "description": "Artikel HTML lengkap minimal 5 paragraf (400-600 kata)",
   "seo_title": "Judul SEO max 60 karakter, sertakan nama tempat dan kata kunci utama.",
@@ -68,7 +68,8 @@ Aturan description:
 - Minimal 500-700 kata
 - SEO friendly: sertakan kata kunci "${name}" secara natural di seluruh artikel
 - seo_title: max 60 karakter, contoh: "${name} — Destinasi Wisata ${province || ""} Terbaik"
-- meta_description: max 160 karakter, contoh: "Nikmati keindahan ${name} di ${province || ""}. [daya tarik singkat]. [aktivitas]."`
+- meta_description: max 160 karakter, contoh: "Nikmati keindahan ${name} di ${province || ""}. [daya tarik singkat]. [aktivitas]."
+- WAJIB: Jangan gunakan baris baru di dalam string JSON. Semua HTML harus dalam satu baris.`
 
     let raw = await callDeepSeek(prompt)
 
@@ -80,18 +81,25 @@ Aturan description:
     // Try to parse JSON from response
     let json: { description?: string; seo_title?: string; meta_description?: string } = {}
     let parsed = false
+
+    function parseJson(str: string) {
+      const match = str.match(/\{[\s\S]*\}/)
+      if (!match) throw new Error("No JSON found")
+      // Escape newlines inside string values (DeepSeek often returns literal newlines in description)
+      const escaped = match[0].split('"').map((part, i) =>
+        i % 2 === 1 ? part.replace(/\n/g, "\\n").replace(/\t/g, "\\t") : part
+      ).join('"')
+      return JSON.parse(escaped)
+    }
+
     try {
-      const jsonMatch = raw.match(/\{[\s\S]*\}/)
-      if (jsonMatch) json = JSON.parse(jsonMatch[0])
-      else json = JSON.parse(raw)
+      json = parseJson(raw)
       parsed = true
     } catch {
       // Retry once if JSON parsing failed
       try {
         const retryRaw = await callDeepSeek(prompt)
-        const jsonMatch = retryRaw.match(/\{[\s\S]*\}/)
-        if (jsonMatch) json = JSON.parse(jsonMatch[0])
-        else json = JSON.parse(retryRaw)
+        json = parseJson(retryRaw)
         parsed = true
       } catch {
         // fallback
