@@ -131,6 +131,9 @@ Kategori: ${existingData?.category || "Tips"}
 Aturan:
 - Output HANYA teks prompt, tanpa penjelasan lain
 - Gunakan Bahasa Inggris untuk prompt utama (Midjourney lebih optimal dengan English)
+- WAJIB: Buat prompt yang menghasilkan gambar bernuansa Indonesia (tropis, vegetasi Indonesia, arsitektur tradisional)
+- JANGAN buat prompt yang terlihat seperti lokasi luar negeri (Eropa, Jepang, Amerika, dll)
+- Sertakan ciri khas Indonesia: sawah, gunung berapi, pantai tropis, pohon kelapa, candi, pasar tradisional, batik
 - Sertakan: subjek utama, lingkungan/setting, pencahayaan, suasana, gaya visual
 - Format yang cocok untuk Midjourney (deskriptif, detail, tidak terlalu pendek)
 - Jangan gunakan --ar atau parameter teknis Midjourney
