@@ -38,7 +38,8 @@ export default async function RootLayout({
 }>) {
   const headersList = await headers()
   const pathname = headersList.get("x-pathname") || ""
-  const isAdmin = pathname.startsWith("/admin")
+  const adminSecret = process.env.ADMIN_SECRET_PATH || "manage-rodatrip"
+  const isAdmin = pathname.startsWith("/admin") || pathname.startsWith(`/${adminSecret}`)
 
   if (isAdmin) {
     return (
