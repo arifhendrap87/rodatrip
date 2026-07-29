@@ -44,7 +44,7 @@ export function Hero({ initialStats }: HeroProps) {
 
   return (
     <section className="relative min-h-[85vh] flex items-center overflow-hidden">
-      <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1600&q=85" alt="" className="absolute inset-0 z-0 w-full h-full object-cover" />
+      <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1200&q=75" alt="" className="absolute inset-0 z-0 w-full h-full object-cover" loading="eager" />
       <div className="absolute inset-0 z-[1] bg-gradient-to-b from-black/80 via-black/60 to-black/70" />
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 py-20 lg:py-32 w-full">
         <motion.div
