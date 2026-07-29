@@ -67,7 +67,7 @@ export default function RoadtripPageClient({ initialItineraries, initialProvince
   return (
     <div className="min-h-screen">
       <section className="relative overflow-hidden py-20 sm:py-28">
-        <img src="/images/hero-bg.svg" alt="" className="absolute inset-0 z-0 w-full h-full object-cover" loading="eager" />
+        <img src="/images/hero-bg.svg" alt="" className="absolute inset-0 z-0 w-full h-full object-cover" loading="eager" fetchPriority="high" />
         <div className="absolute inset-0 z-[1] bg-gradient-to-b from-black/80 via-black/60 to-black/70" />
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
           <div className="max-w-3xl">
