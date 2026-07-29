@@ -19,10 +19,10 @@ interface ProductCardProps {
 }
 
 const productImages = [
-  "/images/feature-poi.jpg",
-  "/images/feature-info.jpg",
-  "/images/feature-biaya.jpg",
-  "/images/feature-produk.jpg",
+  "/images/feature-poi.webp",
+  "/images/feature-info.webp",
+  "/images/feature-biaya.webp",
+  "/images/feature-produk.webp",
 ]
 
 function getProductImage(id: string): string {
