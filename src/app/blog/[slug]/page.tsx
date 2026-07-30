@@ -100,19 +100,35 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {related.map((p: any) => (
                   <Link key={p.slug} href={`/blog/${p.slug}`}
-                    className="group rounded-2xl border border-border/50 bg-white p-5 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
+                    className="group block rounded-2xl border border-border/50 bg-white overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
                   >
-                    {p.image_url && (
-                      <div className="aspect-[16/9] rounded-lg overflow-hidden bg-gradient-to-br from-primary/5 to-accent/5 mb-3">
-                        <img src={p.image_url} alt={p.title} className="w-full h-full object-cover" loading="lazy" />
+                    <div className="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-primary/5 to-accent/5">
+                      {p.image_url ? (
+                        <img src={p.image_url} alt={p.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-4xl opacity-30">📝</div>
+                      )}
+                      <div className="absolute top-3 left-3">
+                        <span className="inline-flex items-center rounded-full bg-white/90 backdrop-blur-sm px-2.5 py-0.5 text-xs font-medium text-foreground shadow-sm">
+                          {p.category}
+                        </span>
                       </div>
-                    )}
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                      <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">{p.category}</span>
-                      <span>{p.read_time}</span>
                     </div>
-                    <h3 className="font-bold font-heading group-hover:text-primary transition-colors">{p.title}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{p.excerpt}</p>
+
+                    <div className="p-5">
+                      <h3 className="font-bold font-heading leading-snug group-hover:text-primary transition-colors line-clamp-2">{p.title}</h3>
+                      {p.excerpt && <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{p.excerpt}</p>}
+
+                      <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
+                            {p.author?.charAt(0) || "R"}
+                          </div>
+                          <span className="truncate max-w-[100px]">{p.author || "RodaTrip"}</span>
+                        </div>
+                        <span>{p.read_time}</span>
+                      </div>
+                    </div>
                   </Link>
                 ))}
               </div>
