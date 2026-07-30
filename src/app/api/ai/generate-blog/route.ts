@@ -138,6 +138,9 @@ Panjang total: 500-800 kata`
 
 Judul: "${existingData?.title || topic}"
 Kategori: ${categoryGambar}
+Konten: ${existingData?.content ? existingData.content.slice(0, 400) : "(tidak ada konten)"}
+
+Gunakan konten artikel sebagai referensi untuk menghasilkan gambar yang relevan dengan topik yang dibahas.
 
 Aturan spesifik untuk ${categoryGambar}:
 ${categoryRules[categoryGambar] || categoryRules["Tips"]}

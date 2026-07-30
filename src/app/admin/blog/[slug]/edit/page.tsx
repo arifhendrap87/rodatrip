@@ -88,7 +88,12 @@ export default function EditBlogPage() {
         body: JSON.stringify({
           action: "gambar",
           topic: form.title,
-          existingData: { title: form.title, category: form.category },
+          existingData: {
+            title: form.title,
+            category: form.category,
+            image_prompt: form.prompt_gambar || "",
+            content: form.content?.replace(/<[^>]+>/g, '').slice(0, 500) || '',
+          },
         }),
       })
       const json = await res.json()

@@ -104,7 +104,11 @@ export default function NewBlogPage() {
         body: JSON.stringify({
           action: "gambar",
           topic: aiTopic,
-          existingData: { title: form.title, category: form.category },
+          existingData: {
+            title: form.title,
+            category: form.category,
+            content: form.content?.replace(/<[^>]+>/g, '').slice(0, 500) || '',
+          },
         }),
       })
       const json = await res.json()
