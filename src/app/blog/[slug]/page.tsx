@@ -4,6 +4,8 @@ import type { Metadata } from "next"
 import { SITE_NAME, SITE_URL } from "@/lib/constants"
 import { getPosts, getPostBySlug } from "@/lib/services/blog"
 import { Breadcrumb } from "@/components/ui/Breadcrumb"
+
+export const dynamic = "force-dynamic"
 import { BlogImage } from "@/components/ui/BlogImage"
 import { SpotCard } from "@/components/spot/SpotCard"
 import { RoadtripCard } from "@/components/roadtrip/RoadtripCard"
