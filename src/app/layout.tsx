@@ -45,6 +45,7 @@ export default async function RootLayout({
     return (
       <html lang="id" className={`h-full antialiased ${montserratDisplay.variable}`}>
         <body className="min-h-full bg-background text-foreground">
+          <meta name="msvalidate.01" content="0B6E2A80B541BDEDB7DB9A4ADBBB0F19" />
           {children}
         </body>
       </html>
@@ -54,6 +55,7 @@ export default async function RootLayout({
   return (
     <html lang="id" className={`h-full antialiased ${montserratDisplay.variable}`}>
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        <meta name="msvalidate.01" content="0B6E2A80B541BDEDB7DB9A4ADBBB0F19" />
         <PostHogProvider>
           <Navbar />
           <main className="flex-1">{children}</main>
