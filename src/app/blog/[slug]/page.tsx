@@ -102,6 +102,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   <Link key={p.slug} href={`/blog/${p.slug}`}
                     className="group rounded-2xl border border-border/50 bg-white p-5 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
                   >
+                    {p.image_url && (
+                      <div className="aspect-[16/9] rounded-lg overflow-hidden bg-gradient-to-br from-primary/5 to-accent/5 mb-3">
+                        <img src={p.image_url} alt={p.title} className="w-full h-full object-cover" loading="lazy" />
+                      </div>
+                    )}
                     <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
                       <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">{p.category}</span>
                       <span>{p.read_time}</span>
