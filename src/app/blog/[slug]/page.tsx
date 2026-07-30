@@ -10,6 +10,8 @@ import { RoadtripCard } from "@/components/roadtrip/RoadtripCard"
 import { getSpots } from "@/lib/services/spots"
 import { getItineraries } from "@/lib/services/itineraries"
 import type { Itinerary } from "@/types"
+import type { SpotData } from "@/lib/services/spots"
+import type { BlogPostData } from "@/lib/services/blog"
 import DOMPurify from "isomorphic-dompurify"
 
 export const dynamic = "force-dynamic"
@@ -58,26 +60,32 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const post = await getPostBySlug(slug)
-  if (!post) notFound()
+  if (!post) return notFound()
 
-  const allPosts = await getPosts()
-  const related = allPosts.filter((p) => p.slug !== slug).slice(0, 3)
+  let allPosts: BlogPostData[] = []
+  let related: BlogPostData[] = []
+  let relatedSpots: SpotData[] = []
+  let relatedRoadtrips: Itinerary[] = []
+  try { allPosts = await getPosts() } catch { allPosts = [] }
+  related = allPosts.filter((p) => p.slug !== slug).slice(0, 3)
 
   const categoryMap: Record<string, string> = {
-    Tips: "",
-    Inspirasi: "alam",
-    Destinasi: "alam",
-    Tutorial: "",
-    Review: "",
-    "Perawatan Mobil": "",
-    Kendaraan: "",
+    Tips: "", Inspirasi: "alam", Destinasi: "alam", Tutorial: "", Review: "",
+    "Perawatan Mobil": "", Kendaraan: "",
   }
   const spotCategory = categoryMap[post.category] || ""
-  const { data: relatedSpots } = spotCategory ? await getSpots({ category: spotCategory, limit: 3 }) : { data: [] }
-  const roadtrips = await getItineraries({ published: true })
-  const hasRoadtripSpot = (itin: Itinerary): boolean =>
-    relatedSpots.some((s) => itin.stops.some((st) => st.spotSlug === s.slug))
-  const relatedRoadtrips = roadtrips.filter(hasRoadtripSpot).slice(0, 3)
+  try {
+    if (spotCategory) {
+      const result = await getSpots({ category: spotCategory, limit: 3 })
+      relatedSpots = (result?.data || []) as SpotData[]
+    }
+  } catch { relatedSpots = [] }
+  try {
+    const roadtrips = await getItineraries({ published: true })
+    relatedRoadtrips = roadtrips.filter((itin) =>
+      relatedSpots.some((s) => itin.stops?.some((st) => st.spotSlug === s.slug))
+    ).slice(0, 3)
+  } catch { relatedRoadtrips = [] }
 
   const jsonLd = {
     "@context": "https://schema.org",
