@@ -41,9 +41,17 @@ export async function GET(request: Request) {
     const result = await publishToPlatform(post as never, account as never)
 
     if (result.success) {
+      const updateData: Record<string, unknown> = {
+        status: "published",
+        published_at: now,
+        updated_at: now,
+      }
+      if (result.post_url) {
+        updateData.post_url = result.post_url
+      }
       await db
         .from("scheduled_posts")
-        .update({ status: "published", published_at: now, updated_at: now })
+        .update(updateData)
         .eq("id", (post as Record<string, unknown>).id)
 
       results.push({ id: String((post as Record<string, unknown>).id), status: "published" })

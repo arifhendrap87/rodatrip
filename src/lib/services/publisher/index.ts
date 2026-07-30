@@ -1,62 +1,35 @@
+import { publishToFacebook } from "./facebook"
+import { publishToInstagram } from "./instagram"
+import { publishToThreads } from "./threads"
+
 interface SocialAccount {
   platform: string
   account_name: string | null
   account_id: string | null
   access_token: string | null
   refresh_token: string | null
+  page_id?: string | null
+  page_name?: string | null
+  ig_account_id?: string | null
 }
 
 interface Post {
   id: string
   draft_id: string
   platform: string
-  content?: string
-  media_urls?: string[]
+  scheduled_at?: string
+  status?: string
 }
 
-async function publishToTwitter(post: Post, _account: SocialAccount): Promise<{ success: boolean; error?: string }> {
-  console.log(`[Publisher] Publishing to Twitter`, {
-    postId: post.id,
-    draftId: post.draft_id,
-    content: post.content?.slice(0, 100),
-    mediaCount: post.media_urls?.length || 0,
-  })
-  return { success: true }
-}
-
-async function publishToInstagram(post: Post, _account: SocialAccount): Promise<{ success: boolean; error?: string }> {
-  console.log(`[Publisher] Publishing to Instagram`, {
-    postId: post.id,
-    draftId: post.draft_id,
-    content: post.content?.slice(0, 100),
-    mediaCount: post.media_urls?.length || 0,
-  })
-  return { success: true }
-}
-
-async function publishToFacebook(post: Post, _account: SocialAccount): Promise<{ success: boolean; error?: string }> {
-  console.log(`[Publisher] Publishing to Facebook`, {
-    postId: post.id,
-    draftId: post.draft_id,
-    content: post.content?.slice(0, 100),
-  })
-  return { success: true }
-}
-
-async function publishToThreads(post: Post, _account: SocialAccount): Promise<{ success: boolean; error?: string }> {
-  console.log(`[Publisher] Publishing to Threads`, {
-    postId: post.id,
-    draftId: post.draft_id,
-    content: post.content?.slice(0, 100),
-  })
-  return { success: true }
+async function publishToTwitter(_post: Post, _account: SocialAccount): Promise<{ success: boolean; error?: string }> {
+  return { success: false, error: "Twitter/X API is paid. Not implemented." }
 }
 
 export async function publishToPlatform(
   post: Post,
   account: SocialAccount
-): Promise<{ success: boolean; error?: string }> {
-  const platformPublishers: Record<string, (post: Post, account: SocialAccount) => Promise<{ success: boolean; error?: string }>> = {
+): Promise<{ success: boolean; error?: string; post_url?: string }> {
+  const platformPublishers: Record<string, (post: Post, account: SocialAccount) => Promise<{ success: boolean; error?: string; post_url?: string }>> = {
     twitter: publishToTwitter,
     instagram: publishToInstagram,
     facebook: publishToFacebook,
@@ -65,9 +38,7 @@ export async function publishToPlatform(
 
   const publisher = platformPublishers[account.platform]
   if (!publisher) {
-    const msg = `Unknown platform: ${account.platform}`
-    console.error(`[Publisher] ${msg}`)
-    return { success: false, error: msg }
+    return { success: false, error: `Unknown platform: ${account.platform}` }
   }
 
   return publisher(post, account)
