@@ -123,21 +123,34 @@ Panjang total: 500-800 kata`
         break
 
       case "gambar":
-        prompt = `Buatkan 1 prompt untuk AI image generator (Midjourney/DALL-E) berdasarkan judul artikel berikut:
+        const categoryGambar = existingData?.category || "Tips"
+        const categoryRules: Record<string, string> = {
+          "Tips": "- Fokus pada kendaraan roadtrip di jalan pedesaan/pegunungan Indonesia\n- Latar: sawah, perkebunan teh, gunung berapi, hutan tropis\n- Jangan sertakan warung, toko, candi, orang, bangunan komersial",
+          "Destinasi": "- Fokus pada pemandangan alam destinasi wisata Indonesia\n- Latar: pantai tropis, gunung, danau, air terjun khas Indonesia\n- Jangan sertakan bangunan modern, candi, mall",
+          "Kuliner": "- Fokus pada makanan tradisional Indonesia\n- Latar: daun pisang, cobek, tampah, gentong tanah liat\n- Jangan sertakan restoran mewah, orang makan",
+          "Review": "- Fokus pada produk/barang dengan latar penggunaan di Indonesia\n- Latar: garasi tradisional, rumah joglo, pedesaan\n- Jangan sertakan studio foto, orang",
+          "Inspirasi": "- Fokus pada panorama alam epik Indonesia\n- Latar: pegunungan, pantai, matahari terbit/terbenam khas tropis\n- Jangan sertakan bangunan, orang, kendaraan",
+          "Tutorial": "- Fokus pada alat/bahan dengan latar Indonesia\n- Latar: meja kayu, latar pedesaan/pegunungan tropis\n- Jangan sertakan orang, bangunan modern",
+          "Perawatan Mobil": "- Fokus pada mobil/aksesoris mobil di lingkungan tropis Indonesia\n- Latar: bengkel tradisional, jalan pedesaan, halaman rumah\n- Jangan sertakan showroom, gedung modern, orang",
+        }
+
+        prompt = `Buatkan 1 prompt untuk AI image generator (Midjourney/DALL-E) berdasarkan:
 
 Judul: "${existingData?.title || topic}"
-Kategori: ${existingData?.category || "Tips"}
+Kategori: ${categoryGambar}
 
-Aturan:
+Aturan spesifik untuk ${categoryGambar}:
+${categoryRules[categoryGambar] || categoryRules["Tips"]}
+
+Aturan umum:
 - Output HANYA teks prompt, tanpa penjelasan lain
-- Gunakan Bahasa Inggris untuk prompt utama (Midjourney lebih optimal dengan English)
-- WAJIB: Buat prompt yang menghasilkan gambar bernuansa Indonesia (tropis, vegetasi Indonesia, arsitektur tradisional)
+- Gunakan Bahasa Inggris untuk prompt utama
+- WAJIB bernuansa Indonesia (tropis, vegetasi Indonesia)
 - JANGAN buat prompt yang terlihat seperti lokasi luar negeri (Eropa, Jepang, Amerika, dll)
-- Sertakan ciri khas Indonesia: sawah, gunung berapi, pantai tropis, pohon kelapa, candi, pasar tradisional, batik
-- Sertakan: subjek utama, lingkungan/setting, pencahayaan, suasana, gaya visual
-- Format yang cocok untuk Midjourney (deskriptif, detail, tidak terlalu pendek)
-- Jangan gunakan --ar atau parameter teknis Midjourney
-- Prompt length: 50-100 kata`
+- JANGAN sertakan: warung, toko, pedagang, payung, tenda, candi, kuil, masjid, gereja, bangunan religius
+- Gaya: cinematic, golden hour, photorealistic, high detail
+- Format deskriptif, detail, 50-100 kata
+- Jangan gunakan --ar atau parameter teknis Midjourney`
         break
 
       case "seo":
