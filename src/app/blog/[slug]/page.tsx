@@ -4,8 +4,6 @@ import type { Metadata } from "next"
 import { SITE_NAME, SITE_URL } from "@/lib/constants"
 import { getPosts, getPostBySlug } from "@/lib/services/blog"
 import { Breadcrumb } from "@/components/ui/Breadcrumb"
-
-export const dynamic = "force-dynamic"
 import { BlogImage } from "@/components/ui/BlogImage"
 import { SpotCard } from "@/components/spot/SpotCard"
 import { RoadtripCard } from "@/components/roadtrip/RoadtripCard"
@@ -13,6 +11,8 @@ import { getSpots } from "@/lib/services/spots"
 import { getItineraries } from "@/lib/services/itineraries"
 import type { Itinerary } from "@/types"
 import DOMPurify from "isomorphic-dompurify"
+
+export const dynamic = "force-dynamic"
 
 function isHtmlContent(str: string): boolean {
   return /<[a-z][\s\S]*>/i.test(str)
