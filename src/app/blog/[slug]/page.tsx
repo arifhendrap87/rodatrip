@@ -20,10 +20,6 @@ function isHtmlContent(str: string): boolean {
   return /<[a-z][\s\S]*>/i.test(str)
 }
 
-export async function generateStaticParams() {
-  const posts = await getPosts()
-  return posts.map((post) => ({ slug: post.slug }))
-}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
