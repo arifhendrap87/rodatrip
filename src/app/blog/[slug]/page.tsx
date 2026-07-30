@@ -113,7 +113,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
         <div className="mt-10 prose prose-gray max-w-none">
           {isHtmlContent(post.content) ? (
-            <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }} />
+            <div dangerouslySetInnerHTML={{ __html: (() => { try { return DOMPurify.sanitize(post.content) } catch { return post.content.replace(/<[^>]+>/g, "").slice(0, 500) } })() }} />
           ) : (
             post.content.split("\n").map((line, i) => {
               if (line.startsWith("## ")) return <h2 key={i} className="text-xl font-bold font-heading mt-8 mb-3">{line.replace("## ", "")}</h2>
