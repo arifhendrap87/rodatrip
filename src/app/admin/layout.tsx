@@ -28,6 +28,7 @@ import {
   CheckCircle,
   Calendar,
   ChevronRight,
+  AtSign,
 } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useState } from "react"
@@ -76,6 +77,7 @@ export default function AdminLayout({
     { href: `${ADMIN_PATH ? ADMIN_PATH + "/content-generator/drafts" : "/admin/content-generator/drafts"}`, label: "Konsep", icon: FileText },
     { href: `${ADMIN_PATH ? ADMIN_PATH + "/content-generator/calendar" : "/admin/content-generator/calendar"}`, label: "Kalender", icon: Calendar },
     { href: `${ADMIN_PATH ? ADMIN_PATH + "/prompt-generator" : "/admin/prompt-generator"}`, label: "Prompt GPT", icon: Sparkles },
+    { href: `${ADMIN_PATH ? ADMIN_PATH + "/social" : "/admin/social"}`, label: "Social", icon: AtSign },
   ]},
   { label: "Data & Analitik", items: [
     { href: `${ADMIN_PATH ? ADMIN_PATH + "/content-readiness" : "/admin/content-readiness"}`, label: "Kesiapan", icon: CheckCircle },
