@@ -12,6 +12,17 @@ interface ImportResult {
   spots: { stopNumber: number; name: string; slug: string; status: string }[]
 }
 
+function buildMapsEmbedUrl(stops: Array<{ name: string }>): string {
+  if (stops.length < 2) return ""
+  const names = stops.map((s) => encodeURIComponent(s.name || ""))
+  const first = names[0]
+  const last = names[names.length - 1]
+  const middle = names.slice(1, -1)
+  let url = `https://www.google.com/maps/dir/?api=1&origin=${first}&destination=${last}&travelmode=driving`
+  if (middle.length > 0) url += `&waypoints=${middle.join("|")}`
+  return url
+}
+
 export default function ImportRoadtripPage() {
   const router = useRouter()
   const [jsonInput, setJsonInput] = useState("")
@@ -61,6 +72,26 @@ export default function ImportRoadtripPage() {
       }
       setSpotStatuses(map)
     } catch { /* ignore */ }
+  }
+
+  function handleStopNameChange(index: number, newName: string) {
+    setParsed((prev) => {
+      if (!prev) return prev
+      const stops = (prev.stops as Record<string, unknown>[]).map((stop, i) =>
+        i === index ? { ...stop, name: newName } : stop
+      )
+      const mapsEmbedUrl = buildMapsEmbedUrl(stops as { name: string }[])
+      return {
+        ...prev,
+        stops,
+        maps_embed_url: mapsEmbedUrl || (prev.maps_embed_url as string) || "",
+      }
+    })
+  }
+
+  function handleStopBlur() {
+    if (!parsed) return
+    checkSpotExistence(parsed.stops as Record<string, unknown>[])
   }
 
   async function handleSubmit() {
@@ -181,7 +212,7 @@ export default function ImportRoadtripPage() {
             </Card>
           ) : parsed ? (
             <>
-              <PreviewCard parsed={parsed} spotStatuses={spotStatuses} />
+              <PreviewCard parsed={parsed} spotStatuses={spotStatuses} onStopNameChange={handleStopNameChange} onStopBlur={handleStopBlur} />
 
               {error && (
                 <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
@@ -207,9 +238,21 @@ export default function ImportRoadtripPage() {
   )
 }
 
-function PreviewCard({ parsed, spotStatuses }: { parsed: Record<string, unknown>; spotStatuses: Map<number, { name: string; exists: boolean; matchType?: string; duplicateName?: string }> }) {
+function PreviewCard({
+  parsed,
+  spotStatuses,
+  onStopNameChange,
+  onStopBlur,
+}: {
+  parsed: Record<string, unknown>
+  spotStatuses: Map<number, { name: string; exists: boolean; matchType?: string; duplicateName?: string }>
+  onStopNameChange: (index: number, name: string) => void
+  onStopBlur: () => void
+}) {
   const p = parsed as Record<string, string>
   const stops = (parsed.stops as Array<Record<string, string>>) || []
+  const routeText = stops.map((s) => s.name || "(tanpa nama)").join(" → ")
+  const mapsUrl = buildMapsEmbedUrl(stops as { name: string }[])
 
   return (
     <div className="space-y-4">
@@ -233,6 +276,27 @@ function PreviewCard({ parsed, spotStatuses }: { parsed: Record<string, unknown>
           {p.maps_embed_url && (
             <div className="rounded-lg bg-blue-50 border border-blue-100 p-2 text-xs text-blue-600 truncate">
               📍 {p.maps_embed_url}
+            </div>
+          )}
+
+          {stops.length > 0 && (
+            <div className="rounded-lg bg-primary/5 border border-primary/20 p-3 space-y-1.5">
+              <p className="text-xs font-semibold text-foreground uppercase tracking-wide">
+                📍 Rute
+              </p>
+              <p className="text-sm text-foreground leading-relaxed break-words">
+                {routeText}
+              </p>
+              {mapsUrl && (
+                <a
+                  href={mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                >
+                  Buka Rute di Google Maps ↗
+                </a>
+              )}
             </div>
           )}
 
@@ -260,7 +324,13 @@ function PreviewCard({ parsed, spotStatuses }: { parsed: Record<string, unknown>
                     )}
                     <div className="min-w-0 flex-1 break-words">
                       <div className="flex flex-wrap items-center gap-1.5">
-                        <p className="text-sm font-medium">{stop.name || "(tanpa nama)"}</p>
+                        <input
+                          value={stop.name || ""}
+                          onChange={(e) => onStopNameChange(i, e.target.value)}
+                          onBlur={onStopBlur}
+                          className="min-w-0 flex-1 bg-transparent text-sm font-medium border-b border-dashed border-muted-foreground/30 focus:outline-none focus:border-primary focus:border-solid"
+                          placeholder="Nama destinasi"
+                        />
                         {stop.category && <span className="text-[10px] uppercase px-1.5 py-0.5 rounded bg-muted text-muted-foreground">{stop.category}</span>}
                       </div>
                       <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground mt-1">
