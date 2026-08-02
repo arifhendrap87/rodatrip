@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { ArrowLeft, Loader2, CheckCircle, XCircle, AlertTriangle } from "lucide-react"
+import { ArrowLeft, Loader2, CheckCircle, XCircle, AlertTriangle, Trash2 } from "lucide-react"
 
 interface ImportResult {
   itinerary: { id: string; slug: string; status: string }
@@ -92,6 +92,16 @@ export default function ImportRoadtripPage() {
   function handleStopBlur() {
     if (!parsed) return
     checkSpotExistence(parsed.stops as Record<string, unknown>[])
+  }
+
+  function handleStopDelete(index: number) {
+    if (!parsed) return
+    const stops = (parsed.stops as Record<string, unknown>[]).filter((_, i) => i !== index)
+    const mapsEmbedUrl = buildMapsEmbedUrl(stops as { name: string }[])
+    setParsed((prev) =>
+      prev ? { ...prev, stops, maps_embed_url: mapsEmbedUrl || "" } : prev
+    )
+    checkSpotExistence(stops)
   }
 
   async function handleSubmit() {
@@ -212,7 +222,7 @@ export default function ImportRoadtripPage() {
             </Card>
           ) : parsed ? (
             <>
-              <PreviewCard parsed={parsed} spotStatuses={spotStatuses} onStopNameChange={handleStopNameChange} onStopBlur={handleStopBlur} />
+              <PreviewCard parsed={parsed} spotStatuses={spotStatuses} onStopNameChange={handleStopNameChange} onStopBlur={handleStopBlur} onStopDelete={handleStopDelete} />
 
               {error && (
                 <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
@@ -243,11 +253,13 @@ function PreviewCard({
   spotStatuses,
   onStopNameChange,
   onStopBlur,
+  onStopDelete,
 }: {
   parsed: Record<string, unknown>
   spotStatuses: Map<number, { name: string; exists: boolean; matchType?: string; duplicateName?: string }>
   onStopNameChange: (index: number, name: string) => void
   onStopBlur: () => void
+  onStopDelete: (index: number) => void
 }) {
   const p = parsed as Record<string, string>
   const stops = (parsed.stops as Array<Record<string, string>>) || []
@@ -344,6 +356,15 @@ function PreviewCard({
                       {stop.tips && <p className="text-xs text-muted-foreground mt-0.5">💡 {stop.tips}</p>}
                       {stop.facilities && <div className="flex flex-wrap gap-1 mt-1">{String(stop.facilities).split(",").map((f: string) => <span key={f} className="rounded bg-muted px-1.5 py-0.5 text-[10px]">{f.trim()}</span>)}</div>}
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => onStopDelete(i)}
+                      disabled={stops.length <= 1}
+                      className="shrink-0 self-start rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-30 disabled:pointer-events-none"
+                      title={stops.length <= 1 ? "Minimal 1 destinasi" : "Hapus destinasi"}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                   </div>
                 )
               })}
