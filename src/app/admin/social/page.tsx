@@ -39,10 +39,13 @@ export default function SocialAccountsPage() {
         toast.success("Instagram juga terhubung!")
       }
     }
+    if (connected === "threads") {
+      toast.success("Threads berhasil dihubungkan!")
+    }
 
     if (error === "no_page") toast.error("Tidak ditemukan Facebook Page. Buat Page dulu.")
-    if (error === "no_code" || error === "token_exchange_failed" || error === "callback_failed") {
-      toast.error("Gagal menghubungkan Facebook. Coba lagi.")
+    if (error === "no_code" || error === "token_exchange_failed" || error === "callback_failed" || error === "no_account") {
+      toast.error("Gagal menghubungkan akun. Coba lagi.")
     }
 
     fetchAccounts()
@@ -68,7 +71,7 @@ export default function SocialAccountsPage() {
     if (platformId === "facebook") {
       window.location.href = "/api/admin/social/auth/facebook"
     } else if (platformId === "threads") {
-      toast.info("Koneksi Threads akan menyusul setelah Meta App disetup")
+      window.location.href = "/api/admin/social/auth/threads"
     } else if (platformId === "instagram") {
       toast.info("Instagram akan otomatis terhubung setelah Facebook Page dikoneksikan")
     }

@@ -34,18 +34,30 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 import Link from "next/link"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 const PLATFORM_ICONS: Record<string, any> = {
   facebook: MessageCircle,
   instagram: Camera,
   tiktok: Music2,
+  threads: MessageCircle,
+  twitter: MessageCircle,
 }
 
 const PLATFORM_LABELS: Record<string, string> = {
   facebook: "Facebook",
   instagram: "Instagram",
   tiktok: "TikTok",
+  threads: "Threads",
+  twitter: "Twitter / X",
 }
+
+const SCHEDULE_PLATFORMS = [
+  { id: "instagram", label: "Instagram", note: "" },
+  { id: "threads", label: "Threads", note: "" },
+  { id: "facebook", label: "Facebook", note: "" },
+  { id: "twitter", label: "Twitter / X", note: "Berbayar (min $100/bulan)" },
+]
 
 const TONE_LABELS: Record<string, string> = {
   promo: "Promo",
@@ -96,6 +108,10 @@ export default function DraftsPage() {
   const [slideImageUpdating, setSlideImageUpdating] = useState<Set<number>>(new Set())
   const [scheduleId, setScheduleId] = useState<string | null>(null)
   const [scheduleDate, setScheduleDate] = useState("")
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false)
+  const [scheduleModalDraft, setScheduleModalDraft] = useState<Draft | null>(null)
+  const [scheduleDateTime, setScheduleDateTime] = useState("")
+  const [schedulePlatforms, setSchedulePlatforms] = useState<string[]>(["instagram"])
 
   useEffect(() => {
     setOffset(0)
@@ -151,8 +167,64 @@ export default function DraftsPage() {
     setSaving(false)
   }
 
-  function handleCopy(text: string, id: string) {
-    navigator.clipboard.writeText(text)
+  function openSchedule(draft: Draft) {
+    setScheduleModalDraft(draft)
+    setScheduleDateTime(draft.scheduled_at ? draft.scheduled_at.substring(0, 16) : "")
+    setSchedulePlatforms(["instagram"])
+    setScheduleModalOpen(true)
+  }
+
+  async function handleSaveSchedule() {
+    if (!scheduleModalDraft) return
+    if (!scheduleDateTime) { toast.error("Pilih tanggal & jam dulu"); return }
+    const validPlatforms = schedulePlatforms.filter((p) => p !== "twitter")
+    if (validPlatforms.length === 0) { toast.error("Pilih minimal 1 platform (selain Twitter)"); return }
+
+    setSaving(true)
+    let successCount = 0
+    const errors: string[] = []
+
+    for (const platform of validPlatforms) {
+      try {
+        const res = await fetch("/api/admin/social/schedule", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ draft_id: scheduleModalDraft.id, platform, scheduled_at: new Date(scheduleDateTime).toISOString() }),
+        })
+        if (res.ok) successCount++
+        else {
+          const j = await res.json()
+          errors.push(`${PLATFORM_LABELS[platform]}: ${j?.error?.message || "Gagal"}`)
+        }
+      } catch {
+        errors.push(`${PLATFORM_LABELS[platform]}: Gagal`)
+      }
+    }
+
+    if (successCount > 0) {
+      try {
+        await fetch("/api/admin/content-generator/drafts", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: scheduleModalDraft.id, scheduled_at: new Date(scheduleDateTime).toISOString() }),
+        })
+      } catch { /* ignore */ }
+      setDrafts((prev) => prev.map((d) => d.id === scheduleModalDraft.id ? { ...d, scheduled_at: new Date(scheduleDateTime).toISOString() } : d))
+    }
+
+    if (successCount > 0 && errors.length === 0) {
+      toast.success(`Terjadwal ke ${successCount} platform!`)
+      setScheduleModalOpen(false)
+    } else if (successCount > 0) {
+      toast.success(`${successCount} terjadwal, ${errors.length} gagal`)
+      setScheduleModalOpen(false)
+    } else {
+      toast.error(errors[0] || "Gagal menjadwalkan")
+    }
+    setSaving(false)
+  }
+
+  function handleCopy(text: string, id: string) {    navigator.clipboard.writeText(text)
     setCopied(id)
     setTimeout(() => setCopied(null), 2000)
     toast.success("Tersalin!")
@@ -440,7 +512,7 @@ export default function DraftsPage() {
                                 </div>
                               ) : (
                                 <Button variant="ghost" size="sm" className="h-8 text-xs gap-1" disabled={saving}
-                                  onClick={() => { setScheduleId(draft.id); setScheduleDate(draft.scheduled_at ? draft.scheduled_at.substring(0, 10) : new Date().toISOString().substring(0, 10)) }}>
+                                  onClick={() => openSchedule(draft)}>
                                   📅 Jadwalkan
                                 </Button>
                               )}
@@ -489,7 +561,7 @@ export default function DraftsPage() {
                                 </div>
                               ) : (
                                 <Button variant="ghost" size="sm" className="h-8 text-xs gap-1" disabled={saving}
-                                  onClick={() => { setScheduleId(draft.id); setScheduleDate(draft.scheduled_at ? draft.scheduled_at.substring(0, 10) : new Date().toISOString().substring(0, 10)) }}>
+                                  onClick={() => openSchedule(draft)}>
                                   📅 Jadwalkan
                                 </Button>
                               )}
@@ -530,6 +602,72 @@ export default function DraftsPage() {
           )}
         </>
       )}
+
+      <Dialog open={scheduleModalOpen} onOpenChange={setScheduleModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-base font-heading">Jadwalkan Publikasi</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {scheduleModalDraft && (
+              <p className="text-sm text-muted-foreground line-clamp-1">{scheduleModalDraft.title}</p>
+            )}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium text-muted-foreground">Tanggal & Jam</Label>
+              <Input
+                type="datetime-local"
+                value={scheduleDateTime}
+                onChange={(e) => setScheduleDateTime(e.target.value)}
+                className="h-10"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium text-muted-foreground">Platform Tujuan</Label>
+              <div className="grid gap-2">
+                {SCHEDULE_PLATFORMS.map((p) => {
+                  const isTwitter = p.id === "twitter"
+                  const active = schedulePlatforms.includes(p.id)
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      disabled={isTwitter}
+                      onClick={() => {
+                        setSchedulePlatforms((prev) =>
+                          active ? prev.filter((x) => x !== p.id) : [...prev, p.id]
+                        )
+                      }}
+                      className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-left transition-colors ${
+                        isTwitter
+                          ? "opacity-50 border-border cursor-not-allowed"
+                          : active
+                          ? "border-primary bg-primary/5"
+                          : "border-border/60 hover:bg-muted/40"
+                      }`}
+                    >
+                      <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
+                        active && !isTwitter ? "border-primary bg-primary" : "border-border"
+                      }`}>
+                        {active && !isTwitter && <Check className="h-3 w-3 text-primary-foreground" />}
+                      </span>
+                      <span className="text-sm font-medium">{p.label}</span>
+                      {p.note && <span className="text-[10px] text-muted-foreground ml-auto">{p.note}</span>}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+            <div className="flex gap-2 pt-1">
+              <Button variant="outline" className="flex-1" onClick={() => setScheduleModalOpen(false)}>
+                Batal
+              </Button>
+              <Button className="flex-1" onClick={handleSaveSchedule} disabled={saving}>
+                {saving ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Menyimpan...</> : "Jadwalkan"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

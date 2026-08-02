@@ -29,7 +29,7 @@ export async function publishToInstagram(
 
   const { data: draft } = await db
     .from("content_drafts")
-    .select("caption, title, hashtags, slide_images, image_prompts, concept_type")
+    .select("caption, title, hashtags, slide_images, image_prompts, concept_type, source_id, source_type")
     .eq("id", post.draft_id)
     .single()
 
@@ -51,6 +51,20 @@ export async function publishToInstagram(
       imageUrl = firstSlide
     } else if (typeof firstSlide?.url === "string") {
       imageUrl = firstSlide.url as string
+    }
+  }
+
+  if (!imageUrl && draft.source_type === "spot" && draft.source_id) {
+    const { data: spot } = await db
+      .from("spots")
+      .select("image_url, images")
+      .eq("slug", draft.source_id)
+      .maybeSingle()
+
+    if (spot?.image_url) {
+      imageUrl = spot.image_url as string
+    } else if (Array.isArray(spot?.images) && (spot.images as string[]).length > 0) {
+      imageUrl = (spot.images as string[])[0]
     }
   }
 
