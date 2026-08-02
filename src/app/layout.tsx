@@ -16,8 +16,13 @@ export const metadata: Metadata = {
   },
   description: SITE_DESCRIPTION,
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
+    icon: [
+      { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon.png", sizes: "32x32", type: "image/png" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: "/apple-icon.png",
+    shortcut: "/favicon.png",
   },
   verification: {
     google: "tXxWuZ6oM4Q4qDpy3d_ezqhSnXt_TU6KX1Qj_jDXGA4",
