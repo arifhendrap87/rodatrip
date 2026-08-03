@@ -45,7 +45,7 @@ export async function POST(request: Request) {
           ...messages.map((m: Message) => ({ role: m.role, content: m.content })),
         ],
         temperature: 0.7,
-        max_tokens: 2048,
+        max_tokens: 4096,
       }),
     })
 

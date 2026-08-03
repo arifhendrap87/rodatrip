@@ -18,13 +18,13 @@ async function callDeepSeek(prompt: string): Promise<string> {
       "Authorization": `Bearer ${API_KEY}`,
     },
     body: JSON.stringify({
-      model: "deepseek-v4-flash",
+      model: "deepseek-v4-pro",
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: prompt },
       ],
       temperature: 0.7,
-      max_tokens: 2048,
+      max_tokens: 8000,
     }),
   })
 

@@ -20,7 +20,7 @@ async function callDeepSeek(prompt: string): Promise<string> {
         { role: "user", content: prompt },
       ],
       temperature: 0.8,
-      max_tokens: 2048,
+      max_tokens: 8000,
     }),
   })
   const data = await res.json()
