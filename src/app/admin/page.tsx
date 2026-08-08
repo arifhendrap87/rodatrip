@@ -3,6 +3,8 @@ import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { MapPin, ShoppingBag, Map, Mail, Eye, ArrowRight, ImageIcon } from "lucide-react"
 
+export const dynamic = "force-dynamic"
+
 async function getStats() {
   try {
     const { count: spots } = await db.from("spots").select("*", { count: "exact", head: true }).limit(1)

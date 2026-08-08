@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Logo } from "@/components/icons"
 import { NAV_LINKS, SITE_NAME } from "@/lib/constants"
+import { fetchSettings } from "@/lib/client-settings"
 import { cn } from "@/lib/utils"
 import { Home, MapPin, Route, FileText } from "lucide-react"
 
@@ -27,10 +28,9 @@ export function Navbar() {
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener("scroll", onScroll, { passive: true })
-    fetch("/api/settings")
-      .then((r) => r.json())
-      .then((json) => {
-        if (json.data?.site_name) setSiteName(json.data.site_name)
+    fetchSettings()
+      .then((d) => {
+        if (d.site_name) setSiteName(d.site_name)
       })
       .catch(() => {})
     fetch("/api/auth/session")

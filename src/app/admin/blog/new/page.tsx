@@ -25,6 +25,39 @@ function generateSlug(title: string) {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
 }
 
+function normalizeKeywords(title: string): Set<string> {
+  const stopwords = new Set(["yang", "dan", "di", "ke", "dari", "untuk", "dengan", "saat", "ini", "itu", "pada", "atau", "juga", "sebelum", "setelah", "wajib", "perlu", "agar", "supaya"])
+  const words = title
+    .toLowerCase()
+    .replace(/[0-9]+/g, " ")
+    .replace(/[^\p{L}\s]/gu, " ")
+    .split(/\s+/)
+    .filter((w) => w.length > 2 && !stopwords.has(w))
+  return new Set(words)
+}
+
+function isDuplicateIdea(title: string, existingTitles: string[]): { duplicate: boolean; matchedWith?: string } {
+  const ideaKeywords = normalizeKeywords(title)
+  if (ideaKeywords.size === 0) return { duplicate: false }
+
+  for (const existing of existingTitles) {
+    const existingKeywords = normalizeKeywords(existing)
+    if (existingKeywords.size === 0) continue
+
+    if (ideaKeywords.size === existingKeywords.size && [...ideaKeywords].every((k) => existingKeywords.has(k))) {
+      return { duplicate: true, matchedWith: existing }
+    }
+
+    const overlap = [...ideaKeywords].filter((k) => existingKeywords.has(k)).length
+    const smallerSize = Math.min(ideaKeywords.size, existingKeywords.size)
+    if (smallerSize > 0 && overlap >= Math.max(2, Math.ceil(smallerSize * 0.6))) {
+      return { duplicate: true, matchedWith: existing }
+    }
+  }
+
+  return { duplicate: false }
+}
+
 export default function NewBlogPage() {
   const router = useRouter()
   const [saving, setSaving] = useState(false)
@@ -65,11 +98,19 @@ export default function NewBlogPage() {
   async function handleGenerateIde() {
     setGeneratingIde(true)
     try {
-      const existingRes = await fetch("/api/admin/blog?limit=100")
-      const existingJson = await existingRes.json()
-      const existingTitles = (
-        existingJson.data?.posts || []
-      ).map((b: any) => b.title).filter(Boolean)
+      const existingTitles: string[] = []
+      let offset = 0
+      const limit = 100
+      while (true) {
+        const existingRes = await fetch(`/api/admin/blog?limit=${limit}&offset=${offset}`)
+        const existingJson = await existingRes.json()
+        const posts = existingJson.data?.posts || []
+        if (posts.length === 0) break
+        existingTitles.push(...posts.map((b: any) => b.title).filter(Boolean))
+        if (existingJson.data?.pagination?.hasMore === false) break
+        if (posts.length < limit) break
+        offset += limit
+      }
 
       const res = await fetch("/api/ai/generate-blog", {
         method: "POST",
@@ -82,9 +123,24 @@ export default function NewBlogPage() {
       const text = json.data?.text || ""
       const match = text.match(/\[[\s\S]*\]/)
       if (match) {
-        const ideas = JSON.parse(match[0])
-        setIdeResults(ideas)
-        toast.success(`${ideas.length} ide berhasil digenerate!`)
+        const rawIdeas = JSON.parse(match[0])
+        const filtered: any[] = []
+        const dropped: { title: string; matchedWith: string }[] = []
+
+        for (const idea of rawIdeas) {
+          const { duplicate, matchedWith } = isDuplicateIdea(idea.title || "", existingTitles)
+          if (duplicate) {
+            dropped.push({ title: idea.title, matchedWith: matchedWith || "" })
+          } else {
+            filtered.push(idea)
+          }
+        }
+
+        setIdeResults(filtered)
+        if (dropped.length > 0) {
+          toast.warning(`${dropped.length} ide dibuang karena topiknya sudah ada: ${dropped.map((d) => d.title).slice(0, 2).join(", ")}${dropped.length > 2 ? "..." : ""}`)
+        }
+        toast.success(`${filtered.length} ide berhasil digenerate!`)
       } else {
         toast.error("Gagal parse ide")
       }

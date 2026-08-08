@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Logo } from "@/components/icons"
+import { fetchSettings } from "@/lib/client-settings"
 import {
   NAV_LINKS,
   SITE_NAME,
@@ -16,10 +17,8 @@ export function Footer() {
   const [social, setSocial] = useState(SOCIAL_LINKS)
 
   useEffect(() => {
-    fetch("/api/settings")
-      .then((r) => r.json())
-      .then((json) => {
-        const d = json.data || {}
+    fetchSettings()
+      .then((d) => {
         if (d.site_name) setSiteName(d.site_name)
         setSocial({
           instagram: d.instagram_url || SOCIAL_LINKS.instagram,

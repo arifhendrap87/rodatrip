@@ -1,7 +1,7 @@
+import { unstable_cache } from "next/cache"
 import { getItineraries } from "@/lib/services/itineraries"
 import { getSpots } from "@/lib/services/spots"
 import { getPosts } from "@/lib/services/blog"
-import { db } from "@/lib/services/db"
 import { Hero } from "@/components/landing/Hero"
 import { LandingMap } from "@/components/landing/LandingMap"
 import { SectionDivider } from "@/components/ui/SectionDivider"
@@ -10,20 +10,25 @@ import { FeaturedRoadtrips } from "@/components/landing/FeaturedRoadtrips"
 import { BlogSection } from "@/components/landing/BlogSection"
 import { MusicPlayer } from "@/components/landing/MusicPlayer"
 
-export default async function LandingPage() {
-  const [itineraries, featuredSpots, blogPosts] = await Promise.all([
-    getItineraries({ published: true, limit: 6 }),
-    getSpots({ published: true, limit: 8 }),
-    getPosts({ limit: 6 }),
-  ])
+const getHomeData = unstable_cache(
+  async () => {
+    const [itineraries, featuredSpots, blogPosts] = await Promise.all([
+      getItineraries({ published: true, limit: 6 }),
+      getSpots({ published: true, limit: 8 }),
+      getPosts({ limit: 6 }),
+    ])
+    return { itineraries, featuredSpots, blogPosts }
+  },
+  ["home-page-data"],
+  { revalidate: 300 }
+)
 
-  const totalSpotsResult = await db
-    .from("spots")
-    .select("id", { count: "exact", head: true })
+export default async function LandingPage() {
+  const { itineraries, featuredSpots, blogPosts } = await getHomeData()
 
   const stats = {
     roadtrips: itineraries.length,
-    spots: totalSpotsResult.count || featuredSpots.data.length,
+    spots: featuredSpots.total,
   }
 
   const mapSpots = featuredSpots.data.map((s) => ({

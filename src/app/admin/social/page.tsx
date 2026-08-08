@@ -1,12 +1,22 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { AtSign, Camera, MessageCircle, Loader2, ExternalLink, Trash2, CheckCircle } from "lucide-react"
 import { toast } from "sonner"
 import { useRouter, useSearchParams } from "next/navigation"
+
+export default function SocialAccountsPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Memuat...</div>}>
+      <SocialAccountsContent />
+    </Suspense>
+  )
+}
+
+function SocialAccountsContent() {
 
 interface SocialAccount {
   id: string
@@ -23,7 +33,6 @@ const PLATFORMS = [
   { id: "threads", label: "Threads", icon: AtSign, color: "text-gray-900", desc: "Posting ke Threads" },
 ]
 
-export default function SocialAccountsPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [accounts, setAccounts] = useState<SocialAccount[]>([])
