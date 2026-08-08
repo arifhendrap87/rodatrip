@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { motion, useInView } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { heroStagger, heroItem } from "@/lib/animations"
@@ -44,7 +45,15 @@ export function Hero({ initialStats }: HeroProps) {
 
   return (
     <section className="relative min-h-[85vh] flex items-center overflow-hidden">
-      <img src="/images/hero-bg.svg" alt="" className="absolute inset-0 z-0 w-full h-full object-cover" loading="eager" fetchPriority="high" />
+      <Image
+        src="/images/hero-bg-1920.webp"
+        alt=""
+        fill
+        priority
+        fetchPriority="high"
+        sizes="100vw"
+        className="absolute inset-0 z-0 object-cover"
+      />
       <div className="absolute inset-0 z-[1] bg-gradient-to-b from-black/80 via-black/60 to-black/70" />
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 py-20 lg:py-32 w-full">
         <motion.div
